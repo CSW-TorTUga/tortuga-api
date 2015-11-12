@@ -3,8 +3,10 @@ package st.ilu.rms4csw.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import st.ilu.rms4csw.controller.exception.NotFoundException;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.UserRepository;
+import st.ilu.rms4csw.util.Patch;
 
 import java.util.List;
 
@@ -34,15 +36,22 @@ public class UserController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    private User putUser(@RequestParam String id, @RequestBody User user) {
+    private User putUser(@PathVariable String id, @RequestBody User user) {
         user.setId(id);
 
         return userRepository.save(user);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    private User patchUser(@RequestParam String id, @RequestBody User user) {
-        return null;
+    private User patchUser(@PathVariable String id, @RequestBody User user) {
+        User original = userRepository.findOne(id);
+        if(original == null) {
+            throw new NotFoundException("Did not find user with the id " + id);
+        }
+
+        User patchedUser = Patch.patch(original, user);
+
+        return userRepository.save(patchedUser);
     }
 
 }

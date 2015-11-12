@@ -6,5 +6,5 @@ import st.ilu.rms4csw.model.user.Role;
 /**
  * @author Mischa Holz
  */
-public interface RoleRepository extends JpaRepository<Role, Long> {
+public interface RoleRepository extends JpaRepository<Role, String> {
 }
