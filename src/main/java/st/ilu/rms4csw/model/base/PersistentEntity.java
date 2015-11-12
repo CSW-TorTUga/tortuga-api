@@ -1,4 +1,6 @@
-package st.ilu.rms4csw.base;
+package st.ilu.rms4csw.model.base;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
@@ -17,10 +19,9 @@ public abstract class PersistentEntity implements Serializable {
     @Access(AccessType.FIELD)
     @Column(length = 32)
     @Pattern(regexp = "[0-9a-f]{32}")
-    private String id;
 
-    @Version
-    private int version = 0;
+    @JsonIgnore
+    private String id;
 
     public PersistentEntity() {
         this.id = UUID.randomUUID().toString().replace("-", "");
@@ -30,12 +31,8 @@ public abstract class PersistentEntity implements Serializable {
         return id;
     }
 
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override

@@ -1,8 +1,9 @@
 package st.ilu.rms4csw.model.user;
 
-import st.ilu.rms4csw.base.PersistentEntity;
+import st.ilu.rms4csw.model.base.PersistentEntity;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Optional;
 
 /**
@@ -35,6 +36,8 @@ public class User extends PersistentEntity {
 
     @OneToOne
     private Role role;
+
+    private Date expires;
 
     public String getLoginName() {
         return loginName;
@@ -130,5 +133,13 @@ public class User extends PersistentEntity {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public Date getExpires() {
+        return expires;
+    }
+
+    public void setExpires(Date expires) {
+        this.expires = expires;
     }
 }

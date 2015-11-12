@@ -1,30 +1,48 @@
 package st.ilu.rms4csw.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import st.ilu.rms4csw.model.user.User;
-import st.ilu.rms4csw.user.UserService;
+import st.ilu.rms4csw.repository.UserRepository;
+
+import java.util.List;
 
 /**
  * @author Mischa Holz
  */
-//@Controller
+@Controller
 @RequestMapping("/api/v1/users")
 @ResponseBody
 public class UserController {
 
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @RequestMapping
+    private List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    @RequestMapping
+    private User postUser(@RequestBody User user) {
+        return userRepository.save(user);
     }
 
     @RequestMapping("/{id}")
-    public User findOne(@PathVariable("id") String id) {
-        return userService.findOne(id);
+    private User putUser(@RequestParam String id, @RequestBody User user) {
+        user.setId(id);
+
+        return userRepository.save(user);
     }
+
+//    private User patchUser(@RequestParam String id, @RequestBody )
 
 }

@@ -1,4 +1,4 @@
-package st.ilu.rms4csw.base;
+package st.ilu.rms4csw.model.base;
 
 import java.lang.reflect.Field;
 import java.util.UUID;

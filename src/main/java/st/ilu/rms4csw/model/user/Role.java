@@ -1,6 +1,6 @@
 package st.ilu.rms4csw.model.user;
 
-import st.ilu.rms4csw.base.PersistentEntity;
+import st.ilu.rms4csw.model.base.PersistentEntity;
 
 import javax.persistence.Entity;
 
