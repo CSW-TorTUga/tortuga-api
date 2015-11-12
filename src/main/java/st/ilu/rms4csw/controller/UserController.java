@@ -2,10 +2,7 @@ package st.ilu.rms4csw.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.UserRepository;
 
@@ -31,18 +28,21 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    @RequestMapping
+    @RequestMapping(method = RequestMethod.POST)
     private User postUser(@RequestBody User user) {
         return userRepository.save(user);
     }
 
-    @RequestMapping("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     private User putUser(@RequestParam String id, @RequestBody User user) {
         user.setId(id);
 
         return userRepository.save(user);
     }
 
-//    private User patchUser(@RequestParam String id, @RequestBody )
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    private User patchUser(@RequestParam String id, @RequestBody User user) {
+        return null;
+    }
 
 }
