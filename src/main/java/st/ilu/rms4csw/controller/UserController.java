@@ -1,9 +1,11 @@
-package st.ilu.rms4csw.user;
+package st.ilu.rms4csw.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import st.ilu.rms4csw.model.user.User;
+import st.ilu.rms4csw.user.UserService;
 
 /**
  * @author Mischa Holz

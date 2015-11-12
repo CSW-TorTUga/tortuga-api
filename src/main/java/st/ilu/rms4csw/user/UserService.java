@@ -1,12 +1,13 @@
 package st.ilu.rms4csw.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import st.ilu.rms4csw.model.user.User;
+import st.ilu.rms4csw.repository.UserRepository;
 
 /**
  * @author Mischa Holz
  */
-@Service
+//@Service
 public class UserService {
 
     private UserRepository userRepository;
