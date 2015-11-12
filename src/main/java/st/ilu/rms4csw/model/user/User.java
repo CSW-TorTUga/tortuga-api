@@ -12,6 +12,7 @@ import java.util.Optional;
 @Entity(name = "rms_user")
 public class User extends PersistentEntity {
 
+    @Column(unique = true)
     private String loginName;
 
     private String firstName;
