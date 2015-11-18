@@ -1,7 +1,6 @@
 package st.ilu.rms4csw.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -12,6 +11,7 @@ import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.UserRepository;
 import st.ilu.rms4csw.util.Patch;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -37,9 +37,9 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    private ResponseEntity<User> postUser(@RequestBody User user, HttpHeaders headers) {
+    private ResponseEntity<User> postUser(@RequestBody User user, HttpServletResponse response) {
         User ret = userRepository.save(user);
-        headers.set("Location", Main.getApiBase() + API_BASE + "/" + ret.getId());
+        response.setHeader("Location", Main.getApiBase() + API_BASE + "/" + ret.getId());
 
         return new ResponseEntity<>(ret, HttpStatus.CREATED);
     }
