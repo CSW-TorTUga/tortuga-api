@@ -1,7 +1,5 @@
 package st.ilu.rms4csw.model.base;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
@@ -20,7 +18,6 @@ public abstract class PersistentEntity implements Serializable {
     @Column(length = 32)
     @Pattern(regexp = "[0-9a-f]{32}")
 
-    @JsonIgnore
     private String id;
 
     public PersistentEntity() {

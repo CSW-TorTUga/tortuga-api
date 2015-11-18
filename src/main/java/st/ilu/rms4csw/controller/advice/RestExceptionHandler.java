@@ -7,6 +7,7 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
@@ -104,12 +105,12 @@ public class RestExceptionHandler {
         return handleGeneralApiExceptions(e, response);
     }
 
-//    @ExceptionHandler(AccessDeniedException.class)
-//    @ResponseBody
-//    public ResponseEntity<ErrorResponse> handleAccessDeniedException(Exception e) {
-//        LOGGER.info("Access Denied:" + e.getMessage());
-//        return handleException(HttpStatus.FORBIDDEN, "Access Denied", e);
-//    }
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(Exception e) {
+        LOGGER.info("Access Denied:" + e.getMessage());
+        return handleException(HttpStatus.FORBIDDEN, "Access Denied", e);
+    }
 
     @ExceptionHandler(Exception.class)
     @ResponseBody

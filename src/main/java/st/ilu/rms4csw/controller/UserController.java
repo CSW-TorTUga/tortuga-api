@@ -3,6 +3,7 @@ package st.ilu.rms4csw.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.Main;
@@ -32,12 +33,13 @@ public class UserController {
     }
 
     @RequestMapping
-    private List<User> findAll() {
+    @PreAuthorize("hasAuthority('OP_TEST')")
+    public List<User> findAll() {
         return userRepository.findAll();
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    private ResponseEntity<User> postUser(@RequestBody User user, HttpServletResponse response) {
+    public ResponseEntity<User> postUser(@RequestBody User user, HttpServletResponse response) {
         User ret = userRepository.save(user);
         response.setHeader("Location", Main.getApiBase() + API_BASE + "/" + ret.getId());
 
@@ -45,14 +47,14 @@ public class UserController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    private User putUser(@PathVariable String id, @RequestBody User user) {
+    public User putUser(@PathVariable String id, @RequestBody User user) {
         user.setId(id);
 
         return userRepository.save(user);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    private User patchUser(@PathVariable String id, @RequestBody User user) {
+    public User patchUser(@PathVariable String id, @RequestBody User user) {
         User original = userRepository.findOne(id);
         if (original == null) {
             throw new NotFoundException("Did not find user with the id " + id);

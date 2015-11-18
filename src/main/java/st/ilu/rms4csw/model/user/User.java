@@ -1,6 +1,9 @@
 package st.ilu.rms4csw.model.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import st.ilu.rms4csw.model.base.PersistentEntity;
+import st.ilu.rms4csw.model.major.Major;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -25,7 +28,7 @@ public class User extends PersistentEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Enumerated(EnumType.STRING)
+    @OneToOne
     private Major major;
 
     @Access(AccessType.FIELD)
@@ -35,9 +38,10 @@ public class User extends PersistentEntity {
 
     private String password;
 
-    @OneToOne
+    @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Access(AccessType.FIELD)
     private Date expires;
 
     public String getLoginName() {
@@ -120,12 +124,13 @@ public class User extends PersistentEntity {
         this.phoneNumber = phoneNumber;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = new BCryptPasswordEncoder().encode(password);
     }
 
     public Role getRole() {
@@ -136,11 +141,19 @@ public class User extends PersistentEntity {
         this.role = role;
     }
 
-    public Date getExpires() {
-        return expires;
+    public Optional<Date> getExpires() {
+        if(expires == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(expires);
     }
 
-    public void setExpires(Date expires) {
-        this.expires = expires;
+    public void setExpires(Optional<Date> expires) {
+        if(expires.isPresent()) {
+            this.expires = expires.get();
+        } else {
+            this.expires = null;
+        }
     }
 }

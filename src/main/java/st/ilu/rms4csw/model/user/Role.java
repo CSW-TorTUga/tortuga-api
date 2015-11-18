@@ -1,32 +1,33 @@
 package st.ilu.rms4csw.model.user;
 
-import st.ilu.rms4csw.model.base.PersistentEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import javax.persistence.Entity;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Mischa Holz
  */
-@Entity
-public class Role extends PersistentEntity {
+public enum Role {
 
-    private String name;
+    ADMIN("OP_TEST"),
+    ;
 
-    private String description;
+    private String[] privileges;
 
-    public String getName() {
-        return name;
+    Role(String... privileges) {
+        this.privileges = privileges;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public Set<GrantedAuthority> getAuthorities() {
+        Set<GrantedAuthority> ret = new HashSet<>();
+        ret.add(new SimpleGrantedAuthority("ROLE_" + this.toString()));
 
-    public String getDescription() {
-        return description;
-    }
+        ret.addAll(Arrays.stream(this.privileges).map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
 
-    public void setDescription(String description) {
-        this.description = description;
+        return ret;
     }
 }
