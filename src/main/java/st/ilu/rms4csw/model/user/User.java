@@ -1,6 +1,7 @@
 package st.ilu.rms4csw.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 import st.ilu.rms4csw.model.major.Major;
@@ -129,6 +130,7 @@ public class User extends PersistentEntity {
         return password;
     }
 
+    @JsonProperty
     public void setPassword(String password) {
         this.password = new BCryptPasswordEncoder().encode(password);
     }
