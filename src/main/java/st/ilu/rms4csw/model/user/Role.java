@@ -13,6 +13,10 @@ import java.util.stream.Collectors;
  */
 public enum Role {
 
+
+    STUDENT(),
+    CSW_TEAM(),
+    LECTURER(),
     ADMIN("OP_TEST"),
     ;
 
