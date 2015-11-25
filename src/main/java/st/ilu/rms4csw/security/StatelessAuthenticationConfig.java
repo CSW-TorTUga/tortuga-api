@@ -1,6 +1,8 @@
 package st.ilu.rms4csw.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 @Order(1)
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, proxyTargetClass = true)
 public class StatelessAuthenticationConfig extends WebSecurityConfigurerAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(StatelessAuthenticationConfig.class);
 
     private TokenAuthenticationService tokenAuthenticationService;
 
@@ -68,6 +72,8 @@ public class StatelessAuthenticationConfig extends WebSecurityConfigurerAdapter 
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
                     ErrorResponse resp = new ErrorResponse(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token or no token at all");
+
+                    logger.info("Caught and handled {}", e);
 
                     new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(response.getOutputStream(), resp);
                 });
