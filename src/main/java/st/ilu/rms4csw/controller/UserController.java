@@ -53,6 +53,13 @@ public class UserController {
         return userRepository.save(user);
     }
 
+
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity deleteUser(@PathVariable String id) {
+		userRepository.delete(id);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     public User patchUser(@PathVariable String id, @RequestBody User user) {
         User original = userRepository.findOne(id);
