@@ -40,9 +40,12 @@ public class TokenAuthenticationService {
     public void addAuthentication(HttpServletResponse response, User user) {
         String strToken = tokenHandler.createTokenForUser(user, validFor);
 
-        response.addCookie(new Cookie(COOKIE_NAME, strToken));
+        Cookie cookie = new Cookie(COOKIE_NAME, strToken);
+        cookie.setPath("/");
+        cookie.setMaxAge((int) (this.validFor / 1000));
+        response.addCookie(cookie);
 
-        response.setHeader("X-Auth-Token", strToken);
+        response.setHeader("X-Next-Auth-Token", strToken);
     }
 
     public Authentication getAuthentication(HttpServletRequest request) {
