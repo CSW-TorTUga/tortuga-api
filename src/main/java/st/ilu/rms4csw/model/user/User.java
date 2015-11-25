@@ -7,6 +7,7 @@ import st.ilu.rms4csw.model.base.PersistentEntity;
 import st.ilu.rms4csw.model.major.Major;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 
@@ -157,5 +158,26 @@ public class User extends PersistentEntity {
         } else {
             this.expires = null;
         }
+    }
+
+    public static Date calculateNextSemesterEnd(Date from) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(from);
+
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+
+        if(calendar.get(Calendar.MONTH) < Calendar.APRIL) {
+            calendar.set(Calendar.MONTH, Calendar.APRIL);
+        } else if(calendar.get(Calendar.MONTH) < Calendar.OCTOBER) {
+            calendar.set(Calendar.MONTH, Calendar.OCTOBER);
+        } else {
+            int year = calendar.get(Calendar.YEAR);
+            year++;
+            calendar.set(Calendar.YEAR, year);
+
+            calendar.set(Calendar.MONTH, Calendar.APRIL);
+        }
+
+        return calendar.getTime();
     }
 }
