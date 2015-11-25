@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import st.ilu.rms4csw.controller.exception.NotFoundException;
 import st.ilu.rms4csw.controller.exception.RestException;
+import st.ilu.rms4csw.security.token.TokenException;
 import st.ilu.rms4csw.util.ErrorResponse;
 import st.ilu.rms4csw.util.ValidationError;
 
@@ -45,6 +46,12 @@ public class RestExceptionHandler {
         }
 
         return new ResponseEntity<>(new ErrorResponse(errorCode.value(), errorMessage), errorCode);
+    }
+
+    @ExceptionHandler(TokenException.class)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> tokenExceptionHandler(Exception e) {
+        return handleException(HttpStatus.UNAUTHORIZED, e.getMessage(), e);
     }
 
     @ExceptionHandler(RestException.class)
