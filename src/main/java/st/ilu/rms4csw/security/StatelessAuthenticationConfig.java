@@ -1,5 +1,6 @@
-package st.ilu.rms4csw.config;
+package st.ilu.rms4csw.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,12 +17,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
 import st.ilu.rms4csw.repository.UserRepository;
-import st.ilu.rms4csw.security.StatelessAuthenticationFilter;
-import st.ilu.rms4csw.security.StatelessLoginFilter;
-import st.ilu.rms4csw.security.TokenAuthenticationService;
-import st.ilu.rms4csw.security.UserAuthentication;
+import st.ilu.rms4csw.util.ErrorResponse;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Mischa Holz
@@ -59,9 +59,18 @@ public class StatelessAuthenticationConfig extends WebSecurityConfigurerAdapter 
 
                 .and()
 
-                .addFilterBefore(new StatelessLoginFilter("/api/v1/login", userRepository, tokenAuthenticationService, authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new StatelessLoginFilter("/api/v1/login", userRepository, tokenAuthenticationService, authenticationManager()), ExceptionTranslationFilter.class)
 
-                .addFilterBefore(new StatelessAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAfter(new StatelessAuthenticationFilter(tokenAuthenticationService), ExceptionTranslationFilter.class)
+
+                .exceptionHandling().authenticationEntryPoint((request, response, e) -> {
+                    response.setContentType("application/json");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+                    ErrorResponse resp = new ErrorResponse(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token or no token at all");
+
+                    new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(response.getOutputStream(), resp);
+                });
     }
 
     @Bean
