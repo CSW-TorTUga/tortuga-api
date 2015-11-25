@@ -42,6 +42,8 @@ public class StatelessAuthenticationConfig extends WebSecurityConfigurerAdapter 
 
     private UserRepository userRepository;
 
+    private ObjectMapper objectMapper;
+
     public StatelessAuthenticationConfig() {
         super(true);
     }
@@ -63,7 +65,7 @@ public class StatelessAuthenticationConfig extends WebSecurityConfigurerAdapter 
 
                 .and()
 
-                .addFilterAfter(new StatelessLoginFilter("/api/v1/login", userRepository, tokenAuthenticationService, authenticationManager()), ExceptionTranslationFilter.class)
+                .addFilterAfter(new StatelessLoginFilter("/api/v1/login", userRepository, tokenAuthenticationService, authenticationManager(), objectMapper), ExceptionTranslationFilter.class)
 
                 .addFilterAfter(new StatelessAuthenticationFilter(tokenAuthenticationService), ExceptionTranslationFilter.class)
 
@@ -118,5 +120,10 @@ public class StatelessAuthenticationConfig extends WebSecurityConfigurerAdapter 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 }
