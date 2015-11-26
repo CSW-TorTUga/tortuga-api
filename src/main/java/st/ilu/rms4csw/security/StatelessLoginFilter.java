@@ -31,11 +31,15 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 
     private TokenAuthenticationService tokenAuthenticationService;
 
-    public StatelessLoginFilter(String urlMapping, UserRepository userRepository, TokenAuthenticationService tokenAuthenticationService, AuthenticationManager authManager) {
+    private ObjectMapper objectMapper;
+
+    public StatelessLoginFilter(String urlMapping, UserRepository userRepository, TokenAuthenticationService tokenAuthenticationService, AuthenticationManager authManager, ObjectMapper objectMapper) {
         super(new AntPathRequestMatcher(urlMapping));
 
         this.userRepository = userRepository;
         this.tokenAuthenticationService = tokenAuthenticationService;
+
+        this.objectMapper = objectMapper;
 
         setAuthenticationManager(authManager);
     }
@@ -47,12 +51,12 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
             httpServletResponse.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
 
             ErrorResponse errorResponse = new ErrorResponse(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "You need to post login information");
-            new ObjectMapper().writeValue(httpServletResponse.getOutputStream(), errorResponse);
+            objectMapper.writeValue(httpServletResponse.getOutputStream(), errorResponse);
 
             return null;
         }
 
-        LoginRequest loginRequest = new ObjectMapper().readValue(httpServletRequest.getInputStream(), LoginRequest.class);
+        LoginRequest loginRequest = objectMapper.readValue(httpServletRequest.getInputStream(), LoginRequest.class);
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getLoginName(), loginRequest.getPassword());
 
         return getAuthenticationManager().authenticate(usernamePasswordAuthenticationToken);
@@ -61,11 +65,15 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         User user = userRepository.findOneByLoginName(authResult.getName());
+
         UserAuthentication userAuthentication = new UserAuthentication(user);
 
         tokenAuthenticationService.addAuthentication(response, user);
 
         SecurityContextHolder.getContext().setAuthentication(userAuthentication);
+
+        response.setContentType("application/json");
+        objectMapper.writeValue(response.getOutputStream(), user);
     }
 
 

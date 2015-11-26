@@ -2,6 +2,7 @@ package st.ilu.rms4csw.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 import st.ilu.rms4csw.model.major.Major;
@@ -15,6 +16,7 @@ import java.util.Optional;
  * @author Mischa Holz
  */
 @Entity(name = "rms_user")
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class User extends PersistentEntity {
 
     @Column(unique = true)

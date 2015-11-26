@@ -10,7 +10,6 @@ import st.ilu.rms4csw.repository.UserRepository;
 import st.ilu.rms4csw.security.token.Token;
 import st.ilu.rms4csw.security.token.TokenException;
 import st.ilu.rms4csw.security.token.TokenHandler;
-import st.ilu.rms4csw.security.token.TokenNotPresentException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -62,7 +61,7 @@ public class TokenAuthenticationService {
                     return value;
                 });
         if(strToken == null) {
-            throw new TokenNotPresentException("No token in either the cookie " + COOKIE_NAME + " or the header " + HttpHeaders.AUTHORIZATION);
+            throw new TokenException("No token in either the cookie " + COOKIE_NAME + " or the header " + HttpHeaders.AUTHORIZATION);
         }
 
         Token token = tokenHandler.validateToken(strToken);

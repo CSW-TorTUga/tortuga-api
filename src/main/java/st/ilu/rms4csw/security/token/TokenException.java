@@ -1,11 +1,14 @@
 package st.ilu.rms4csw.security.token;
 
+import org.springframework.security.core.AuthenticationException;
+
 /**
  * @author Mischa Holz
  */
-public class TokenException extends RuntimeException {
+public class TokenException extends AuthenticationException {
 
     public TokenException() {
+        super("");
     }
 
     public TokenException(String message) {
@@ -17,10 +20,10 @@ public class TokenException extends RuntimeException {
     }
 
     public TokenException(Throwable cause) {
-        super(cause);
+        super("", cause);
     }
 
     public TokenException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        super("");
     }
 }
