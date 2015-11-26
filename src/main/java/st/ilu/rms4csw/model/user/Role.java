@@ -15,8 +15,8 @@ public enum Role {
 
 
     STUDENT(),
-    CSW_TEAM(),
     LECTURER(),
+    CSW_TEAM(),
     ADMIN("OP_TEST"),
     ;
 
