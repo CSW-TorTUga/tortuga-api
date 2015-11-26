@@ -1,4 +1,4 @@
-package st.ilu.rms4csw.util;
+package st.ilu.rms4csw.patch;
 
 import java.lang.reflect.Field;
 

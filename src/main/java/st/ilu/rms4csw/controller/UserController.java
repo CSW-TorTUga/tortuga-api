@@ -11,7 +11,7 @@ import st.ilu.rms4csw.controller.exception.NotFoundException;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.UserRepository;
-import st.ilu.rms4csw.util.Patch;
+import st.ilu.rms4csw.patch.Patch;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;

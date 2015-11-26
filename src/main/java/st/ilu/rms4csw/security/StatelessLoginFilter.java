@@ -14,7 +14,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.UserRepository;
 import st.ilu.rms4csw.security.json.LoginRequest;
-import st.ilu.rms4csw.util.ErrorResponse;
+import st.ilu.rms4csw.patch.ErrorResponse;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

@@ -21,7 +21,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import st.ilu.rms4csw.repository.UserRepository;
-import st.ilu.rms4csw.util.ErrorResponse;
+import st.ilu.rms4csw.patch.ErrorResponse;
 
 import javax.servlet.http.HttpServletResponse;
 

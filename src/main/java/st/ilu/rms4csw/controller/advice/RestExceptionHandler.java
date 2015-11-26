@@ -21,11 +21,12 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import st.ilu.rms4csw.controller.exception.NotFoundException;
 import st.ilu.rms4csw.controller.exception.RestException;
 import st.ilu.rms4csw.security.token.TokenException;
-import st.ilu.rms4csw.util.ErrorResponse;
-import st.ilu.rms4csw.util.ValidationError;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author Mischa Holz
@@ -35,6 +36,45 @@ import javax.validation.ConstraintViolationException;
 public class RestExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RestExceptionHandler.class);
+
+    public static class ErrorResponse {
+
+        private int errorCode;
+        private String errorMessage;
+
+        public ErrorResponse(int errorCode, String errorMessage) {
+            this.errorCode = errorCode;
+            this.errorMessage = errorMessage;
+        }
+
+        public int getErrorCode() {
+            return errorCode;
+        }
+
+        public String getErrorMessage() {
+            return errorMessage;
+        }
+    }
+
+    public static class ValidationError extends ErrorResponse {
+
+        private Map<String, String> errors = new LinkedHashMap<>();
+
+        public ValidationError(ConstraintViolationException e) {
+            super(400, "Could not validate object");
+
+            for(ConstraintViolation cv : e.getConstraintViolations()) {
+                String key = cv.getPropertyPath().toString();
+                String value = cv.getMessage();
+
+                errors.put(key, value);
+            }
+        }
+
+        public Map<String, String> getErrors() {
+            return errors;
+        }
+    }
 
     private ResponseEntity<ErrorResponse> handleException(HttpStatus defaultStatus, String defaultMessage, Exception e) {
 

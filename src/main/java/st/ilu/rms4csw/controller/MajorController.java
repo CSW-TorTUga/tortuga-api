@@ -3,15 +3,13 @@ package st.ilu.rms4csw.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.Main;
 import st.ilu.rms4csw.controller.exception.NotFoundException;
 import st.ilu.rms4csw.model.major.Major;
-import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.MajorRepository;
-import st.ilu.rms4csw.util.Patch;
+import st.ilu.rms4csw.patch.Patch;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
