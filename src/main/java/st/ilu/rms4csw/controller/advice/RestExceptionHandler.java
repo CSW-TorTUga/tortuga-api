@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.TransactionSystemException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -48,6 +49,12 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(new ErrorResponse(errorCode.value(), errorMessage), errorCode);
     }
 
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> methodNotAllowedHandler(Exception e) {
+        return handleException(HttpStatus.METHOD_NOT_ALLOWED, "Method not allowed", e);
+    }
+
     @ExceptionHandler(TokenException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponse> tokenExceptionHandler(Exception e) {
@@ -63,7 +70,11 @@ public class RestExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponse> notFoundExceptionHandler(Exception e) throws Exception {
-        return handleException(HttpStatus.NOT_FOUND, "Resource not found", e);
+        String msg = e.getMessage();
+        if(msg.isEmpty()) {
+            msg = "Resource not found";
+        }
+        return handleException(HttpStatus.NOT_FOUND, msg, e);
     }
 
 
