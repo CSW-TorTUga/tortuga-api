@@ -38,6 +38,16 @@ public class UserController {
         return userRepository.findAll();
     }
 
+    @RequestMapping("/{id}")
+    public User findOne(@PathVariable String id) {
+        User ret = userRepository.findOne(id);
+        if(ret == null) {
+            throw new NotFoundException("Did not find user with id '" + id + "'");
+        }
+
+        return ret;
+    }
+
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<User> postUser(@RequestBody User user, HttpServletResponse response) {
         User ret = userRepository.save(user);
