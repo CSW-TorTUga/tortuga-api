@@ -31,6 +31,7 @@ public class User extends PersistentEntity {
     private Gender gender;
 
     @OneToOne
+    @Access(AccessType.FIELD)
     private Major major;
 
     @Access(AccessType.FIELD)
@@ -94,12 +95,16 @@ public class User extends PersistentEntity {
         }
     }
 
-    public Major getMajor() {
-        return major;
+    public Optional<Major> getMajor() {
+        return Optional.ofNullable(this.major);
     }
 
-    public void setMajor(Major major) {
-        this.major = major;
+    public void setMajor(Optional<Major> major) {
+        if(major.isPresent()) {
+            this.major = major.get();
+        } else {
+            this.major = null;
+        }
     }
 
     public Optional<Long> getStudentId() {
