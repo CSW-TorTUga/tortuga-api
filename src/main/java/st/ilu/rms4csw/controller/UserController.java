@@ -1,6 +1,7 @@
 package st.ilu.rms4csw.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -61,7 +62,7 @@ public class UserController {
 
 
         User ret = userRepository.save(user);
-        response.setHeader("Location", Main.getApiBase() + USER_API_BASE + "/" + ret.getId());
+        response.setHeader(HttpHeaders.LOCATION, Main.getApiBase() + USER_API_BASE + "/" + ret.getId());
 
         return new ResponseEntity<>(ret, HttpStatus.CREATED);
     }
