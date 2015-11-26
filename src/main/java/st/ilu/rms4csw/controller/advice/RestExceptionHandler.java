@@ -7,6 +7,7 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import st.ilu.rms4csw.controller.exception.NotFoundException;
 import st.ilu.rms4csw.controller.exception.RestException;
 import st.ilu.rms4csw.security.token.TokenException;
@@ -29,6 +31,7 @@ import javax.validation.ConstraintViolationException;
  * @author Mischa Holz
  */
 @ControllerAdvice
+@EnableWebMvc
 public class RestExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RestExceptionHandler.class);
@@ -77,11 +80,16 @@ public class RestExceptionHandler {
         return handleException(HttpStatus.NOT_FOUND, msg, e);
     }
 
-
     @ExceptionHandler(TypeMismatchException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponse> handleTypeMismatchException(Exception e) {
-        return handleException(HttpStatus.BAD_REQUEST, "Bad Request", e);
+        return handleException(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage(), e);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handleJsonMappingException(Exception e) {
+        return handleException(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage(), e);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
