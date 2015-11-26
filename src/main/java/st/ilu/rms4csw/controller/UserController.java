@@ -22,11 +22,11 @@ import java.util.Optional;
  * @author Mischa Holz
  */
 @Controller
-@RequestMapping("/api/v1/" + UserController.API_BASE)
+@RequestMapping("/api/v1/" + UserController.USER_API_BASE)
 @ResponseBody
 public class UserController {
 
-    public final static String API_BASE = "users";
+    public final static String USER_API_BASE = "users";
 
     private UserRepository userRepository;
 
@@ -41,6 +41,16 @@ public class UserController {
         return userRepository.findAll();
     }
 
+    @RequestMapping("/{id}")
+    public User findOne(@PathVariable String id) {
+        User ret = userRepository.findOne(id);
+        if(ret == null) {
+            throw new NotFoundException("Did not find user with id '" + id + "'");
+        }
+
+        return ret;
+    }
+
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<User> postUser(@RequestBody User user, HttpServletResponse response) {
 
@@ -49,8 +59,9 @@ public class UserController {
             user.setExpires(Optional.of(expires));
         }
 
+
         User ret = userRepository.save(user);
-        response.setHeader("Location", Main.getApiBase() + API_BASE + "/" + ret.getId());
+        response.setHeader("Location", Main.getApiBase() + USER_API_BASE + "/" + ret.getId());
 
         return new ResponseEntity<>(ret, HttpStatus.CREATED);
     }
