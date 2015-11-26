@@ -1,8 +1,9 @@
 package st.ilu.rms4csw.config;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+import org.postgresql.Driver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,7 +15,7 @@ import java.net.URISyntaxException;
 public class DataSourceConfig {
 
     @Bean
-    public BasicDataSource dataSource() throws URISyntaxException {
+    public SimpleDriverDataSource dataSource() throws URISyntaxException {
         String url = System.getenv("DATABASE_URL");
         if(url == null) {
             // default. if you need a different configuration for development just
@@ -29,12 +30,13 @@ public class DataSourceConfig {
         String password = dbUri.getUserInfo().split(":")[1];
         String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
 
-        BasicDataSource basicDataSource = new BasicDataSource();
-        basicDataSource.setUrl(dbUrl);
-        basicDataSource.setUsername(username);
-        basicDataSource.setPassword(password);
+        SimpleDriverDataSource driverDataSource = new SimpleDriverDataSource();
+        driverDataSource.setUrl(dbUrl);
+        driverDataSource.setUsername(username);
+        driverDataSource.setPassword(password);
+        driverDataSource.setDriverClass(Driver.class);
 
-        return basicDataSource;
+        return driverDataSource;
     }
 
 }
