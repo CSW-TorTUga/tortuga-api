@@ -60,8 +60,6 @@ public class UserController {
             user.setExpires(Optional.of(expires));
         }
 
-        // test
-
         User ret = userRepository.save(user);
         response.setHeader(HttpHeaders.LOCATION, Main.getApiBase() + USER_API_BASE + "/" + ret.getId());
 
@@ -74,7 +72,6 @@ public class UserController {
 
         return userRepository.save(user);
     }
-
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity deleteUser(@PathVariable String id) {
