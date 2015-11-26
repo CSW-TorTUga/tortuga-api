@@ -8,12 +8,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.Main;
 import st.ilu.rms4csw.controller.exception.NotFoundException;
+import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.UserRepository;
 import st.ilu.rms4csw.util.Patch;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Mischa Holz
@@ -50,6 +53,13 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<User> postUser(@RequestBody User user, HttpServletResponse response) {
+
+        if(user.getRole() == Role.STUDENT || user.getRole() == Role.LECTURER) {
+            Date expires = User.calculateNextSemesterEnd(new Date());
+            user.setExpires(Optional.of(expires));
+        }
+
+
         User ret = userRepository.save(user);
         response.setHeader("Location", Main.getApiBase() + USER_API_BASE + "/" + ret.getId());
 
@@ -62,6 +72,13 @@ public class UserController {
 
         return userRepository.save(user);
     }
+
+
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity deleteUser(@PathVariable String id) {
+		userRepository.delete(id);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     public User patchUser(@PathVariable String id, @RequestBody User user) {

@@ -1,12 +1,14 @@
 package st.ilu.rms4csw.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 import st.ilu.rms4csw.model.major.Major;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 
@@ -136,6 +138,7 @@ public class User extends PersistentEntity {
         return password;
     }
 
+    @JsonProperty
     public void setPassword(String password) {
         this.password = new BCryptPasswordEncoder().encode(password);
     }
@@ -162,5 +165,31 @@ public class User extends PersistentEntity {
         } else {
             this.expires = null;
         }
+    }
+
+    public static Date calculateNextSemesterEnd(Date from) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(from);
+
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+
+        if(calendar.get(Calendar.MONTH) < Calendar.APRIL) {
+            calendar.set(Calendar.MONTH, Calendar.APRIL);
+        } else if(calendar.get(Calendar.MONTH) < Calendar.OCTOBER) {
+            calendar.set(Calendar.MONTH, Calendar.OCTOBER);
+        } else {
+            int year = calendar.get(Calendar.YEAR);
+            year++;
+            calendar.set(Calendar.YEAR, year);
+
+            calendar.set(Calendar.MONTH, Calendar.APRIL);
+        }
+
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTime();
     }
 }
