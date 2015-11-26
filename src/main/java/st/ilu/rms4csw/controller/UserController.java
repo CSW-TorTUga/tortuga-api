@@ -60,6 +60,7 @@ public class UserController {
             user.setExpires(Optional.of(expires));
         }
 
+        // test
 
         User ret = userRepository.save(user);
         response.setHeader(HttpHeaders.LOCATION, Main.getApiBase() + USER_API_BASE + "/" + ret.getId());
