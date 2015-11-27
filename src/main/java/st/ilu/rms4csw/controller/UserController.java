@@ -46,6 +46,7 @@ public class UserController {
     public User findOne(@PathVariable String id) {
         User ret = userRepository.findOne(id);
         if(ret == null) {
+            // test
             throw new NotFoundException("Did not find user with id '" + id + "'");
         }
 
