@@ -20,8 +20,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
+import st.ilu.rms4csw.controller.advice.RestExceptionHandler;
 import st.ilu.rms4csw.repository.UserRepository;
-import st.ilu.rms4csw.patch.ErrorResponse;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -73,7 +73,7 @@ public class StatelessAuthenticationConfig extends WebSecurityConfigurerAdapter 
                     response.setContentType("application/json");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-                    ErrorResponse resp = new ErrorResponse(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token or no token at all");
+                    RestExceptionHandler.ErrorResponse resp = new RestExceptionHandler.ErrorResponse(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token or no token at all");
 
                     logger.info("Caught and handled {}", e);
 

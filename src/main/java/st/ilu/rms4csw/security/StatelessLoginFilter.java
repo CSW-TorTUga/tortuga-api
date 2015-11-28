@@ -11,10 +11,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import st.ilu.rms4csw.controller.advice.RestExceptionHandler;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.UserRepository;
 import st.ilu.rms4csw.security.json.LoginRequest;
-import st.ilu.rms4csw.patch.ErrorResponse;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -50,7 +50,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
             httpServletResponse.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
             httpServletResponse.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
 
-            ErrorResponse errorResponse = new ErrorResponse(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "You need to post login information");
+            RestExceptionHandler.ErrorResponse errorResponse = new RestExceptionHandler.ErrorResponse(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "You need to post login information");
             objectMapper.writeValue(httpServletResponse.getOutputStream(), errorResponse);
 
             return null;
