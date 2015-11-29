@@ -35,7 +35,7 @@ public class SetupUsers implements CommandLineRunner {
             user.setFirstName("Ilu");
             user.setLastName("St");
             user.setGender(Optional.empty());
-            user.setMajor(null);
+            user.setMajor(Optional.empty());
             user.setPassword("change me.");
             user.setStudentId(Optional.empty());
             user.setPhoneNumber("");
