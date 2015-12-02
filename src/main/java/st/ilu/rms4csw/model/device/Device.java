@@ -23,7 +23,7 @@ public class Device extends PersistentEntity {
     private String name;
 
     @OneToOne
-    private DeviceCategory deviceCategory;
+    private DeviceCategory category;
 
     private String description;
 
@@ -39,7 +39,7 @@ public class Device extends PersistentEntity {
     private String inventoryNumber;
 
     @Access(AccessType.FIELD)
-    private Date buyDate;
+    private Date acquisitionDate;
 
     public String getName() {
         return name;
@@ -49,12 +49,12 @@ public class Device extends PersistentEntity {
         this.name = name;
     }
 
-    public DeviceCategory getDeviceCategory() {
-        return deviceCategory;
+    public DeviceCategory getCategory() {
+        return category;
     }
 
-    public void setDeviceCategory(DeviceCategory deviceCategory) {
-        this.deviceCategory = deviceCategory;
+    public void setCategory(DeviceCategory category) {
+        this.category = category;
     }
 
     public String getDescription() {
@@ -89,11 +89,11 @@ public class Device extends PersistentEntity {
         this.inventoryNumber = inventoryNumber;
     }
 
-    public Optional<Date> getBuyDate() {
-        return Optional.ofNullable(buyDate);
+    public Optional<Date> getAcquisitionDate() {
+        return Optional.ofNullable(acquisitionDate);
     }
 
-    public void setBuyDate(Optional<Date> buyDate) {
-        this.buyDate = buyDate.orElse(null);
+    public void setAcquisitionDate(Optional<Date> acquisitionDate) {
+        this.acquisitionDate = acquisitionDate.orElse(null);
     }
 }
