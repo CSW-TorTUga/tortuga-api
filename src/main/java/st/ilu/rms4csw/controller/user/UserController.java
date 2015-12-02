@@ -1,4 +1,4 @@
-package st.ilu.rms4csw.controller;
+package st.ilu.rms4csw.controller.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -11,8 +11,8 @@ import st.ilu.rms4csw.Main;
 import st.ilu.rms4csw.controller.exception.NotFoundException;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
-import st.ilu.rms4csw.repository.UserRepository;
 import st.ilu.rms4csw.patch.Patch;
+import st.ilu.rms4csw.repository.UserRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
@@ -31,11 +31,6 @@ public class UserController {
 
     private UserRepository userRepository;
 
-    @Autowired
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
     @RequestMapping
     @PreAuthorize("hasAuthority('OP_TEST')")
     public List<User> findAll() {
@@ -46,7 +41,6 @@ public class UserController {
     public User findOne(@PathVariable String id) {
         User ret = userRepository.findOne(id);
         if(ret == null) {
-            // test
             throw new NotFoundException("Did not find user with id '" + id + "'");
         }
 
@@ -55,10 +49,13 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<User> postUser(@RequestBody User user, HttpServletResponse response) {
-
         if(user.getRole() == Role.STUDENT || user.getRole() == Role.LECTURER) {
             Date expires = User.calculateNextSemesterEnd(new Date());
             user.setExpires(Optional.of(expires));
+        }
+
+        if(userRepository.findOne(user.getId()) != null) {
+            throw new IllegalArgumentException("A user with this ID exists already. Please use PUT and/or PATCH to update existing resources");
         }
 
         User ret = userRepository.save(user);
@@ -92,4 +89,8 @@ public class UserController {
         return userRepository.save(patchedUser);
     }
 
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 }
