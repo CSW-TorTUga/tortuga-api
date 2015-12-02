@@ -1,45 +1,45 @@
-package st.ilu.rms4csw.controller.user;
+package st.ilu.rms4csw.controller.device;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.CrudController;
-import st.ilu.rms4csw.model.major.Major;
-import st.ilu.rms4csw.repository.user.MajorRepository;
+import st.ilu.rms4csw.model.devicecategory.DeviceCategory;
+import st.ilu.rms4csw.repository.device.DeviceCategoryRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
- * Created by hannes on 24.11.15.
+ * @author Mischa Holz
  */
 @RestController
-@RequestMapping("/api/v1/" + MajorController.API_BASE)
-public class MajorController extends CrudController<Major> {
+@RequestMapping("/api/v1/" + DeviceCategoryController.API_BASE)
+public class DeviceCategoryController extends CrudController<DeviceCategory> {
 
-	public final static String API_BASE = "majors";
+    public static final String API_BASE = "devicecategories";
 
     @Override
     @RequestMapping
-    public List<Major> findAll() {
+    public List<DeviceCategory> findAll() {
         return super.findAll();
     }
 
     @Override
     @RequestMapping("/{id}")
-    public Major findOne(@PathVariable String id) {
+    public DeviceCategory findOne(@PathVariable String id) {
         return super.findOne(id);
     }
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Major> post(@RequestBody Major newEntity, HttpServletResponse response) {
+    public ResponseEntity<DeviceCategory> post(@RequestBody DeviceCategory newEntity, HttpServletResponse response) {
         return super.post(newEntity, response);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public Major put(@PathVariable String id, @RequestBody Major entity) {
+    public DeviceCategory put(@PathVariable String id, @RequestBody DeviceCategory entity) {
         return super.put(id, entity);
     }
 
@@ -51,13 +51,13 @@ public class MajorController extends CrudController<Major> {
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public Major patch(@PathVariable String id, @RequestBody Major entity) {
+    public DeviceCategory patch(@PathVariable String id, @RequestBody DeviceCategory entity) {
         return super.patch(id, entity);
     }
 
     @Autowired
-    public void setMajorRepository(MajorRepository majorRepository) {
-        this.repository = majorRepository;
+    public void setDeviceCategoryRepository(DeviceCategoryRepository deviceCategoryRepository) {
+        this.repository = deviceCategoryRepository;
     }
 
     @Override
