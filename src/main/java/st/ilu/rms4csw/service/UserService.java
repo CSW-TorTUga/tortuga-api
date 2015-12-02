@@ -1,7 +1,6 @@
 package st.ilu.rms4csw.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,7 +9,6 @@ import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.UserRepository;
 
 import java.util.Date;
-import java.util.stream.Collectors;
 
 /**
  * @author Mischa Holz
@@ -31,7 +29,7 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getLoginName(),
                 user.getPassword(),
-                (!user.getExpires().isPresent()) || user.getExpires().get().after(new Date()),
+                (!user.getExpirationDate().isPresent()) || user.getExpirationDate().get().after(new Date()),
                 true,
                 true,
                 true,
