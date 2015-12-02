@@ -1,4 +1,4 @@
-package st.ilu.rms4csw.controller;
+package st.ilu.rms4csw.controller.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.Main;
 import st.ilu.rms4csw.controller.exception.NotFoundException;
 import st.ilu.rms4csw.model.major.Major;
-import st.ilu.rms4csw.repository.MajorRepository;
 import st.ilu.rms4csw.patch.Patch;
+import st.ilu.rms4csw.repository.MajorRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -24,13 +24,7 @@ public class MajorController {
 
 	public final static String API_BASE = "majors";
 
-
 	private MajorRepository majorRepository;
-
-	@Autowired
-	public MajorController(MajorRepository majorRepository) {
-		this.majorRepository = majorRepository;
-	}
 
 	@RequestMapping
 	public List<Major> findAll() {
@@ -41,6 +35,10 @@ public class MajorController {
 	public ResponseEntity<Major> postMajor(@RequestBody Major major, HttpServletResponse response) {
 		Major ret = majorRepository.save(major);
 		response.setHeader("Location", Main.getApiBase() + API_BASE + "/" + ret.getId());
+
+        if(majorRepository.findOne(major.getId()) != null) {
+            throw new IllegalArgumentException("A major with this ID exists already. Please use PUT and/or PATCH to update existing resources");
+        }
 
 		return new ResponseEntity<>(ret, HttpStatus.CREATED);
 	}
@@ -64,4 +62,8 @@ public class MajorController {
 		return majorRepository.save(patchedMajor);
 	}
 
+    @Autowired
+    public void setMajorRepository(MajorRepository majorRepository) {
+        this.majorRepository = majorRepository;
+    }
 }
