@@ -30,7 +30,6 @@ public class Device extends PersistentEntity {
     private String accessories;
 
     @Enumerated(EnumType.STRING)
-    @NotEmpty
     @NotNull
     private Cabinet cabinet;
 
