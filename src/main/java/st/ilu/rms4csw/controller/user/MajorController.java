@@ -7,6 +7,7 @@ import st.ilu.rms4csw.controller.base.CrudController;
 import st.ilu.rms4csw.model.major.Major;
 import st.ilu.rms4csw.repository.user.MajorRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -20,9 +21,14 @@ public class MajorController extends CrudController<Major> {
 	public final static String API_BASE = "majors";
 
     @Override
+    protected Class<Major> getEntityClass() {
+        return Major.class;
+    }
+
+    @Override
     @RequestMapping
-    public List<Major> findAll() {
-        return super.findAll();
+    public List<Major> findAll(HttpServletRequest request) {
+        return super.findAll(request);
     }
 
     @Override

@@ -3,6 +3,7 @@ package st.ilu.rms4csw.model.base;
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.UUID;
 
 /**
@@ -46,5 +47,31 @@ public abstract class PersistentEntity implements Serializable {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder ret = new StringBuilder();
+        ret.append(this.getClass().getSimpleName()).append("(");
+
+        String delim = "";
+        for (Field field : this.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+
+            ret.append(delim);
+            ret.append(field.getName());
+            ret.append("=");
+            try {
+                ret.append(field.get(this).toString());
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+
+            delim = ", ";
+        }
+
+        ret.append(")");
+
+        return ret.toString();
     }
 }

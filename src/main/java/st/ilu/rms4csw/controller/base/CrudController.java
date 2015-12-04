@@ -1,6 +1,7 @@
 package st.ilu.rms4csw.controller.base;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,8 +9,12 @@ import st.ilu.rms4csw.Main;
 import st.ilu.rms4csw.controller.exception.NotFoundException;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 import st.ilu.rms4csw.patch.Patch;
+import st.ilu.rms4csw.repository.base.JpaSpecificationRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,12 +22,73 @@ import java.util.List;
  */
 public abstract class CrudController<T extends PersistentEntity> {
 
-    protected JpaRepository<T, String> repository;
+    protected JpaSpecificationRepository<T, String> repository;
 
     public abstract String getApiBase();
 
-    public List<T> findAll() {
-        return repository.findAll();
+    protected abstract Class<T> getEntityClass();
+
+    private Sort buildSortObject(HttpServletRequest request) {
+        Sort.Direction dir = Sort.DEFAULT_DIRECTION;
+        String dirValue = request.getParameter("direction");
+        if(dirValue != null) {
+            dir = Sort.Direction.fromString(dirValue);
+        }
+
+        String sortValue = request.getParameter("sort");
+        if(sortValue == null) {
+            return new Sort(dir);
+        }
+
+        return new Sort(dir, sortValue.split(","));
+    }
+
+    public List<T> findAll(HttpServletRequest request) {
+        List<PersistentEntitySpecification<T>> specifications = new ArrayList<>();
+        for (Field field : getEntityClass().getDeclaredFields()) {
+            field.setAccessible(true);
+
+            String name = field.getName();
+
+            String value = request.getParameter(name);
+            if(value != null) {
+                FilterCriteria criteria;
+                if(value.startsWith("<")) {
+                    criteria = new FilterCriteria();
+                    criteria.setKey(name);
+                    criteria.setOperation(FilterCriteria.Operation.LESS_THAN);
+                    criteria.setValue(value.substring(1));
+                } else if(value.startsWith(">")) {
+                    criteria = new FilterCriteria();
+                    criteria.setKey(name);
+                    criteria.setOperation(FilterCriteria.Operation.GREATER_THAN);
+                    criteria.setValue(value.substring(1));
+                } else {
+                    criteria = new FilterCriteria();
+                    criteria.setKey(name);
+                    criteria.setOperation(FilterCriteria.Operation.EQUALS);
+                    criteria.setValue(value);
+                }
+                specifications.add(new PersistentEntitySpecification<>(criteria));
+            }
+        }
+
+        if(specifications.size() > 0) {
+            boolean first = true;
+            Specifications<T> spec = null;
+            for (PersistentEntitySpecification<T> specification : specifications) {
+                if(first) {
+                    spec = Specifications.where(specification);
+                    first = false;
+                } else {
+                    spec = spec.and(specification);
+                }
+            }
+
+            return repository.findAll(spec, buildSortObject(request));
+        }
+
+        return repository.findAll(buildSortObject(request));
     }
 
     public T findOne(String id) {
