@@ -27,7 +27,7 @@ public class DeviceReservation extends Reservation<DeviceReservation> {
         this.borrowed = borrowed;
     }
 
-    private Device getDevice() {
+    public Device getDevice() {
         return device;
     }
 
