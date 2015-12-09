@@ -1,7 +1,19 @@
 language: java
-
 jdk:
   - oraclejdk8
+
+addons:
+  postgresql: "9.4"
+
+services:
+  - postgresql
+
+env:
+- DATABASE_URL=postgres://postgres@localhost:5432/rms4csw
+
+
+before_script:
+  - psql -c 'create database rms4csw;' -U postgres
 
 after_success:
   - mvn clean test jacoco:report coveralls:report
