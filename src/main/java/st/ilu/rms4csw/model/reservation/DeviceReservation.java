@@ -4,8 +4,8 @@ import st.ilu.rms4csw.model.device.Device;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Mischa Holz
@@ -14,14 +14,25 @@ import java.util.Optional;
 public class DeviceReservation extends Reservation<DeviceReservation> {
 
     @OneToOne
+    @NotNull
     private Device device;
 
-    private Optional<Device> getDevice() {
-        return Optional.ofNullable(device);
+    private boolean borrowed;
+
+    public boolean isBorrowed() {Adde
+        return borrowed;
     }
 
-    public void setDevice(Optional<Device> device) {
-        this.device = device.orElse(null);
+    public void setBorrowed(boolean borrowed) {
+        this.borrowed = borrowed;
+    }
+
+    private Device getDevice() {
+        return device;
+    }
+
+    public void setDevice(Device device) {
+        this.device = device;
     }
 
     @Override
