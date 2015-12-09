@@ -7,7 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
-import st.ilu.rms4csw.repository.UserRepository;
+import st.ilu.rms4csw.repository.user.UserRepository;
 
 import java.util.Optional;
 

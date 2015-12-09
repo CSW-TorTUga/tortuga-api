@@ -1,19 +1,14 @@
 package st.ilu.rms4csw.controller.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import st.ilu.rms4csw.Main;
-import st.ilu.rms4csw.controller.exception.NotFoundException;
+import st.ilu.rms4csw.controller.base.CrudController;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
-import st.ilu.rms4csw.patch.Patch;
-import st.ilu.rms4csw.repository.UserRepository;
+import st.ilu.rms4csw.repository.user.UserRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
@@ -22,29 +17,31 @@ import java.util.Optional;
 /**
  * @author Mischa Holz
  */
-@Controller
+@RestController
 @RequestMapping("/api/v1/" + UserController.USER_API_BASE)
-@ResponseBody
-public class UserController {
+public class UserController extends CrudController<User> {
 
     public final static String USER_API_BASE = "users";
 
-    private UserRepository userRepository;
+    @Override
+    public String getApiBase() {
+        return USER_API_BASE;
+    }
 
+    @Override
+    protected Class<User> getEntityClass() {
+        return User.class;
+    }
+
+    @Override
     @RequestMapping
-    @PreAuthorize("hasAuthority('OP_TEST')")
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<User> findAll(HttpServletRequest request) {
+        return super.findAll(request);
     }
 
     @RequestMapping("/{id}")
     public User findOne(@PathVariable String id) {
-        User ret = userRepository.findOne(id);
-        if(ret == null) {
-            throw new NotFoundException("Did not find user with id '" + id + "'");
-        }
-
-        return ret;
+        return super.findOne(id);
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -54,43 +51,26 @@ public class UserController {
             user.setExpirationDate(Optional.of(expires));
         }
 
-        if(userRepository.findOne(user.getId()) != null) {
-            throw new IllegalArgumentException("A user with this ID exists already. Please use PUT and/or PATCH to update existing resources");
-        }
-
-        User ret = userRepository.save(user);
-        response.setHeader(HttpHeaders.LOCATION, Main.getApiBase() + USER_API_BASE + "/" + ret.getId());
-
-        return new ResponseEntity<>(ret, HttpStatus.CREATED);
+        return super.post(user, response);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public User putUser(@PathVariable String id, @RequestBody User user) {
-        user.setId(id);
-
-        return userRepository.save(user);
+        return super.put(id, user);
     }
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity deleteUser(@PathVariable String id) {
-		userRepository.delete(id);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return super.delete(id);
 	}
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     public User patchUser(@PathVariable String id, @RequestBody User user) {
-        User original = userRepository.findOne(id);
-        if (original == null) {
-            throw new NotFoundException("Did not find user with the id " + id);
-        }
-
-        User patchedUser = Patch.patch(original, user);
-
-        return userRepository.save(patchedUser);
+        return super.patch(id, user);
     }
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
+        this.repository = userRepository;
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import st.ilu.rms4csw.model.user.User;
-import st.ilu.rms4csw.repository.UserRepository;
+import st.ilu.rms4csw.repository.user.UserRepository;
 
 import java.util.Date;
 

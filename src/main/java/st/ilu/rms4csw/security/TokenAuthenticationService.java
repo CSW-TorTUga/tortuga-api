@@ -6,7 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import st.ilu.rms4csw.model.user.User;
-import st.ilu.rms4csw.repository.UserRepository;
+import st.ilu.rms4csw.repository.user.UserRepository;
 import st.ilu.rms4csw.security.token.Token;
 import st.ilu.rms4csw.security.token.TokenException;
 import st.ilu.rms4csw.security.token.TokenHandler;
