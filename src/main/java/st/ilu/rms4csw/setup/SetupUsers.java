@@ -28,7 +28,7 @@ public class SetupUsers implements CommandLineRunner {
 
             User user = new User();
 
-            user.setExpires(Optional.empty());
+            user.setExpirationDate(Optional.empty());
             user.setLoginName("admin");
             user.setRole(Role.ADMIN);
             user.setEmail("bp@ilu.st");

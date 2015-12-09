@@ -29,7 +29,7 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getLoginName(),
                 user.getPassword(),
-                (!user.getExpires().isPresent()) || user.getExpires().get().after(new Date()),
+                (!user.getExpirationDate().isPresent()) || user.getExpirationDate().get().after(new Date()),
                 true,
                 true,
                 true,

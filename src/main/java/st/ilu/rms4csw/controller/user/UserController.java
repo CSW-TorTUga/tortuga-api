@@ -46,9 +46,9 @@ public class UserController extends CrudController<User> {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<User> postUser(@RequestBody User user, HttpServletResponse response) {
-        if(user.getRole() == Role.STUDENT || user.getRole() == Role.LECTURER) {
+        if(user.getRole() == Role.STUDENT) {
             Date expires = User.calculateNextSemesterEnd(new Date());
-            user.setExpires(Optional.of(expires));
+            user.setExpirationDate(Optional.of(expires));
         }
 
         return super.post(user, response);

@@ -47,7 +47,7 @@ public class User extends PersistentEntity {
     private Role role;
 
     @Access(AccessType.FIELD)
-    private Date expires;
+    private Date expirationDate;
 
     public String getLoginName() {
         return loginName;
@@ -151,19 +151,19 @@ public class User extends PersistentEntity {
         this.role = role;
     }
 
-    public Optional<Date> getExpires() {
-        if(expires == null) {
+    public Optional<Date> getExpirationDate() {
+        if(expirationDate == null) {
             return Optional.empty();
         }
 
-        return Optional.of(expires);
+        return Optional.of(expirationDate);
     }
 
-    public void setExpires(Optional<Date> expires) {
-        if(expires.isPresent()) {
-            this.expires = expires.get();
+    public void setExpirationDate(Optional<Date> expirationDate) {
+        if(expirationDate.isPresent()) {
+            this.expirationDate = expirationDate.get();
         } else {
-            this.expires = null;
+            this.expirationDate = null;
         }
     }
 
