@@ -37,7 +37,7 @@ public abstract class CrudController<T extends PersistentEntity> {
 
         String sortValue = request.getParameter("sort");
         if(sortValue == null) {
-            return new Sort(dir);
+            return null;
         }
 
         return new Sort(dir, sortValue.split(","));
@@ -85,9 +85,17 @@ public abstract class CrudController<T extends PersistentEntity> {
                 }
             }
 
-            return repository.findAll(spec, buildSortObject(request));
+            Sort sort = buildSortObject(request);
+            if(sort == null) {
+                return repository.findAll(spec);
+            }
+            return repository.findAll(spec, sort);
         }
 
+        Sort sort = buildSortObject(request);
+        if(sort == null) {
+            return repository.findAll();
+        }
         return repository.findAll(buildSortObject(request));
     }
 
