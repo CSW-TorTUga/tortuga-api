@@ -44,7 +44,7 @@ public class ReservationTests {
     @BeforeClass
     public static void setUp() {
         user = new User();
-        user.setExpires(Optional.empty());
+        user.setExpirationDate(Optional.empty());
         user.setStudentId(Optional.empty());
         user.setPassword("");
         user.setLoginName("admin");
