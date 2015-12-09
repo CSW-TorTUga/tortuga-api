@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import st.ilu.rms4csw.controller.base.CrudController;
-import st.ilu.rms4csw.model.reservation.Reservation;
+import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.repository.reservation.ReservationRepository;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,31 +18,31 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v1/" + ReservationController.API_BASE)
-public class ReservationController extends CrudController<Reservation> {
+public class ReservationController extends CrudController<DeviceReservation> {
 
     public static final String API_BASE = "reservations";
 
     @Override
     @RequestMapping
-    public List<Reservation> findAll(HttpServletRequest request) {
+    public List<DeviceReservation> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping("/{id}")
-    public Reservation findOne(String id) {
+    public DeviceReservation findOne(String id) {
         return super.findOne(id);
     }
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Reservation> post(Reservation newEntity, HttpServletResponse response) {
+    public ResponseEntity<DeviceReservation> post(DeviceReservation newEntity, HttpServletResponse response) {
         return super.post(newEntity, response);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public Reservation put(String id, Reservation entity) {
+    public DeviceReservation put(String id, DeviceReservation entity) {
         return super.put(id, entity);
     }
 
@@ -54,7 +54,7 @@ public class ReservationController extends CrudController<Reservation> {
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public Reservation patch(String id, Reservation entity) {
+    public DeviceReservation patch(String id, DeviceReservation entity) {
         return super.patch(id, entity);
     }
 
@@ -64,8 +64,8 @@ public class ReservationController extends CrudController<Reservation> {
     }
 
     @Override
-    protected Class<Reservation> getEntityClass() {
-        return Reservation.class;
+    protected Class<DeviceReservation> getEntityClass() {
+        return DeviceReservation.class;
     }
 
     @Autowired
