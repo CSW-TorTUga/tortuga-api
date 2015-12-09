@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import st.ilu.rms4csw.controller.base.CrudController;
-import st.ilu.rms4csw.model.reservation.DeviceReservation;
-import st.ilu.rms4csw.repository.reservation.ReservationRepository;
+import st.ilu.rms4csw.model.reservation.RoomReservation;
+import st.ilu.rms4csw.repository.reservation.RoomReservationRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,32 +17,32 @@ import java.util.List;
  * @author Mischa Holz
  */
 @RestController
-@RequestMapping("/api/v1/" + ReservationController.API_BASE)
-public class ReservationController extends CrudController<DeviceReservation> {
+@RequestMapping("/api/v1/" + RoomReservationController.API_BASE)
+public class RoomReservationController extends CrudController<RoomReservation> {
 
-    public static final String API_BASE = "reservations";
+    public static final String API_BASE = "roomreservations";
 
     @Override
     @RequestMapping
-    public List<DeviceReservation> findAll(HttpServletRequest request) {
+    public List<RoomReservation> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping("/{id}")
-    public DeviceReservation findOne(String id) {
+    public RoomReservation findOne(String id) {
         return super.findOne(id);
     }
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<DeviceReservation> post(DeviceReservation newEntity, HttpServletResponse response) {
+    public ResponseEntity<RoomReservation> post(RoomReservation newEntity, HttpServletResponse response) {
         return super.post(newEntity, response);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public DeviceReservation put(String id, DeviceReservation entity) {
+    public RoomReservation put(String id, RoomReservation entity) {
         return super.put(id, entity);
     }
 
@@ -54,7 +54,7 @@ public class ReservationController extends CrudController<DeviceReservation> {
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public DeviceReservation patch(String id, DeviceReservation entity) {
+    public RoomReservation patch(String id, RoomReservation entity) {
         return super.patch(id, entity);
     }
 
@@ -64,12 +64,12 @@ public class ReservationController extends CrudController<DeviceReservation> {
     }
 
     @Override
-    protected Class<DeviceReservation> getEntityClass() {
-        return DeviceReservation.class;
+    protected Class<RoomReservation> getEntityClass() {
+        return RoomReservation.class;
     }
 
     @Autowired
-    public void setReservationRepository(ReservationRepository reservationRepository) {
+    public void setReservationRepository(RoomReservationRepository reservationRepository) {
         this.repository = reservationRepository;
     }
 }
