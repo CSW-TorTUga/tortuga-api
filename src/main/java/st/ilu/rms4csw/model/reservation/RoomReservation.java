@@ -20,6 +20,6 @@ public class RoomReservation extends Reservation<RoomReservation> {
 
     @Override
     public boolean intersects(RoomReservation other) {
-        return other.getTimeSpan().intersects(other.getTimeSpan());
+        return this.getTimeSpan().intersects(other.getTimeSpan());
     }
 }
