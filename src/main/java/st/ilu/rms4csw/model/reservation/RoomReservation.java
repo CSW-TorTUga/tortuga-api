@@ -1,8 +1,11 @@
 package st.ilu.rms4csw.model.reservation;
 
+import javax.persistence.Entity;
+
 /**
  * @author Mischa Holz
  */
+@Entity
 public class RoomReservation extends Reservation<RoomReservation> {
 
     private boolean approved;
