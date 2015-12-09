@@ -12,6 +12,26 @@ public class RoomReservation extends Reservation<RoomReservation> {
 
     private String description;
 
+    private boolean open;
+
+    private TimeSpan openedTimeSpan;
+
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
+    }
+
+    public TimeSpan getOpenedTimeSpan() {
+        return openedTimeSpan;
+    }
+
+    public void setOpenedTimeSpan(TimeSpan openedTimeSpan) {
+        this.openedTimeSpan = openedTimeSpan;
+    }
+
     public String getDescription() {
         return description;
     }
