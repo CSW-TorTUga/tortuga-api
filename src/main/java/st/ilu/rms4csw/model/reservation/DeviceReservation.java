@@ -19,7 +19,7 @@ public class DeviceReservation extends Reservation<DeviceReservation> {
 
     private boolean borrowed;
 
-    public boolean isBorrowed() {Adde
+    public boolean isBorrowed() {
         return borrowed;
     }
 
