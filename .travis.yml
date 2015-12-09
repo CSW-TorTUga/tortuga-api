@@ -11,9 +11,10 @@ services:
 env:
 - DATABASE_URL=postgres://postgres@localhost:5432/rms4csw
 
+install: true
 
 before_script:
   - psql -c 'create database rms4csw;' -U postgres
 
-after_success:
+script:
   - mvn clean test jacoco:report coveralls:report
