@@ -2,13 +2,13 @@ package st.ilu.rms4csw.controller.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.CrudController;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.user.UserRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
@@ -28,10 +28,15 @@ public class UserController extends CrudController<User> {
         return USER_API_BASE;
     }
 
+    @Override
+    protected Class<User> getEntityClass() {
+        return User.class;
+    }
+
+    @Override
     @RequestMapping
-    @PreAuthorize("hasAuthority('OP_TEST')")
-    public List<User> findAll() {
-        return super.findAll();
+    public List<User> findAll(HttpServletRequest request) {
+        return super.findAll(request);
     }
 
     @RequestMapping("/{id}")

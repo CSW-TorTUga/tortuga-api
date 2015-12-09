@@ -27,7 +27,10 @@ public class DataSourceConfig {
         URI dbUri = new URI(url);
 
         String username = dbUri.getUserInfo().split(":")[0];
-        String password = dbUri.getUserInfo().split(":")[1];
+        String password = null;
+        if(dbUri.getUserInfo().split(":").length == 2) {
+            password = dbUri.getUserInfo().split(":")[1];
+        }
         String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
 
         SimpleDriverDataSource driverDataSource = new SimpleDriverDataSource();
