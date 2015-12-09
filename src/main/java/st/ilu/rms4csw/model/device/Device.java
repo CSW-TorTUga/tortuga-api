@@ -18,8 +18,6 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class Device extends PersistentEntity {
 
-    @NotEmpty
-    @NotNull
     private String name;
 
     @OneToOne

@@ -7,6 +7,7 @@ import st.ilu.rms4csw.controller.base.CrudController;
 import st.ilu.rms4csw.model.devicecategory.DeviceCategory;
 import st.ilu.rms4csw.repository.device.DeviceCategoryRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -19,10 +20,16 @@ public class DeviceCategoryController extends CrudController<DeviceCategory> {
 
     public static final String API_BASE = "devicecategories";
 
+
+    @Override
+    protected Class<DeviceCategory> getEntityClass() {
+        return DeviceCategory.class;
+    }
+
     @Override
     @RequestMapping
-    public List<DeviceCategory> findAll() {
-        return super.findAll();
+    public List<DeviceCategory> findAll(HttpServletRequest request) {
+        return super.findAll(request);
     }
 
     @Override
