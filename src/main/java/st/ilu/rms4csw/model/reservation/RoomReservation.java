@@ -8,13 +8,13 @@ import javax.persistence.Entity;
 @Entity
 public class RoomReservation extends Reservation<RoomReservation> {
 
+    private static final long OPEN_EXPAND_MILLIS = 15 * 60 * 1000;
+
     private boolean approved;
 
     private String description;
 
     private boolean open;
-
-    private TimeSpan openedTimeSpan;
 
     public boolean isOpen() {
         return open;
@@ -25,11 +25,7 @@ public class RoomReservation extends Reservation<RoomReservation> {
     }
 
     public TimeSpan getOpenedTimeSpan() {
-        return openedTimeSpan;
-    }
-
-    public void setOpenedTimeSpan(TimeSpan openedTimeSpan) {
-        this.openedTimeSpan = openedTimeSpan;
+        return this.getTimeSpan().expand(OPEN_EXPAND_MILLIS);
     }
 
     public String getDescription() {
