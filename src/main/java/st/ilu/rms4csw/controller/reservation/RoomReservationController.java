@@ -7,12 +7,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import st.ilu.rms4csw.controller.base.CrudController;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
-import st.ilu.rms4csw.model.reservation.TimeSpan;
 import st.ilu.rms4csw.repository.reservation.RoomReservationRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,11 +38,6 @@ public class RoomReservationController extends CrudController<RoomReservation> {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<RoomReservation> post(RoomReservation newEntity, HttpServletResponse response) {
         newEntity.setApproved(false);
-
-        Date beginning = new Date(newEntity.getTimeSpan().getBeginning().getTime() - 15 * 60 * 1000);
-        Date end = new Date(newEntity.getTimeSpan().getEnd().getTime() + 15 * 60 * 1000);
-
-        newEntity.setOpenedTimeSpan(new TimeSpan(beginning, end));
         newEntity.setOpen(false);
 
         return super.post(newEntity, response);
