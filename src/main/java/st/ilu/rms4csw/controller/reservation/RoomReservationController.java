@@ -37,6 +37,9 @@ public class RoomReservationController extends CrudController<RoomReservation> {
     @Override
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<RoomReservation> post(RoomReservation newEntity, HttpServletResponse response) {
+        newEntity.setApproved(false);
+        newEntity.setOpen(false);
+
         return super.post(newEntity, response);
     }
 
