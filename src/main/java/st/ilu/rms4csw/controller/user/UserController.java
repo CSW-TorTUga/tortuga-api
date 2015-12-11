@@ -2,6 +2,7 @@ package st.ilu.rms4csw.controller.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.CrudController;
 import st.ilu.rms4csw.model.user.Role;
@@ -35,6 +36,7 @@ public class UserController extends CrudController<User> {
 
     @Override
     @RequestMapping
+    @PreAuthorize("hasAuthority('OP_TEST_BLA')")
     public List<User> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
