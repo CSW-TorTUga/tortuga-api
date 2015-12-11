@@ -137,4 +137,10 @@ public class UserControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.loginName", is("test_user")));
     }
+
+    @Test
+    public void testUserNotFound() throws Exception {
+        mockMvc.perform(get("/api/v1/users/asas").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 }
