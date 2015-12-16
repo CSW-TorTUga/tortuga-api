@@ -65,7 +65,6 @@ public class UserController extends CrudController<User> {
             throw new IllegalArgumentException("Can't set the expiration date of a user!");
         }
 
-
         return super.put(id, user);
     }
 
@@ -76,6 +75,11 @@ public class UserController extends CrudController<User> {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     public User patchUser(@PathVariable String id, @RequestBody User user) {
+        User beforeUpdate = repository.findOne(id);
+        if(beforeUpdate != null && user.getExpirationDate().isPresent() && !beforeUpdate.getExpirationDate().equals(user.getExpirationDate())) {
+            throw new IllegalArgumentException("Can't set the expiration date of a user!");
+        }
+
         return super.patch(id, user);
     }
 
