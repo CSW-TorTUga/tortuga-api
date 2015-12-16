@@ -6,7 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import st.ilu.rms4csw.Main;
-import st.ilu.rms4csw.controller.exception.NotFoundException;
+import st.ilu.rms4csw.controller.base.exception.NotFoundException;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 import st.ilu.rms4csw.patch.Patch;
 import st.ilu.rms4csw.repository.base.JpaSpecificationRepository;

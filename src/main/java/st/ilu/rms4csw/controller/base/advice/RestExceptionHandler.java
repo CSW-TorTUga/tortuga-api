@@ -1,4 +1,4 @@
-package st.ilu.rms4csw.controller.advice;
+package st.ilu.rms4csw.controller.base.advice;
 
 import org.apache.catalina.connector.ClientAbortException;
 import org.slf4j.Logger;
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import st.ilu.rms4csw.controller.exception.NotFoundException;
-import st.ilu.rms4csw.controller.exception.RestException;
+import st.ilu.rms4csw.controller.base.exception.NotFoundException;
+import st.ilu.rms4csw.controller.base.exception.RestException;
 import st.ilu.rms4csw.security.token.TokenException;
 
 import javax.servlet.http.HttpServletResponse;
