@@ -119,7 +119,7 @@ public class UserControllerTest {
         User user3 = new User();
         user3.setExpirationDate(Optional.empty());
         user3.setPhoneNumber("123456789");
-        user3.setRole(Role.CSW_TEAM);
+        user3.setRole(Role.ADMIN);
         user3.setFirstName("Team");
         user3.setLastName("Teamington");
         user3.setGender(Optional.of(Gender.FEMALE));
@@ -150,7 +150,7 @@ public class UserControllerTest {
         user1.setEmail("bla@ilu.st");
         user1.setExpirationDate(Optional.empty());
 
-        String body = mockMvc.perform(put("/api/v1/users/" + user1.getId())
+        mockMvc.perform(put("/api/v1/users/" + user1.getId())
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(user1))
@@ -197,5 +197,42 @@ public class UserControllerTest {
         mockMvc.perform(delete("/api/v1/users/" + user1.getId())).andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/v1/users/" + user1.getId())).andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testPutUserWithExpirationDate() throws Exception {
+        user1.setExpirationDate(Optional.of(new Date()));
+
+        mockMvc.perform(put("/api/v1/users/" + user1.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user1))
+        ).andExpect(status().is4xxClientError());
+    }
+
+
+    @Test
+    public void testPatchUserWithExpirationDate() throws Exception {
+        User patch = new User();
+        patch.setExpirationDate(Optional.of(new Date()));
+
+        mockMvc.perform(patch("/api/v1/users/" + patch.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user1))
+        ).andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void testPatchUser() throws Exception {
+        User patch = new User();
+        patch.setEmail("bla@ilu.st");
+
+        mockMvc.perform(patch("/api/v1/users/" + user1.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(patch)))
+                .andExpect(jsonPath("$.loginName", is(user1.getLoginName())))
+                .andExpect(jsonPath("$.email", is("bla@ilu.st")));
     }
 }
