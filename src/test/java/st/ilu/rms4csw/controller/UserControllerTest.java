@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,6 +31,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -148,7 +150,43 @@ public class UserControllerTest {
 
     @Test
     public void testPutUser() throws Exception {
+        User user3 = new User();
+        user3.setExpirationDate(Optional.empty());
+        user3.setPhoneNumber("123456789");
+        user3.setRole(Role.STUDENT);
+        user3.setFirstName("Team");
+        user3.setLastName("Teamington");
+        user3.setGender(Optional.of(Gender.FEMALE));
+        user3.setStudentId(Optional.empty());
+        user3.setMajor(Optional.empty());
+        user3.setEmail("testuser@ilu.st");
+        user3.setLoginName("test_user3");
+        user3.setPassword("change me.");
+        user3.setId(null);
 
+        MockHttpServletResponse response = mockMvc .perform(post("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user3)))
+
+                .andExpect(header().string("Location", Matchers.notNullValue()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.loginName", is("test_user3")))
+                .andReturn().getResponse();
+
+        String location = response.getHeader("Location");
+        User returnedUser = objectMapper.readValue(response.getContentAsString(), User.class);
+
+        returnedUser.setEmail("bla@ilu.st");
+        returnedUser.setExpirationDate(Optional.empty());
+
+        String body = mockMvc.perform(put(location)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(returnedUser))
+        )
+        .andExpect(jsonPath("$.loginName", is("test_user3")))
+        .andExpect(jsonPath("$.email", is("bla@ilu.st")))
+        .andReturn().getResponse().getContentAsString();
     }
 
     @Test
