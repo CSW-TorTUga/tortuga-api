@@ -21,6 +21,7 @@ public class Device extends PersistentEntity {
     private String name;
 
     @OneToOne
+    @NotNull
     private DeviceCategory category;
 
     private String description;
