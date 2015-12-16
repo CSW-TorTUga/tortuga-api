@@ -114,7 +114,7 @@ public abstract class CrudController<T extends PersistentEntity> {
         }
 
         T ret = repository.save(newEntity);
-        response.setHeader(HttpHeaders.LOCATION, Main.getApiBase() + getApiBase() + "/" + ret.getId());
+        response.setHeader(HttpHeaders.LOCATION, Main.getApiBase() + "/" + getApiBase() + "/" + ret.getId());
 
         return new ResponseEntity<>(ret, HttpStatus.CREATED);
     }

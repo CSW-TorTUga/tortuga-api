@@ -22,10 +22,12 @@ import st.ilu.rms4csw.repository.user.UserRepository;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -142,5 +144,42 @@ public class UserControllerTest {
     public void testUserNotFound() throws Exception {
         mockMvc.perform(get("/api/v1/users/asas").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testPutUser() throws Exception {
+
+    }
+
+    @Test
+    public void testPostStudent() throws Exception {
+        User user3 = new User();
+        user3.setExpirationDate(Optional.empty());
+        user3.setPhoneNumber("123456789");
+        user3.setRole(Role.STUDENT);
+        user3.setFirstName("Team");
+        user3.setLastName("Teamington");
+        user3.setGender(Optional.of(Gender.FEMALE));
+        user3.setStudentId(Optional.empty());
+        user3.setMajor(Optional.empty());
+        user3.setEmail("testuser@ilu.st");
+        user3.setLoginName("test_user2");
+        user3.setPassword("change me.");
+        user3.setId(null);
+
+        String location = mockMvc .perform(post("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user3)))
+
+                .andExpect(header().string("Location", Matchers.notNullValue()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.loginName", is("test_user2")))
+                .andReturn().getResponse().getHeader("Location");
+
+        User userReturned = objectMapper.readValue(mockMvc.perform(get(location)
+            .accept(MediaType.APPLICATION_JSON)
+        ).andReturn().getResponse().getContentAsString(), User.class);
+
+        assertTrue("A student must have an expiration date and it has to be in the future", new Date().before(userReturned.getExpirationDate().orElseThrow(NullPointerException::new)));
     }
 }
