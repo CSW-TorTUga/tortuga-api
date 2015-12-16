@@ -216,10 +216,10 @@ public class UserControllerTest {
         User patch = new User();
         patch.setExpirationDate(Optional.of(new Date()));
 
-        mockMvc.perform(patch("/api/v1/users/" + patch.getId())
+        mockMvc.perform(patch("/api/v1/users/" + user1.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user1))
+                .content(objectMapper.writeValueAsString(patch))
         ).andExpect(status().is4xxClientError());
     }
 
