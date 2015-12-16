@@ -100,9 +100,9 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[*].id", is(user1.getId())))
-                .andExpect(jsonPath("$[*].loginName", is(user1.getLoginName())))
-                .andExpect(jsonPath("$[*].id", is(user2.getId())));
+                .andExpect(jsonPath("$[0].id", is(user1.getId())))
+                .andExpect(jsonPath("$[0].loginName", is(user1.getLoginName())))
+                .andExpect(jsonPath("$[1].id", is(user2.getId())));
     }
 
     @Test
