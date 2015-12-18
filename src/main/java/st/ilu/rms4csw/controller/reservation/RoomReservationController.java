@@ -2,10 +2,7 @@ package st.ilu.rms4csw.controller.reservation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.CrudController;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.repository.reservation.RoomReservationRepository;
@@ -37,9 +34,10 @@ public class RoomReservationController extends CrudController<RoomReservation> {
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<RoomReservation> post(RoomReservation newEntity, HttpServletResponse response) {
+    public ResponseEntity<RoomReservation> post(@RequestBody RoomReservation newEntity, HttpServletResponse response) {
         newEntity.setApproved(false);
         newEntity.setOpen(false);
+        //newEntity.setUser(); //TODO USER SETZEN HIER
 
         return super.post(newEntity, response);
     }
