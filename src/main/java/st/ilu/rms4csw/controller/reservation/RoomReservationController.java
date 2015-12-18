@@ -56,7 +56,7 @@ public class RoomReservationController extends CrudController<RoomReservation> {
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public RoomReservation patch(String id, RoomReservation entity) {
+    public RoomReservation patch(@PathVariable  String id, @RequestBody RoomReservation entity) {
         return super.patch(id, entity);
     }
 

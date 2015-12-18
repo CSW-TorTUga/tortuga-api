@@ -2,10 +2,7 @@ package st.ilu.rms4csw.controller.reservation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.CrudController;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.repository.reservation.DeviceReservationRepository;
@@ -55,7 +52,7 @@ public class DeviceReservationController extends CrudController<DeviceReservatio
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public DeviceReservation patch(String id, DeviceReservation entity) {
+    public DeviceReservation patch(@PathVariable String id, @RequestBody DeviceReservation entity) {
         return super.patch(id, entity);
     }
 
