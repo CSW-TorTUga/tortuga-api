@@ -1,4 +1,4 @@
-package st.ilu.rms4csw.controller.exception;
+package st.ilu.rms4csw.controller.base.exception;
 
 import org.springframework.http.HttpStatus;
 

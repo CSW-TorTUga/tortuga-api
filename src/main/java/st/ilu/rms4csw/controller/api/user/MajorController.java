@@ -1,4 +1,4 @@
-package st.ilu.rms4csw.controller.user;
+package st.ilu.rms4csw.controller.api.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

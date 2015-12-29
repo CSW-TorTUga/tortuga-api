@@ -1,8 +1,7 @@
-package st.ilu.rms4csw.controller.user;
+package st.ilu.rms4csw.controller.api.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.CrudController;
 import st.ilu.rms4csw.model.user.Role;
@@ -36,7 +35,6 @@ public class UserController extends CrudController<User> {
 
     @Override
     @RequestMapping
-    @PreAuthorize("hasAuthority('OP_TEST_BLA')")
     public List<User> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
@@ -53,11 +51,20 @@ public class UserController extends CrudController<User> {
             user.setExpirationDate(Optional.of(expires));
         }
 
+        if(user.getRole() == Role.ADMIN) {
+            user.setExpirationDate(Optional.empty());
+        }
+
         return super.post(user, response);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public User putUser(@PathVariable String id, @RequestBody User user) {
+        User beforeUpdate = repository.findOne(id);
+        if(beforeUpdate != null && user.getExpirationDate().isPresent() && !beforeUpdate.getExpirationDate().equals(user.getExpirationDate())) {
+            throw new IllegalArgumentException("Can't set the expiration date of a user!");
+        }
+
         return super.put(id, user);
     }
 
@@ -68,6 +75,11 @@ public class UserController extends CrudController<User> {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     public User patchUser(@PathVariable String id, @RequestBody User user) {
+        User beforeUpdate = repository.findOne(id);
+        if(beforeUpdate != null && user.getExpirationDate().isPresent() && !beforeUpdate.getExpirationDate().equals(user.getExpirationDate())) {
+            throw new IllegalArgumentException("Can't set the expiration date of a user!");
+        }
+
         return super.patch(id, user);
     }
 

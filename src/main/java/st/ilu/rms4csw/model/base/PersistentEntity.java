@@ -62,7 +62,12 @@ public abstract class PersistentEntity implements Serializable {
             ret.append(field.getName());
             ret.append("=");
             try {
-                ret.append(field.get(this).toString());
+                Object fieldValue = field.get(this);
+                if(fieldValue == null) {
+                    ret.append("null");
+                } else {
+                    ret.append(fieldValue.toString());
+                }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
