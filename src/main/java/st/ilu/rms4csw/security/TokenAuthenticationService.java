@@ -14,6 +14,9 @@ import st.ilu.rms4csw.security.token.TokenHandler;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Arrays;
 
 /**
@@ -38,6 +41,11 @@ public class TokenAuthenticationService {
 
     public void addAuthentication(HttpServletResponse response, User user) {
         String strToken = tokenHandler.createTokenForUser(user, validFor);
+        try {
+            strToken = URLEncoder.encode(strToken, "UTF-8");
+        } catch(UnsupportedEncodingException e) {
+            throw new AssertionError(e);
+        }
 
         Cookie cookie = new Cookie(COOKIE_NAME, strToken);
         cookie.setPath("/");
@@ -52,6 +60,13 @@ public class TokenAuthenticationService {
                 .stream(request.getCookies() == null ? new Cookie[0] : request.getCookies())
                 .filter(c -> COOKIE_NAME.equals(c.getName()))
                 .map(Cookie::getValue)
+                .map(v -> {
+                    try {
+                        return URLDecoder.decode(v, "UTF-8");
+                    } catch(UnsupportedEncodingException e) {
+                        throw new AssertionError(e);
+                    }
+                })
                 .findAny()
                 .orElseGet(() -> {
                     String value = request.getHeader(HttpHeaders.AUTHORIZATION);

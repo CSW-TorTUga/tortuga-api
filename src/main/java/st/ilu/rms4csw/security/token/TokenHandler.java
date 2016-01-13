@@ -20,8 +20,8 @@ import java.util.Date;
 public class TokenHandler {
 
     private static final String HMAC_ALGO = "HmacSHA256";
-    private static final String SEPARATOR = ",";
-    private static final String SEPARATOR_SPLITTER = ",";
+    private static final String SEPARATOR = ".";
+    private static final String SEPARATOR_SPLITTER = "\\.";
 
     private ObjectMapper objectMapper;
 
