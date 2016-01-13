@@ -2,9 +2,7 @@ package st.ilu.rms4csw.controller.api.reservation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.CrudController;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.model.user.User;
@@ -34,13 +32,13 @@ public class DeviceReservationController extends CrudController<DeviceReservatio
 
     @Override
     @RequestMapping("/{id}")
-    public DeviceReservation findOne(String id) {
+    public DeviceReservation findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<DeviceReservation> post(DeviceReservation newEntity, HttpServletResponse response) {
+    public ResponseEntity<DeviceReservation> post(@RequestBody DeviceReservation newEntity, HttpServletResponse response) {
         User user = userService.getLoggedInUser();
         newEntity.setUser(user);
 
@@ -49,19 +47,19 @@ public class DeviceReservationController extends CrudController<DeviceReservatio
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public DeviceReservation put(String id, DeviceReservation entity) {
+    public DeviceReservation put(@PathVariable("id") String id, @RequestBody DeviceReservation entity) {
         return super.put(id, entity);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity delete(String id) {
+    public ResponseEntity delete(@PathVariable("id") String id) {
         return super.delete(id);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public DeviceReservation patch(String id, DeviceReservation entity) {
+    public DeviceReservation patch(@PathVariable("id") String id, @RequestBody DeviceReservation entity) {
         return super.patch(id, entity);
     }
 
