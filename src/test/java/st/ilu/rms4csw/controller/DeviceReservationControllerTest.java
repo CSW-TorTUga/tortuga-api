@@ -176,7 +176,7 @@ public class DeviceReservationControllerTest {
     }
 
     @Test
-    public void testPatchDevice() throws Exception {
+    public void testPatchDeviceReservation() throws Exception {
         DeviceReservation patch = new DeviceReservation();
         patch.setId(null);
         patch.setTimeSpan(new TimeSpan(new Date(900), new Date(1000)));
@@ -192,12 +192,13 @@ public class DeviceReservationControllerTest {
     }
 
     @Test
-    public void testDeleteDevice() throws Exception {
-        mockMvc.perform(delete("/api/v1/devicereservationss/" + one.getId())
+    public void testDeleteDeviceReservation() throws Exception {
+        mockMvc.perform(delete("/api/v1/devicereservations/" + one.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON));
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/v1/devicereservationss/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/v1/devicereservations/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 }

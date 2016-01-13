@@ -186,7 +186,8 @@ public class DeviceControllerTest {
     public void testDeleteDevice() throws Exception {
         mockMvc.perform(delete("/api/v1/devices/" + device1.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON));
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/v1/devices/" + device1.getId()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
