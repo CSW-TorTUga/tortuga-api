@@ -104,11 +104,11 @@ public class TokenHandler {
     }
 
     private String toBase64(byte[] content) {
-        return Base64.getEncoder().encodeToString(content);
+        return Base64.getUrlEncoder().encodeToString(content);
     }
 
     private byte[] fromBase64(String content) {
-        return Base64.getDecoder().decode(content);
+        return Base64.getUrlDecoder().decode(content);
     }
 
 }
