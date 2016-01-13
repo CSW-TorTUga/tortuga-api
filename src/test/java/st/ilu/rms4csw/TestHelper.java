@@ -14,6 +14,12 @@ import java.util.Optional;
  */
 public class TestHelper {
 
+    public static User createLoginUser() {
+        User user = createUser();
+        user.setLoginName("eirungirungvije");
+        return user;
+    }
+
     public static User createUser() {
         User user = new User();
         user.setExpirationDate(Optional.empty());
