@@ -1,18 +1,30 @@
 package st.ilu.rms4csw.patch;
 
+import st.ilu.rms4csw.model.base.PersistentEntity;
+
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Mischa Holz
  */
 public class Patch {
 
-    public static <T> T patch(T base, T patch) {
+    public static <T extends PersistentEntity> T patch(T base, T patch) {
         if(!base.getClass().equals(patch.getClass())) {
             throw new IllegalArgumentException("Both objects need to be the exact same class");
         }
 
-        Field[] fields = base.getClass().getDeclaredFields();
+        List<Field> fields = new ArrayList<>();
+
+        Class<?> clazz = base.getClass();
+        while(!clazz.equals(PersistentEntity.class)) {
+            fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+
+            clazz = clazz.getSuperclass();
+        }
 
         for (Field field : fields) {
             field.setAccessible(true);

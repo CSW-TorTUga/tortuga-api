@@ -16,7 +16,7 @@ public class DeviceCategory extends PersistentEntity {
     @NotEmpty
     private String name;
 
-    private boolean active;
+    private Boolean active;
 
     public String getName() {
         return name;
@@ -26,11 +26,11 @@ public class DeviceCategory extends PersistentEntity {
         this.name = name;
     }
 
-    public boolean isActive() {
+    public Boolean isActive() {
         return active;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(Boolean active) {
         this.active = active;
     }
 }

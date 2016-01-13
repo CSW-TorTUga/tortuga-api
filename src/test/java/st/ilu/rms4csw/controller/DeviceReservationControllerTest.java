@@ -32,8 +32,8 @@ import java.util.Date;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -159,5 +159,45 @@ public class DeviceReservationControllerTest {
 
         mockMvc.perform(get(location).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(three.getId())));
+    }
+
+    @Test
+    public void testPutDeviceReservation() throws Exception {
+        two.setTimeSpan(new TimeSpan(new Date(700), new Date(800)));
+
+        mockMvc.perform(put("/api/v1/devicereservations/" + two.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(two))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(two.getId())))
+                .andExpect(jsonPath("$.timeSpan.beginning", is(700)));
+    }
+
+    @Test
+    public void testPatchDevice() throws Exception {
+        DeviceReservation patch = new DeviceReservation();
+        patch.setId(null);
+        patch.setTimeSpan(new TimeSpan(new Date(900), new Date(1000)));
+
+        mockMvc.perform(patch("/api/v1/devicereservations/" + one.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(patch))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(one.getId())))
+                .andExpect(jsonPath("$.timeSpan.beginning", is(900)));
+    }
+
+    @Test
+    public void testDeleteDevice() throws Exception {
+        mockMvc.perform(delete("/api/v1/devicereservationss/" + one.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+
+        mockMvc.perform(get("/api/v1/devicereservationss/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

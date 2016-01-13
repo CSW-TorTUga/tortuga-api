@@ -17,13 +17,13 @@ public class DeviceReservation extends Reservation<DeviceReservation> {
     @NotNull
     private Device device;
 
-    private boolean borrowed;
+    private Boolean borrowed;
 
-    public boolean isBorrowed() {
+    public Boolean isBorrowed() {
         return borrowed;
     }
 
-    public void setBorrowed(boolean borrowed) {
+    public void setBorrowed(Boolean borrowed) {
         this.borrowed = borrowed;
     }
 

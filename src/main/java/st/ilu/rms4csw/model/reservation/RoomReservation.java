@@ -10,17 +10,17 @@ public class RoomReservation extends Reservation<RoomReservation> {
 
     private static final long OPEN_EXPAND_MILLIS = 15 * 60 * 1000;
 
-    private boolean approved;
+    private Boolean approved;
 
     private String description;
 
-    private boolean open;
+    private Boolean open;
 
-    public boolean isOpen() {
+    public Boolean isOpen() {
         return open;
     }
 
-    public void setOpen(boolean open) {
+    public void setOpen(Boolean open) {
         this.open = open;
     }
 
@@ -36,11 +36,11 @@ public class RoomReservation extends Reservation<RoomReservation> {
         this.description = description;
     }
 
-    public boolean isApproved() {
+    public Boolean isApproved() {
         return approved;
     }
 
-    public void setApproved(boolean approved) {
+    public void setApproved(Boolean approved) {
         this.approved = approved;
     }
 
