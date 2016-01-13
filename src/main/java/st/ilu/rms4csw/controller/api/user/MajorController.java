@@ -20,9 +20,8 @@ public class MajorController extends CrudController<Major> {
 
 	public final static String API_BASE = "majors";
 
-    @Override
-    protected Class<Major> getEntityClass() {
-        return Major.class;
+    public MajorController() {
+        super(Major.class);
     }
 
     @Override

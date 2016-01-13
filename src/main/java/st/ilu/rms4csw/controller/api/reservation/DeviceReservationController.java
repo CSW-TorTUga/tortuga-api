@@ -24,6 +24,10 @@ public class DeviceReservationController extends CrudController<DeviceReservatio
 
     private UserService userService;
 
+    public DeviceReservationController() {
+        super(DeviceReservation.class);
+    }
+
     @Override
     @RequestMapping
     public List<DeviceReservation> findAll(HttpServletRequest request) {
@@ -66,11 +70,6 @@ public class DeviceReservationController extends CrudController<DeviceReservatio
     @Override
     public String getApiBase() {
         return API_BASE;
-    }
-
-    @Override
-    protected Class<DeviceReservation> getEntityClass() {
-        return DeviceReservation.class;
     }
 
     @Autowired

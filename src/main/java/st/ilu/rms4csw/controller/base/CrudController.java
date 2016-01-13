@@ -26,7 +26,11 @@ public abstract class CrudController<T extends PersistentEntity> {
 
     public abstract String getApiBase();
 
-    protected abstract Class<T> getEntityClass();
+    private Class<T> entityClass;
+
+    public CrudController(Class<T> entityClass) {
+        this.entityClass = entityClass;
+    }
 
     private Sort buildSortObject(HttpServletRequest request) {
         Sort.Direction dir = Sort.DEFAULT_DIRECTION;
@@ -45,7 +49,7 @@ public abstract class CrudController<T extends PersistentEntity> {
 
     public List<T> findAll(HttpServletRequest request) {
         List<PersistentEntitySpecification<T>> specifications = new ArrayList<>();
-        for (Field field : getEntityClass().getDeclaredFields()) {
+        for (Field field : entityClass.getDeclaredFields()) {
             field.setAccessible(true);
 
             String name = field.getName();

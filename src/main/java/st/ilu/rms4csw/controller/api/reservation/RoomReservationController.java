@@ -24,6 +24,10 @@ public class RoomReservationController extends CrudController<RoomReservation> {
 
     private UserService userService;
 
+    public RoomReservationController() {
+        super(RoomReservation.class);
+    }
+
     @Override
     @RequestMapping
     public List<RoomReservation> findAll(HttpServletRequest request) {
@@ -57,11 +61,6 @@ public class RoomReservationController extends CrudController<RoomReservation> {
     @Override
     public String getApiBase() {
         return API_BASE;
-    }
-
-    @Override
-    protected Class<RoomReservation> getEntityClass() {
-        return RoomReservation.class;
     }
 
     @Autowired

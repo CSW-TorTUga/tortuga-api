@@ -23,14 +23,13 @@ public class UserController extends CrudController<User> {
 
     public final static String USER_API_BASE = "users";
 
-    @Override
-    public String getApiBase() {
-        return USER_API_BASE;
+    public UserController() {
+        super(User.class);
     }
 
     @Override
-    protected Class<User> getEntityClass() {
-        return User.class;
+    public String getApiBase() {
+        return USER_API_BASE;
     }
 
     @Override

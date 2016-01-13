@@ -20,9 +20,8 @@ public class DeviceController extends CrudController<Device> {
 
     public static final String API_BASE = "devices";
 
-    @Override
-    protected Class<Device> getEntityClass() {
-        return Device.class;
+    public DeviceController() {
+        super(Device.class);
     }
 
     @Override

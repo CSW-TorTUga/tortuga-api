@@ -20,10 +20,8 @@ public class DeviceCategoryController extends CrudController<DeviceCategory> {
 
     public static final String API_BASE = "devicecategories";
 
-
-    @Override
-    protected Class<DeviceCategory> getEntityClass() {
-        return DeviceCategory.class;
+    public DeviceCategoryController() {
+        super(DeviceCategory.class);
     }
 
     @Override
