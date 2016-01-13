@@ -1,10 +1,19 @@
 package st.ilu.rms4csw;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
+import st.ilu.rms4csw.service.SpringSecurityLoggedInUserHolder;
 
 /**
  * @author Mischa Holz
  */
-@SpringBootApplication
+@Configuration
+@EnableAutoConfiguration
+@ComponentScan(excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SpringSecurityLoggedInUserHolder.class),
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = Main.class)
+})
 public class TestContext {
 }

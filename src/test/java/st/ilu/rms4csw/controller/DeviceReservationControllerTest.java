@@ -1,6 +1,7 @@
 package st.ilu.rms4csw.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import st.ilu.rms4csw.MockLoggedInUserHolder;
 import st.ilu.rms4csw.TestContext;
 import st.ilu.rms4csw.TestHelper;
 import st.ilu.rms4csw.model.device.Device;
@@ -31,9 +33,8 @@ import java.util.Date;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * @author Mischa Holz
@@ -73,6 +74,9 @@ public class DeviceReservationControllerTest {
     @Autowired
     private DeviceCategoryRepository deviceCategoryRepository;
 
+    @Autowired
+    private MockLoggedInUserHolder mockLoggedInUserHolder;
+
 
     @Before
     public void setUp() throws Exception {
@@ -80,6 +84,8 @@ public class DeviceReservationControllerTest {
         deviceRepository.deleteAllInBatch();
         deviceCategoryRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
+
+        mockLoggedInUserHolder.setUp();
 
         deviceCategory = TestHelper.createDeviceCategory();
         deviceCategory = deviceCategoryRepository.save(deviceCategory);
@@ -132,5 +138,26 @@ public class DeviceReservationControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.id", is(one.getId())))
                 .andExpect(jsonPath("$.user.id", is(one.getUser().getId())));
+    }
+
+    @Test
+    public void testPostDeviceReservation() throws Exception {
+        DeviceReservation three = new DeviceReservation();
+        three.setTimeSpan(new TimeSpan(new Date(401), new Date(500)));
+        three.setBorrowed(false);
+        three.setDevice(device);
+        three.setUser(user);
+
+        String location = mockMvc.perform(post("/api/v1/devicereservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(three))
+        ).andExpect(jsonPath("$.id", is(three.getId())))
+                .andExpect(header().string("Location", Matchers.notNullValue()))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getHeader("Location");
+
+        mockMvc.perform(get(location).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", is(three.getId())));
     }
 }
