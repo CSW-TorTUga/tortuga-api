@@ -2,6 +2,7 @@ package st.ilu.rms4csw.security.token;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import st.ilu.rms4csw.model.user.User;
 
 import javax.crypto.Mac;
@@ -29,6 +30,7 @@ public class TokenHandler {
 
     public TokenHandler(byte[] secret) {
         this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new Jdk8Module());
 
         try {
             mac = Mac.getInstance(HMAC_ALGO);
