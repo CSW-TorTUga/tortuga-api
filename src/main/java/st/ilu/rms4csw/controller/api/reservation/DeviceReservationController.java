@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import st.ilu.rms4csw.controller.base.CrudController;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
+import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.reservation.DeviceReservationRepository;
+import st.ilu.rms4csw.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +23,8 @@ import java.util.List;
 public class DeviceReservationController extends CrudController<DeviceReservation> {
 
     public static final String API_BASE = "devicereservations";
+
+    private UserService userService;
 
     @Override
     @RequestMapping
@@ -37,6 +41,9 @@ public class DeviceReservationController extends CrudController<DeviceReservatio
     @Override
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<DeviceReservation> post(DeviceReservation newEntity, HttpServletResponse response) {
+        User user = userService.getLoggedInUser();
+        newEntity.setUser(user);
+
         return super.post(newEntity, response);
     }
 
@@ -71,5 +78,10 @@ public class DeviceReservationController extends CrudController<DeviceReservatio
     @Autowired
     public void setReservationRepository(DeviceReservationRepository reservationRepository) {
         this.repository = reservationRepository;
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }
