@@ -16,7 +16,7 @@ public class DeviceCategory extends PersistentEntity {
     @NotEmpty
     private String name;
 
-    private Boolean active;
+    private Boolean active = false;
 
     public String getName() {
         return name;
