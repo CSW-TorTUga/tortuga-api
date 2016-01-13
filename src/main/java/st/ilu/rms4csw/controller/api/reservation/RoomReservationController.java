@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import st.ilu.rms4csw.controller.base.CrudController;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
+import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.reservation.RoomReservationRepository;
+import st.ilu.rms4csw.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +23,8 @@ import java.util.List;
 public class RoomReservationController extends CrudController<RoomReservation> {
 
     public static final String API_BASE = "roomreservations";
+
+    private UserService userService;
 
     @Override
     @RequestMapping
@@ -37,6 +41,9 @@ public class RoomReservationController extends CrudController<RoomReservation> {
     @Override
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<RoomReservation> post(RoomReservation newEntity, HttpServletResponse response) {
+        User user = userService.getLoggedInUser();
+        newEntity.setUser(user);
+
         newEntity.setApproved(false);
         newEntity.setOpen(false);
 
@@ -74,5 +81,10 @@ public class RoomReservationController extends CrudController<RoomReservation> {
     @Autowired
     public void setReservationRepository(RoomReservationRepository reservationRepository) {
         this.repository = reservationRepository;
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

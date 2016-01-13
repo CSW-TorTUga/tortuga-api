@@ -1,6 +1,7 @@
 package st.ilu.rms4csw.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,6 +36,17 @@ public class UserService implements UserDetailsService {
                 true,
                 user.getRole().getAuthorities()
         );
+    }
+
+    public User getLoggedInUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(principal instanceof String) {
+            return userRepository.findOneByLoginName((String) principal);
+        } else if(principal instanceof User) {
+            return (User) principal;
+        } else {
+            throw new RuntimeException("I don't know what to do with this principal: " + principal);
+        }
     }
 
     @Autowired
