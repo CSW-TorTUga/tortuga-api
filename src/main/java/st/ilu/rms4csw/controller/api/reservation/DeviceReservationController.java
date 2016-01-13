@@ -31,7 +31,7 @@ public class DeviceReservationController extends CrudController<DeviceReservatio
     }
 
     @Override
-    @RequestMapping("/{id}")
+    @RequestMapping("/{id")
     public DeviceReservation findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
