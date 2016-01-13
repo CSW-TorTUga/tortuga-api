@@ -4,6 +4,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import st.ilu.rms4csw.model.device.Device;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
+import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
@@ -21,20 +22,21 @@ public class ReservationTests {
 
     private static User user;
 
-    private DeviceReservation makeReservationFromTimeSpan(TimeSpan timeSpan) {
-        DeviceReservation reservation = new DeviceReservation();
+    private RoomReservation makeRoomReservation(TimeSpan timeSpan) {
+        RoomReservation reservation = new RoomReservation();
         reservation.setTimeSpan(timeSpan);
         reservation.setUser(user);
-        reservation.setDevice(Optional.empty());
+        reservation.setApproved(false);
+        reservation.setDescription("I want the room for stuff");
 
         return reservation;
     }
 
-    private DeviceReservation makeReservation(Device device, TimeSpan timeSpan) {
+    private DeviceReservation makeDeviceReservation(Device device, TimeSpan timeSpan) {
         DeviceReservation reservation = new DeviceReservation();
         reservation.setTimeSpan(timeSpan);
         reservation.setUser(user);
-        reservation.setDevice(Optional.of(device));
+        reservation.setDevice(device);
 
         return reservation;
     }
@@ -59,7 +61,7 @@ public class ReservationTests {
     public void testIntersectionOfSameReservation() {
         TimeSpan one = new TimeSpan(new Date(100), new Date(200));
 
-        DeviceReservation reservation = makeReservationFromTimeSpan(one);
+        RoomReservation reservation = makeRoomReservation(one);
 
         assertTrue("The same reservation needs to intersect with itself", reservation.intersects(reservation));
     }
@@ -69,8 +71,8 @@ public class ReservationTests {
         TimeSpan one = new TimeSpan(new Date(100), new Date(200));
         TimeSpan two = new TimeSpan(new Date(150), new Date(250));
 
-        DeviceReservation rOne = makeReservationFromTimeSpan(one);
-        DeviceReservation rTwo = makeReservationFromTimeSpan(two);
+        RoomReservation rOne = makeRoomReservation(one);
+        RoomReservation rTwo = makeRoomReservation(two);
 
         assertTrue("These two reservations need to intersect", rOne.intersects(rTwo));
 
@@ -82,8 +84,8 @@ public class ReservationTests {
         TimeSpan one = new TimeSpan(new Date(100), new Date(200));
         TimeSpan two = new TimeSpan(new Date(50), new Date(150));
 
-        DeviceReservation rOne = makeReservationFromTimeSpan(one);
-        DeviceReservation rTwo = makeReservationFromTimeSpan(two);
+        RoomReservation rOne = makeRoomReservation(one);
+        RoomReservation rTwo = makeRoomReservation(two);
 
         assertTrue("These two reservations need to intersect", rOne.intersects(rTwo));
 
@@ -95,8 +97,8 @@ public class ReservationTests {
         TimeSpan one = new TimeSpan(new Date(100), new Date(200));
         TimeSpan two = new TimeSpan(new Date(50), new Date(250));
 
-        DeviceReservation rOne = makeReservationFromTimeSpan(one);
-        DeviceReservation rTwo = makeReservationFromTimeSpan(two);
+        RoomReservation rOne = makeRoomReservation(one);
+        RoomReservation rTwo = makeRoomReservation(two);
 
         assertTrue("These two reservations need to intersect", rOne.intersects(rTwo));
 
@@ -108,8 +110,8 @@ public class ReservationTests {
         TimeSpan one = new TimeSpan(new Date(100), new Date(200));
         TimeSpan two = new TimeSpan(new Date(201), new Date(250));
 
-        DeviceReservation rOne = makeReservationFromTimeSpan(one);
-        DeviceReservation rTwo = makeReservationFromTimeSpan(two);
+        RoomReservation rOne = makeRoomReservation(one);
+        RoomReservation rTwo = makeRoomReservation(two);
 
         assertFalse("These two reservations should not intersect", rOne.intersects(rTwo));
 
@@ -121,8 +123,8 @@ public class ReservationTests {
         TimeSpan one = new TimeSpan(new Date(100), new Date(200));
         TimeSpan two = new TimeSpan(new Date(100), new Date(200));
 
-        DeviceReservation rOne = makeReservation(new Device(), one);
-        DeviceReservation rTwo = makeReservation(new Device(), two);
+        DeviceReservation rOne = makeDeviceReservation(new Device(), one);
+        DeviceReservation rTwo = makeDeviceReservation(new Device(), two);
 
         assertFalse("These two reservations should not intersect", rOne.intersects(rTwo));
 
@@ -136,8 +138,8 @@ public class ReservationTests {
 
         Device device = new Device();
 
-        DeviceReservation rOne = makeReservation(device, one);
-        DeviceReservation rTwo = makeReservation(device, two);
+        DeviceReservation rOne = makeDeviceReservation(device, one);
+        DeviceReservation rTwo = makeDeviceReservation(device, two);
 
         assertTrue("These two reservations need to intersect", rOne.intersects(rTwo));
 

@@ -47,6 +47,10 @@ public class TimeSpan {
         return checkIntersectInOneDirection(one, two) || checkIntersectInOneDirection(two, one);
     }
 
+    public TimeSpan expand(long millis) {
+        return new TimeSpan(new Date(this.getBeginning().getTime() - millis), new Date(this.getEnd().getTime() + millis));
+    }
+
     private boolean checkIntersectInOneDirection(TimeSpan one, TimeSpan two) {
         long unixStartOne = one.beginning.getTime();
         long unixEndOne = one.end.getTime();
