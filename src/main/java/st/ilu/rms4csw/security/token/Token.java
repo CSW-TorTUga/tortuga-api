@@ -1,6 +1,7 @@
 package st.ilu.rms4csw.security.token;
 
 import st.ilu.rms4csw.model.user.Role;
+import st.ilu.rms4csw.model.user.User;
 
 import java.util.Date;
 
@@ -16,6 +17,8 @@ public class Token {
     private Date expires;
 
     private Role role;
+
+    private User user;
 
     public String getLoginName() {
         return loginName;
@@ -47,5 +50,13 @@ public class Token {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

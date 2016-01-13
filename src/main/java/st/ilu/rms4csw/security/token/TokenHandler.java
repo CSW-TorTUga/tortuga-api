@@ -48,6 +48,7 @@ public class TokenHandler {
         token.setLoginName(user.getLoginName());
         token.setId(user.getId());
         token.setRole(user.getRole());
+        token.setUser(user);
 
         Date in3Minutes = new Date((new Date()).getTime() + validFor);
 
