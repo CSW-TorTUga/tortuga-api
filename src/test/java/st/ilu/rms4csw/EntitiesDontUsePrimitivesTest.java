@@ -4,10 +4,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import st.ilu.rms4csw.util.ReflectionUtils;
 
 import javax.persistence.Entity;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,24 +75,14 @@ public class EntitiesDontUsePrimitivesTest {
     private Result testForPrimitivesInClass(Class<?> checkingCLass) {
         List<String> primitiveFields = new ArrayList<>();
 
-        Class<?> clazz = checkingCLass;
-        while(clazz.getSuperclass() != null) {
-            for(Field field : clazz.getDeclaredFields()) {
-                if(Modifier.isStatic(field.getModifiers())) {
-                    continue;
-                }
-                if(Modifier.isTransient(field.getModifiers())) {
-                    continue;
-                }
+        List<Field> classFields = ReflectionUtils.getAllFieldsOfClass(checkingCLass);
 
-                for(Class<?> primitive : primitives) {
-                    if(primitive.equals(field.getType())) {
-                        primitiveFields.add(field.getName());
-                    }
+        for(Field field : classFields) {
+            for(Class<?> primitive : primitives) {
+                if(primitive.equals(field.getType())) {
+                    primitiveFields.add(field.getName());
                 }
             }
-
-            clazz = clazz.getSuperclass();
         }
 
         String str = checkingCLass.getName() + " contains primitives: ";

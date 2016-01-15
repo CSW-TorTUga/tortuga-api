@@ -1,5 +1,6 @@
 package st.ilu.rms4csw.controller.base;
 
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
@@ -13,7 +14,6 @@ import st.ilu.rms4csw.repository.base.JpaSpecificationRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,38 +49,34 @@ public abstract class CrudController<T extends PersistentEntity> {
 
     public List<T> findAll(HttpServletRequest request) {
         List<PersistentEntitySpecification<T>> specifications = new ArrayList<>();
-        for (Field field : entityClass.getDeclaredFields()) {
-            field.setAccessible(true);
 
-            String name = field.getName();
-
-            String value = request.getParameter(name);
-            if(value != null) {
+        request.getParameterMap().forEach((key, valueArray) -> {
+            for(String value : valueArray) {
                 FilterCriteria criteria;
                 if(value.startsWith("<")) {
                     criteria = new FilterCriteria();
-                    criteria.setKey(name);
+                    criteria.setKey(key);
                     criteria.setOperation(FilterCriteria.Operation.LESS_THAN);
                     criteria.setValue(value.substring(1));
                 } else if(value.startsWith(">")) {
                     criteria = new FilterCriteria();
-                    criteria.setKey(name);
+                    criteria.setKey(key);
                     criteria.setOperation(FilterCriteria.Operation.GREATER_THAN);
                     criteria.setValue(value.substring(1));
                 } else {
                     criteria = new FilterCriteria();
-                    criteria.setKey(name);
+                    criteria.setKey(key);
                     criteria.setOperation(FilterCriteria.Operation.EQUALS);
                     criteria.setValue(value);
                 }
                 specifications.add(new PersistentEntitySpecification<>(criteria));
             }
-        }
+        });
 
         if(specifications.size() > 0) {
             boolean first = true;
             Specifications<T> spec = null;
-            for (PersistentEntitySpecification<T> specification : specifications) {
+            for(PersistentEntitySpecification<T> specification : specifications) {
                 if(first) {
                     spec = Specifications.where(specification);
                     first = false;
@@ -91,9 +87,17 @@ public abstract class CrudController<T extends PersistentEntity> {
 
             Sort sort = buildSortObject(request);
             if(sort == null) {
-                return repository.findAll(spec);
+                try {
+                    return repository.findAll(spec);
+                } catch(InvalidDataAccessApiUsageException e) {
+                    throw (RuntimeException) e.getCause();
+                }
             }
-            return repository.findAll(spec, sort);
+            try {
+                return repository.findAll(spec, sort);
+            } catch(InvalidDataAccessApiUsageException e) {
+                throw (RuntimeException) e.getCause();
+            }
         }
 
         Sort sort = buildSortObject(request);
@@ -136,7 +140,7 @@ public abstract class CrudController<T extends PersistentEntity> {
 
     public T patch(String id, T entity) {
         T original = repository.findOne(id);
-        if (original == null) {
+        if(original == null) {
             throw new NotFoundException("Did not find resource with the id " + id);
         }
 
