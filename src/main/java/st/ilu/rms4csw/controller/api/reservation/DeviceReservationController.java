@@ -28,42 +28,37 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
 
     @Override
     @RequestMapping("/{id}")
-    public DeviceReservation findOne(String id) {
+    public DeviceReservation findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<DeviceReservation> post(DeviceReservation newEntity, HttpServletResponse response) {
+    public ResponseEntity<DeviceReservation> post(@RequestBody DeviceReservation newEntity, HttpServletResponse response) {
         return super.post(newEntity, response);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public DeviceReservation put(String id, DeviceReservation entity) {
+    public DeviceReservation put(@PathVariable("id") String id, @RequestBody DeviceReservation entity) {
         return super.put(id, entity);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity delete(@PathVariable String id) {
+    public ResponseEntity delete(@PathVariable("id") String id) {
         return super.delete(id);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public DeviceReservation patch(@PathVariable String id, @RequestBody DeviceReservation entity) {
+    public DeviceReservation patch(@PathVariable("id") String id, @RequestBody DeviceReservation entity) {
         return super.patch(id, entity);
     }
 
     @Override
     public String getApiBase() {
         return API_BASE;
-    }
-
-    @Override
-    protected Class<DeviceReservation> getEntityClass() {
-        return DeviceReservation.class;
     }
 
     @Autowired

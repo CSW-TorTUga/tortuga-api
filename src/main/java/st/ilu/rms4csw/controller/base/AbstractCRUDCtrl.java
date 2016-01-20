@@ -26,12 +26,6 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
 
     public abstract String getApiBase();
 
-    private Class<T> entityClass;
-
-    public AbstractCRUDCtrl(Class<T> entityClass) {
-        this.entityClass = entityClass;
-    }
-
     private Sort buildSortObject(HttpServletRequest request) {
         Sort.Direction dir = Sort.DEFAULT_DIRECTION;
         String dirValue = request.getParameter("direction");

@@ -20,10 +20,6 @@ public class DeviceCategoryController extends AbstractCRUDCtrl<DeviceCategory> {
 
     public static final String API_BASE = "devicecategories";
 
-    public DeviceCategoryController() {
-        super(DeviceCategory.class);
-    }
-
     @Override
     @RequestMapping
     public List<DeviceCategory> findAll(HttpServletRequest request) {

@@ -20,10 +20,6 @@ public class MajorController extends AbstractCRUDCtrl<Major> {
 
 	public final static String API_BASE = "majors";
 
-    public MajorController() {
-        super(Major.class);
-    }
-
     @Override
     @RequestMapping
     public List<Major> findAll(HttpServletRequest request) {
@@ -32,7 +28,7 @@ public class MajorController extends AbstractCRUDCtrl<Major> {
 
     @Override
     @RequestMapping("/{id}")
-    public Major findOne(@PathVariable String id) {
+    public Major findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -44,19 +40,19 @@ public class MajorController extends AbstractCRUDCtrl<Major> {
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public Major put(@PathVariable String id, @RequestBody Major entity) {
+    public Major put(@PathVariable("id") String id, @RequestBody Major entity) {
         return super.put(id, entity);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity delete(@PathVariable String id) {
+    public ResponseEntity delete(@PathVariable("id") String id) {
         return super.delete(id);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public Major patch(@PathVariable String id, @RequestBody Major entity) {
+    public Major patch(@PathVariable("id") String id, @RequestBody Major entity) {
         return super.patch(id, entity);
     }
 

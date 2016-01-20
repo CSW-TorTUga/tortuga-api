@@ -3,6 +3,7 @@ package st.ilu.rms4csw.controller.api.device;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.device.Device;
 import st.ilu.rms4csw.repository.device.DeviceRepository;
 
@@ -14,14 +15,10 @@ import java.util.List;
  * @author Mischa Holz
  */
 @RestController
-@RequestMapping("/api/v1/" + AbstractCRUDCtrl.API_BASE)
-public class AbstractCRUDCtrl extends AbstractCRUDCtrl<Device> {
+@RequestMapping("/api/v1/" + DeviceController.API_BASE)
+public class DeviceController extends AbstractCRUDCtrl<Device> {
 
     public static final String API_BASE = "devices";
-
-    public AbstractCRUDCtrl() {
-        super(Device.class);
-    }
 
     @Override
     @RequestMapping
@@ -31,7 +28,7 @@ public class AbstractCRUDCtrl extends AbstractCRUDCtrl<Device> {
 
     @Override
     @RequestMapping("/{id}")
-    public Device findOne(@PathVariable String id) {
+    public Device findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -43,19 +40,19 @@ public class AbstractCRUDCtrl extends AbstractCRUDCtrl<Device> {
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public Device put(@PathVariable String id, @RequestBody Device entity) {
+    public Device put(@PathVariable("id") String id, @RequestBody Device entity) {
         return super.put(id, entity);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity delete(@PathVariable String id) {
+    public ResponseEntity delete(@PathVariable("id") String id) {
         return super.delete(id);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public Device patch(@PathVariable String id, @RequestBody Device entity) {
+    public Device patch(@PathVariable("id") String id, @RequestBody Device entity) {
         return super.patch(id, entity);
     }
 

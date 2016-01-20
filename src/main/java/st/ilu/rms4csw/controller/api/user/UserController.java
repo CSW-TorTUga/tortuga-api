@@ -23,10 +23,6 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
     public final static String USER_API_BASE = "users";
 
-    public UserController() {
-        super(User.class);
-    }
-
     @Override
     public String getApiBase() {
         return USER_API_BASE;
@@ -39,7 +35,7 @@ public class UserController extends AbstractCRUDCtrl<User> {
     }
 
     @RequestMapping("/{id}")
-    public User findOne(@PathVariable String id) {
+    public User findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -58,7 +54,7 @@ public class UserController extends AbstractCRUDCtrl<User> {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public User putUser(@PathVariable String id, @RequestBody User user) {
+    public User putUser(@PathVariable("id") String id, @RequestBody User user) {
         User beforeUpdate = repository.findOne(id);
         if(beforeUpdate != null && user.getExpirationDate().isPresent() && !beforeUpdate.getExpirationDate().equals(user.getExpirationDate())) {
             throw new IllegalArgumentException("Can't set the expiration date of a user!");
@@ -68,12 +64,12 @@ public class UserController extends AbstractCRUDCtrl<User> {
     }
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity deleteUser(@PathVariable String id) {
+	public ResponseEntity deleteUser(@PathVariable("id") String id) {
         return super.delete(id);
 	}
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public User patchUser(@PathVariable String id, @RequestBody User user) {
+    public User patchUser(@PathVariable("id") String id, @RequestBody User user) {
         User beforeUpdate = repository.findOne(id);
         if(beforeUpdate != null && user.getExpirationDate().isPresent() && !beforeUpdate.getExpirationDate().equals(user.getExpirationDate())) {
             throw new IllegalArgumentException("Can't set the expiration date of a user!");
