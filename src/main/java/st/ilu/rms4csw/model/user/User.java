@@ -8,6 +8,7 @@ import st.ilu.rms4csw.model.base.PersistentEntity;
 import st.ilu.rms4csw.model.major.Major;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
@@ -44,6 +45,7 @@ public class User extends PersistentEntity {
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @NotNull
     private Role role;
 
     @Access(AccessType.FIELD)
