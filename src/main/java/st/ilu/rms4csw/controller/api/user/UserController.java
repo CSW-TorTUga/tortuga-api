@@ -3,7 +3,7 @@ package st.ilu.rms4csw.controller.api.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import st.ilu.rms4csw.controller.base.CrudController;
+import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.user.UserRepository;
@@ -19,7 +19,7 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/v1/" + UserController.USER_API_BASE)
-public class UserController extends CrudController<User> {
+public class UserController extends AbstractCRUDCtrl<User> {
 
     public final static String USER_API_BASE = "users";
 

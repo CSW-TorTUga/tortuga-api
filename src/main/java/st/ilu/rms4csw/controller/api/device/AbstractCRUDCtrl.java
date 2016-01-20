@@ -3,7 +3,6 @@ package st.ilu.rms4csw.controller.api.device;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import st.ilu.rms4csw.controller.base.CrudController;
 import st.ilu.rms4csw.model.device.Device;
 import st.ilu.rms4csw.repository.device.DeviceRepository;
 
@@ -15,12 +14,12 @@ import java.util.List;
  * @author Mischa Holz
  */
 @RestController
-@RequestMapping("/api/v1/" + DeviceController.API_BASE)
-public class DeviceController extends CrudController<Device> {
+@RequestMapping("/api/v1/" + AbstractCRUDCtrl.API_BASE)
+public class AbstractCRUDCtrl extends AbstractCRUDCtrl<Device> {
 
     public static final String API_BASE = "devices";
 
-    public DeviceController() {
+    public AbstractCRUDCtrl() {
         super(Device.class);
     }
 

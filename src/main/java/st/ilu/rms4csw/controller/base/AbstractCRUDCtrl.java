@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * @author Mischa Holz
  */
-public abstract class CrudController<T extends PersistentEntity> {
+public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
 
     protected JpaSpecificationRepository<T, String> repository;
 
@@ -28,7 +28,7 @@ public abstract class CrudController<T extends PersistentEntity> {
 
     private Class<T> entityClass;
 
-    public CrudController(Class<T> entityClass) {
+    public AbstractCRUDCtrl(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
 

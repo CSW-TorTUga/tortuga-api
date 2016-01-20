@@ -3,7 +3,7 @@ package st.ilu.rms4csw.controller.api.reservation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import st.ilu.rms4csw.controller.base.CrudController;
+import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.reservation.RoomReservationRepository;
@@ -18,7 +18,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v1/" + RoomReservationController.API_BASE)
-public class RoomReservationController extends CrudController<RoomReservation> {
+public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation> {
 
     public static final String API_BASE = "roomreservations";
 
