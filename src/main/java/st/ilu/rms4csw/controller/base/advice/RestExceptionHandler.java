@@ -61,6 +61,8 @@ public class RestExceptionHandler {
 
     public static class ValidationError extends ErrorResponse {
 
+        public static String GLOBAL_ERROR_KEY = "_GLOBAL";
+
         private Map<String, String> errors = new LinkedHashMap<>();
 
         public ValidationError() {
@@ -72,7 +74,7 @@ public class RestExceptionHandler {
             for(ConstraintViolation cv : e.getConstraintViolations()) {
                 String key = cv.getPropertyPath().toString();
                 if(key.isEmpty()) {
-                    key = "_GLOBAL";
+                    key = GLOBAL_ERROR_KEY;
                 }
 
                 String value = cv.getMessage();

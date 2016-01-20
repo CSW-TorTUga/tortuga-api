@@ -145,7 +145,7 @@ public class RoomReservationControllerTest {
                 .andReturn().getResponse().getContentAsString();
 
         RestExceptionHandler.ValidationError error = objectMapper.readValue(json, RestExceptionHandler.ValidationError.class);
-        Assert.assertFalse("This has to be a global error", error.getErrors().get("_GLOBAL").isEmpty());
+        Assert.assertFalse("RoomtReservations overlapping has to be a global error", error.getErrors().get(RestExceptionHandler.ValidationError.GLOBAL_ERROR_KEY).isEmpty());
     }
 
     @Test
