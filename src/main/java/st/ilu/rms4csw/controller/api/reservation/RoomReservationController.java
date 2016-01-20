@@ -49,21 +49,9 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
     }
 
     @Override
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public RoomReservation put(@PathVariable("id") String id, RoomReservation entity) {
-        return super.put(id, entity);
-    }
-
-    @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity delete(@PathVariable("id") String id) {
         return super.delete(id);
-    }
-
-    @Override
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public RoomReservation patch(@PathVariable("id") String id, @RequestBody RoomReservation entity) {
-        return super.patch(id, entity);
     }
 
     @Override
