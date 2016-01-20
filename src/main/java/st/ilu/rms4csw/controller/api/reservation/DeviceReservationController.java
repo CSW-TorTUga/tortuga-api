@@ -5,9 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
-import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.reservation.DeviceReservationRepository;
-import st.ilu.rms4csw.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,12 +20,6 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
 
     public static final String API_BASE = "devicereservations";
 
-    private UserService userService;
-
-    public DeviceReservationController() {
-        super(DeviceReservation.class);
-    }
-
     @Override
     @RequestMapping
     public List<DeviceReservation> findAll(HttpServletRequest request) {
@@ -36,34 +28,31 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
 
     @Override
     @RequestMapping("/{id}")
-    public DeviceReservation findOne(@PathVariable("id") String id) {
+    public DeviceReservation findOne(String id) {
         return super.findOne(id);
     }
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<DeviceReservation> post(@RequestBody DeviceReservation newEntity, HttpServletResponse response) {
-        User user = userService.getLoggedInUser();
-        newEntity.setUser(user);
-
+    public ResponseEntity<DeviceReservation> post(DeviceReservation newEntity, HttpServletResponse response) {
         return super.post(newEntity, response);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public DeviceReservation put(@PathVariable("id") String id, @RequestBody DeviceReservation entity) {
+    public DeviceReservation put(String id, DeviceReservation entity) {
         return super.put(id, entity);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity delete(@PathVariable("id") String id) {
+    public ResponseEntity delete(@PathVariable String id) {
         return super.delete(id);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public DeviceReservation patch(@PathVariable("id") String id, @RequestBody DeviceReservation entity) {
+    public DeviceReservation patch(@PathVariable String id, @RequestBody DeviceReservation entity) {
         return super.patch(id, entity);
     }
 
@@ -72,13 +61,13 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
         return API_BASE;
     }
 
-    @Autowired
-    public void setReservationRepository(DeviceReservationRepository reservationRepository) {
-        this.repository = reservationRepository;
+    @Override
+    protected Class<DeviceReservation> getEntityClass() {
+        return DeviceReservation.class;
     }
 
     @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+    public void setReservationRepository(DeviceReservationRepository reservationRepository) {
+        this.repository = reservationRepository;
     }
 }
