@@ -130,6 +130,21 @@ public class RoomReservationControllerTest {
     }
 
     @Test
+    public void testOverlappingRoomReservations() throws Exception {
+        RoomReservation three = new RoomReservation();
+        three.setTimeSpan(new TimeSpan(new Date(150), new Date(500)));
+        three.setOpen(true);
+        three.setApproved(true);
+        three.setDescription("beschreibung");
+
+        mockMvc.perform(post("/api/v1/roomreservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(three)))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
     public void testPostRoomReservation() throws Exception {
         RoomReservation three = new RoomReservation();
         three.setTimeSpan(new TimeSpan(new Date(401), new Date(500)));
