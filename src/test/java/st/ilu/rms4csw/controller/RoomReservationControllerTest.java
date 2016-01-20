@@ -3,6 +3,7 @@ package st.ilu.rms4csw.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,7 @@ import org.springframework.web.context.WebApplicationContext;
 import st.ilu.rms4csw.MockLoggedInUserHolder;
 import st.ilu.rms4csw.TestContext;
 import st.ilu.rms4csw.TestHelper;
+import st.ilu.rms4csw.controller.base.advice.RestExceptionHandler;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
 import st.ilu.rms4csw.model.user.User;
@@ -30,9 +32,7 @@ import java.util.Date;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -137,11 +137,15 @@ public class RoomReservationControllerTest {
         three.setApproved(true);
         three.setDescription("beschreibung");
 
-        mockMvc.perform(post("/api/v1/roomreservations")
+        String json = mockMvc.perform(post("/api/v1/roomreservations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(three)))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().is4xxClientError())
+                .andReturn().getResponse().getContentAsString();
+
+        RestExceptionHandler.ValidationError error = objectMapper.readValue(json, RestExceptionHandler.ValidationError.class);
+        Assert.assertFalse("This has to be a global error", error.getErrors().get("_GLOBAL").isEmpty());
     }
 
     @Test

@@ -42,6 +42,9 @@ public class RestExceptionHandler {
         private int errorCode;
         private String errorMessage;
 
+        public ErrorResponse() {
+        }
+
         public ErrorResponse(int errorCode, String errorMessage) {
             this.errorCode = errorCode;
             this.errorMessage = errorMessage;
@@ -60,11 +63,18 @@ public class RestExceptionHandler {
 
         private Map<String, String> errors = new LinkedHashMap<>();
 
+        public ValidationError() {
+        }
+
         public ValidationError(ConstraintViolationException e) {
             super(400, "Could not validate object");
 
             for(ConstraintViolation cv : e.getConstraintViolations()) {
                 String key = cv.getPropertyPath().toString();
+                if(key.isEmpty()) {
+                    key = "_GLOBAL";
+                }
+
                 String value = cv.getMessage();
 
                 errors.put(key, value);
