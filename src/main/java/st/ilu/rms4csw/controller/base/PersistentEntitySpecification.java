@@ -5,6 +5,8 @@ import st.ilu.rms4csw.controller.base.exception.IllegalFilterException;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 
 import javax.persistence.criteria.*;
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * @author Mischa Holz
@@ -47,6 +49,18 @@ public class PersistentEntitySpecification<T extends PersistentEntity> implement
     public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
         Path path = getPath(root, criteria.getKey());
 
+        if(path.getJavaType().equals(Date.class)) {
+            Date date = new Date(Long.parseLong((String) criteria.getValue()));
+
+            if(criteria.getOperation() == FilterCriteria.Operation.GREATER_THAN) {
+                return builder.greaterThanOrEqualTo(path, date);
+            } else if(criteria.getOperation() == FilterCriteria.Operation.LESS_THAN) {
+                return builder.lessThanOrEqualTo(path, date);
+            } else if(criteria.getOperation() == FilterCriteria.Operation.EQUALS) {
+                return builder.equal(path, date);
+            }
+            return null;
+        }
         if(criteria.getOperation() == FilterCriteria.Operation.GREATER_THAN) {
             return builder.greaterThanOrEqualTo(path, criteria.getValue().toString());
         } else if(criteria.getOperation() == FilterCriteria.Operation.LESS_THAN) {
