@@ -23,9 +23,7 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -141,5 +139,21 @@ public class SupportMessageControllerTest {
 
         mockMvc.perform(get("/api/v1/supportmessages/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testPatchSupportMessage() throws Exception {
+
+        String patchJson = "{\"done\": true, \"answer\": \"answer\"}";
+
+        mockMvc.perform(patch("/api/v1/supportmessages/" + one.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(patchJson)
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(one.getId())))
+                .andExpect(jsonPath("$.answer", is("answer")))
+                .andExpect(jsonPath("$.done", is(true)));
     }
 }

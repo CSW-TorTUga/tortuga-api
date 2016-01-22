@@ -1,8 +1,6 @@
 package st.ilu.rms4csw.model.support;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 
@@ -33,9 +31,10 @@ public class SupportMessage extends PersistentEntity {
 
     private Boolean done = false;
 
-    private Date openedAt = new Date();
+    private Date openedAt;
 
-    private transient String answer;
+    @Access(AccessType.FIELD)
+    private String answer;
 
     public String getSubject() {
         return subject;
@@ -77,14 +76,12 @@ public class SupportMessage extends PersistentEntity {
         this.done = done;
     }
 
-    @JsonIgnore
-    public String getAnswer() {
-        return answer;
+    public Optional<String> getAnswer() {
+        return Optional.ofNullable(this.answer);
     }
 
-    @JsonProperty
-    public void setAnswer(String answer) {
-        this.answer = answer;
+    public void setAnswer(Optional<String> answer) {
+        this.answer = answer.orElse(null);
     }
 
     public Date getOpenedAt() {
