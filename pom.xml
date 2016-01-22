@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>rms4csv-api</name>
-	<titel>Demo project for Spring Boot</titel>
+	<description>RMS4CSW server</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
