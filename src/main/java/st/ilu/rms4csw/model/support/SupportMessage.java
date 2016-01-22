@@ -6,6 +6,7 @@ import st.ilu.rms4csw.model.base.PersistentEntity;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Entity;
+import java.util.Date;
 import java.util.Optional;
 
 /**
@@ -27,6 +28,8 @@ public class SupportMessage extends PersistentEntity {
     private String name;
 
     private Boolean done = false;
+
+    private Date openedAt = new Date();
 
     private transient String answer;
 
@@ -76,5 +79,13 @@ public class SupportMessage extends PersistentEntity {
 
     public void setAnswer(String answer) {
         this.answer = answer;
+    }
+
+    public Date getOpenedAt() {
+        return openedAt;
+    }
+
+    public void setOpenedAt(Date openedAt) {
+        this.openedAt = openedAt;
     }
 }
