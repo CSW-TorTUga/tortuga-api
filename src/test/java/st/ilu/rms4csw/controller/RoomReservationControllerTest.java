@@ -155,18 +155,18 @@ public class RoomReservationControllerTest {
         three.setOpen(true);
         three.setApproved(true);
         three.setTitle("beschreibung");
+        three.setId(null);
 
         String location = mockMvc.perform(post("/api/v1/roomreservations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(three))
-        ).andExpect(jsonPath("$.id", is(three.getId())))
+        )
                 .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
 
         mockMvc.perform(get(location).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(three.getId())))
                 .andExpect(jsonPath("$.user.id", is(mockLoggedInUserHolder.getLoggedInUser().getId())))
                 .andExpect(jsonPath("$.approved", is(false)))
                 .andExpect(jsonPath("$.open", is(false)));

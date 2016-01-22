@@ -1,5 +1,6 @@
 package st.ilu.rms4csw.model.devicecategory;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.validator.constraints.NotEmpty;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 
@@ -9,6 +10,7 @@ import javax.persistence.Entity;
  * @author Mischa Holz
  */
 @Entity
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class DeviceCategory extends PersistentEntity {
 
     @NotEmpty(message = "Der Kategorienname darf nicht leer sein")

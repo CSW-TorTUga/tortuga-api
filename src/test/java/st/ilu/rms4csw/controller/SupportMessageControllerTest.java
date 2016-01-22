@@ -23,9 +23,7 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -116,19 +114,19 @@ public class SupportMessageControllerTest {
         three.setEmail(Optional.empty());
         three.setName(Optional.of("name"));
         three.setSubject("subject");
+        three.setId(null);
 
 
         String location = mockMvc.perform(post("/api/v1/supportmessages")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(three))
-        ).andExpect(jsonPath("$.id", is(three.getId())))
+        )
                 .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
 
         mockMvc.perform(get(location).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(three.getId())))
                 .andExpect(jsonPath("$.name", is(three.getName().get())));
     }
 
@@ -141,5 +139,21 @@ public class SupportMessageControllerTest {
 
         mockMvc.perform(get("/api/v1/supportmessages/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testPatchSupportMessage() throws Exception {
+
+        String patchJson = "{\"done\": true, \"answer\": \"answer\"}";
+
+        mockMvc.perform(patch("/api/v1/supportmessages/" + one.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(patchJson)
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(one.getId())))
+                .andExpect(jsonPath("$.answer", is("answer")))
+                .andExpect(jsonPath("$.done", is(true)));
     }
 }

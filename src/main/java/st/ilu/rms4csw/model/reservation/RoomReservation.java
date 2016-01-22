@@ -1,5 +1,6 @@
 package st.ilu.rms4csw.model.reservation;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.persistence.Entity;
  */
 @Entity
 @RoomReservationDoesNotIntersect
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class RoomReservation extends Reservation<RoomReservation> {
 
     private static final long OPEN_EXPAND_MILLIS = 15 * 60 * 1000;

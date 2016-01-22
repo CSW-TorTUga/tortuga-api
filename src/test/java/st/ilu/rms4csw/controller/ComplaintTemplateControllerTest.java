@@ -91,19 +91,19 @@ public class ComplaintTemplateControllerTest {
     public void testPostComplaintTemplate() throws Exception {
         ComplaintTemplate three = new ComplaintTemplate();
         three.setText("three");
+        three.setId(null);
 
 
         String location = mockMvc.perform(post("/api/v1/complainttemplates")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(three))
-        ).andExpect(jsonPath("$.id", is(three.getId())))
+        )
                 .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
 
         mockMvc.perform(get(location).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(three.getId())))
                 .andExpect(jsonPath("$.text", is(three.getText())));
     }
 
@@ -116,5 +116,31 @@ public class ComplaintTemplateControllerTest {
 
         mockMvc.perform(get("/api/v1/complainttemplates/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testPutComplaintTemplate() throws Exception {
+        two.setText("bla");
+
+        mockMvc.perform(put("/api/v1/complainttemplates/" + two.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(two)))
+                .andExpect(jsonPath("$.id", is(two.getId())))
+                .andExpect(jsonPath("$.text", is(two.getText())));
+    }
+
+    @Test
+    public void testPatchComplaintTemplate() throws Exception {
+        ComplaintTemplate template = new ComplaintTemplate();
+        template.setText("bla");
+        template.setId(null);
+
+        mockMvc.perform(patch("/api/v1/complainttemplates/" + one.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(template)))
+                .andExpect(jsonPath("$.id", is(one.getId())))
+                .andExpect(jsonPath("$.text", is(template.getText())));
     }
 }

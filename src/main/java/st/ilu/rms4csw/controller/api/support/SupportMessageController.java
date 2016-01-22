@@ -45,7 +45,7 @@ public class SupportMessageController extends AbstractCRUDCtrl<SupportMessage> {
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public SupportMessage patch(@PathVariable("id") String id, SupportMessage entity) {
+    public SupportMessage patch(@PathVariable("id") String id, @RequestBody SupportMessage entity) {
         return super.patch(id, entity);
     }
 
