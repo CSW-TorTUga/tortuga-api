@@ -136,19 +136,19 @@ public class DeviceControllerTest {
         device3.setCategory(deviceCategory);
         device3.setDescription("description");
         device3.setInventoryNumber("1234");
+        device3.setId(null);
 
         String location = mockMvc.perform(post("/api/v1/devices")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(device3))
-        ).andExpect(jsonPath("$.id", is(device3.getId())))
+        )
                 .andExpect(jsonPath("$.name", is(device3.getName())))
                 .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
 
         mockMvc.perform(get(location).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(device3.getId())))
                 .andExpect(jsonPath("$.name", is(device3.getName())));
     }
 

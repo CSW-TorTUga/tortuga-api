@@ -1,5 +1,6 @@
 package st.ilu.rms4csw.model.reservation;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import st.ilu.rms4csw.model.device.Device;
 
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import java.util.Objects;
  */
 @Entity
 @DeviceReservationDoesNotOverlap
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class DeviceReservation extends Reservation<DeviceReservation> {
 
     @OneToOne

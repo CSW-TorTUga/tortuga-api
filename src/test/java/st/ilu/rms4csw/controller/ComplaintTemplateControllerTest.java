@@ -91,19 +91,19 @@ public class ComplaintTemplateControllerTest {
     public void testPostComplaintTemplate() throws Exception {
         ComplaintTemplate three = new ComplaintTemplate();
         three.setText("three");
+        three.setId(null);
 
 
         String location = mockMvc.perform(post("/api/v1/complainttemplates")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(three))
-        ).andExpect(jsonPath("$.id", is(three.getId())))
+        )
                 .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
 
         mockMvc.perform(get(location).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(three.getId())))
                 .andExpect(jsonPath("$.text", is(three.getText())));
     }
 

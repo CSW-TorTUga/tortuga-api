@@ -95,19 +95,19 @@ public class DeviceCategoryControllerTest {
     public void testPostDeviceCategory() throws Exception {
         DeviceCategory deviceCategory = new DeviceCategory();
         deviceCategory.setName("DeviceCategory 3");
+        deviceCategory.setId(null);
 
         String location = mockMvc.perform(post("/api/v1/devicecategories")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(deviceCategory))
-        ).andExpect(jsonPath("$.id", is(deviceCategory.getId())))
+        )
          .andExpect(jsonPath("$.name", is(deviceCategory.getName())))
          .andExpect(header().string("Location", Matchers.notNullValue()))
          .andExpect(status().isCreated())
          .andReturn().getResponse().getHeader("Location");
 
         mockMvc.perform(get(location).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(deviceCategory.getId())))
                 .andExpect(jsonPath("$.name", is(deviceCategory.getName())));
     }
 

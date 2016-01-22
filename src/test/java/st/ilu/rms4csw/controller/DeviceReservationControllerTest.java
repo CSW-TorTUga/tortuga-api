@@ -186,6 +186,7 @@ public class DeviceReservationControllerTest {
         three.setBorrowed(false);
         three.setDevice(device);
         three.setUser(user);
+        three.setId(null);
 
         String json = mockMvc.perform(post("/api/v1/devicereservations")
                 .contentType(MediaType.APPLICATION_JSON)

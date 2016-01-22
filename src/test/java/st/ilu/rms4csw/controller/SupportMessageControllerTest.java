@@ -114,19 +114,19 @@ public class SupportMessageControllerTest {
         three.setEmail(Optional.empty());
         three.setName(Optional.of("name"));
         three.setSubject("subject");
+        three.setId(null);
 
 
         String location = mockMvc.perform(post("/api/v1/supportmessages")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(three))
-        ).andExpect(jsonPath("$.id", is(three.getId())))
+        )
                 .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
 
         mockMvc.perform(get(location).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(three.getId())))
                 .andExpect(jsonPath("$.name", is(three.getName().get())));
     }
 
