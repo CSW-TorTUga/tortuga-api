@@ -76,14 +76,14 @@ public class RoomReservationControllerTest {
 
         one = new RoomReservation();
         one.setTimeSpan(new TimeSpan(new Date(100), new Date(200)));
-        one.setTitel("beschreibung");
+        one.setTitle("beschreibung");
         one.setApproved(false);
         one.setOpen(false);
         one.setUser(mockLoggedInUserHolder.getLoggedInUser());
 
         two = new RoomReservation();
         two.setTimeSpan(new TimeSpan(new Date(201), new Date(300)));
-        two.setTitel("beschreibung");
+        two.setTitle("beschreibung");
         two.setApproved(false);
         two.setOpen(false);
         two.setUser(other);
@@ -135,7 +135,7 @@ public class RoomReservationControllerTest {
         three.setTimeSpan(new TimeSpan(new Date(150), new Date(500)));
         three.setOpen(true);
         three.setApproved(true);
-        three.setTitel("titel");
+        three.setTitle("titel");
 
         String json = mockMvc.perform(post("/api/v1/roomreservations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -154,7 +154,7 @@ public class RoomReservationControllerTest {
         three.setTimeSpan(new TimeSpan(new Date(401), new Date(500)));
         three.setOpen(true);
         three.setApproved(true);
-        three.setTitel("beschreibung");
+        three.setTitle("beschreibung");
 
         String location = mockMvc.perform(post("/api/v1/roomreservations")
                 .contentType(MediaType.APPLICATION_JSON)
