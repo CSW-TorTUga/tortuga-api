@@ -20,6 +20,8 @@ import java.util.Optional;
  */
 @Entity(name = "rms_user")
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
+@StudentsHaveToHaveAMajor
+@StudentsHaveToHaveAStudentId
 public class User extends PersistentEntity {
 
     @Column(unique = true)
@@ -45,7 +47,7 @@ public class User extends PersistentEntity {
     private Major major;
 
     @Access(AccessType.FIELD)
-    private Long studentId;
+    private String studentId;
 
     @NotEmpty(message = "Benutzer brauchen eine Telefonnummer")
     private String phoneNumber;
@@ -119,20 +121,12 @@ public class User extends PersistentEntity {
         }
     }
 
-    public Optional<Long> getStudentId() {
-        if(studentId == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(studentId);
+    public Optional<String> getStudentId() {
+        return Optional.ofNullable(this.studentId);
     }
 
-    public void setStudentId(Optional<Long> studentId) {
-        if(studentId.isPresent()) {
-            this.studentId = studentId.get();
-        } else {
-            this.studentId = null;
-        }
+    public void setStudentId(Optional<String> studentId) {
+        this.studentId = studentId.orElse(null);
     }
 
     public String getPhoneNumber() {

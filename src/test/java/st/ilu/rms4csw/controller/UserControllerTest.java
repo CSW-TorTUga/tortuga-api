@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import st.ilu.rms4csw.TestContext;
+import st.ilu.rms4csw.controller.base.advice.RestExceptionHandler;
 import st.ilu.rms4csw.model.user.Gender;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
@@ -27,6 +28,8 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -130,13 +133,44 @@ public class UserControllerTest {
         user3.setPassword("change me.");
         user3.setId(null);
 
-        mockMvc .perform(post("/api/v1/users")
+        mockMvc.perform(post("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user3)))
 
                 .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.loginName", is("test_user")));
+    }
+
+
+    @Test
+    public void testPostStudentWithoutMajor() throws Exception {
+        User user3 = new User();
+        user3.setExpirationDate(Optional.empty());
+        user3.setPhoneNumber("123456789");
+        user3.setRole(Role.STUDENT);
+        user3.setFirstName("");
+        user3.setLastName("studentington");
+        user3.setGender(Optional.of(Gender.FEMALE));
+        user3.setStudentId(Optional.empty());
+        user3.setMajor(Optional.empty());
+        user3.setEmail("testuser@ilu.st");
+        user3.setLoginName("test_user");
+        user3.setPassword("change me.");
+        user3.setId(null);
+
+        String json = mockMvc.perform(post("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user3)))
+
+                .andExpect(status().is4xxClientError())
+                .andReturn().getResponse().getContentAsString();
+
+        RestExceptionHandler.ValidationError validationError = objectMapper.readValue(json, RestExceptionHandler.ValidationError.class);
+        assertFalse("There has to be an error message for the major field", validationError.getErrors().get("major").isEmpty());
+        assertFalse("There has to be an error message for the firstName field", validationError.getErrors().get("firstName").isEmpty());
+        assertFalse("There has to be an error message for the studentId field", validationError.getErrors().get("studentId").isEmpty());
+        assertEquals("There have to be 3 errors", validationError.getErrors().size(), 3);
     }
 
     @Test
@@ -151,13 +185,13 @@ public class UserControllerTest {
         user1.setExpirationDate(Optional.empty());
 
         mockMvc.perform(put("/api/v1/users/" + user1.getId())
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(user1))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user1))
         )
-        .andExpect(jsonPath("$.loginName", is(user1.getLoginName())))
-        .andExpect(jsonPath("$.email", is("bla@ilu.st")))
-        .andReturn().getResponse().getContentAsString();
+                .andExpect(jsonPath("$.loginName", is(user1.getLoginName())))
+                .andExpect(jsonPath("$.email", is("bla@ilu.st")))
+                .andReturn().getResponse().getContentAsString();
     }
 
     @Test
@@ -176,7 +210,7 @@ public class UserControllerTest {
         user3.setPassword("change me.");
         user3.setId(null);
 
-        String location = mockMvc .perform(post("/api/v1/users")
+        String location = mockMvc.perform(post("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user3)))
 
@@ -186,7 +220,7 @@ public class UserControllerTest {
                 .andReturn().getResponse().getHeader("Location");
 
         User userReturned = objectMapper.readValue(mockMvc.perform(get(location)
-            .accept(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
         ).andReturn().getResponse().getContentAsString(), User.class);
 
         assertTrue("A student must have an expiration date and it has to be in the future", new Date().before(userReturned.getExpirationDate().orElseThrow(NullPointerException::new)));
