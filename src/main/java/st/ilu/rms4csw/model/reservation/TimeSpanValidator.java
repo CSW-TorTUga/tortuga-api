@@ -22,8 +22,11 @@ public class TimeSpanValidator implements ConstraintValidator<TimeSpanIsValid, T
         ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);
         ZoneOffset zoneOffset = zdt.getOffset();
 
-        LocalDateTime beginning = LocalDateTime.ofEpochSecond(value.getBeginning().getTime(), 0, zoneOffset);
-        LocalDateTime end = LocalDateTime.ofEpochSecond(value.getEnd().getTime(), 0, zoneOffset);
+        long beginningSeconds = value.getBeginning().getTime() / 1000;
+        long endSeconds = value.getBeginning().getTime() / 1000;
+
+        LocalDateTime beginning = LocalDateTime.ofEpochSecond(beginningSeconds, 0, zoneOffset);
+        LocalDateTime end = LocalDateTime.ofEpochSecond(endSeconds, 0, zoneOffset);
 
         int beginningDayOfYear = beginning.getDayOfYear();
         int endDayOfYear = end.getDayOfYear();
