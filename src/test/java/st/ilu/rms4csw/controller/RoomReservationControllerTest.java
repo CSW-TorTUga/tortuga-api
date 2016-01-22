@@ -149,6 +149,20 @@ public class RoomReservationControllerTest {
     }
 
     @Test
+    public void testPatchRoomReservation() throws Exception {
+        RoomReservation three = new RoomReservation();
+        three.setApproved(true);
+        three.setId(null);
+
+        mockMvc.perform(patch("/api/v1/roomreservations/" + two.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(three)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.approved", is(true)));
+    }
+
+    @Test
     public void testPostRoomReservation() throws Exception {
         RoomReservation three = new RoomReservation();
         three.setTimeSpan(new TimeSpan(new Date(401), new Date(500)));

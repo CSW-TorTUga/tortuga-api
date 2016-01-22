@@ -31,6 +31,10 @@ public class RoomReservation extends Reservation<RoomReservation> {
     }
 
     public TimeSpan getOpenedTimeSpan() {
+        if(this.getTimeSpan() == null) {
+            return null;
+        }
+
         return this.getTimeSpan().expand(OPEN_EXPAND_MILLIS);
     }
 

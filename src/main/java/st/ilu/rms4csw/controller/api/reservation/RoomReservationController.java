@@ -55,6 +55,12 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
     }
 
     @Override
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    public RoomReservation patch(@PathVariable("id") String id, @RequestBody RoomReservation entity) {
+        return super.patch(id, entity);
+    }
+
+    @Override
     public String getApiBase() {
         return API_BASE;
     }
