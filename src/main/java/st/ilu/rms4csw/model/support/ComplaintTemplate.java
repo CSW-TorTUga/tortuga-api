@@ -13,7 +13,7 @@ import javax.persistence.Entity;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class ComplaintTemplate extends PersistentEntity {
 
-    @NotEmpty(message = "Beschwerevorlagen brauchen einen Text")
+    @NotEmpty(message = "Beschwerdevorlagen brauchen einen Text")
     private String text;
 
     public String getText() {
