@@ -117,4 +117,30 @@ public class ComplaintTemplateControllerTest {
         mockMvc.perform(get("/api/v1/complainttemplates/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void testPutComplaintTemplate() throws Exception {
+        two.setText("bla");
+
+        mockMvc.perform(put("/api/v1/complainttemplates/" + two.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(two)))
+                .andExpect(jsonPath("$.id", is(two.getId())))
+                .andExpect(jsonPath("$.text", is(two.getText())));
+    }
+
+    @Test
+    public void testPatchComplaintTemplate() throws Exception {
+        ComplaintTemplate template = new ComplaintTemplate();
+        template.setText("bla");
+        template.setId(null);
+
+        mockMvc.perform(patch("/api/v1/complainttemplates/" + one.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(template)))
+                .andExpect(jsonPath("$.id", is(one.getId())))
+                .andExpect(jsonPath("$.text", is(template.getText())));
+    }
 }
