@@ -5,7 +5,6 @@ import st.ilu.rms4csw.controller.base.exception.IllegalFilterException;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 
 import javax.persistence.criteria.*;
-import java.text.DateFormat;
 import java.util.Date;
 
 /**
@@ -61,6 +60,17 @@ public class PersistentEntitySpecification<T extends PersistentEntity> implement
             }
             return null;
         }
+
+        if(path.getJavaType().equals(Boolean.class)) {
+            Boolean bool = criteria.getValue().toString().toLowerCase().equals("true");
+
+            if(criteria.getOperation() == FilterCriteria.Operation.EQUALS) {
+                return builder.equal(path, bool);
+            }
+
+            return null;
+        }
+
         if(criteria.getOperation() == FilterCriteria.Operation.GREATER_THAN) {
             return builder.greaterThanOrEqualTo(path, criteria.getValue().toString());
         } else if(criteria.getOperation() == FilterCriteria.Operation.LESS_THAN) {

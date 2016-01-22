@@ -55,7 +55,7 @@ public class SupportMessage extends PersistentEntity {
     }
 
     public Optional<String> getName() {
-        return Optional.of(this.name);
+        return Optional.ofNullable(this.name);
     }
 
     public void setName(Optional<String> name) {
