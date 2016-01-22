@@ -12,7 +12,7 @@ public class RoomReservation extends Reservation<RoomReservation> {
 
     private Boolean approved;
 
-    private String description;
+    private String titel;
 
     private Boolean open;
 
@@ -28,12 +28,12 @@ public class RoomReservation extends Reservation<RoomReservation> {
         return this.getTimeSpan().expand(OPEN_EXPAND_MILLIS);
     }
 
-    public String getDescription() {
-        return description;
+    public String getTitel() {
+        return titel;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setTitel(String titel) {
+        this.titel = titel;
     }
 
     public Boolean isApproved() {

@@ -27,7 +27,7 @@ public class ReservationTests {
         reservation.setTimeSpan(timeSpan);
         reservation.setUser(user);
         reservation.setApproved(false);
-        reservation.setDescription("I want the room for stuff");
+        reservation.setTitel("I want the room for stuff");
 
         return reservation;
     }
