@@ -1,5 +1,8 @@
 package st.ilu.rms4csw.model.support;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 
@@ -13,6 +16,7 @@ import java.util.Optional;
  * @author Mischa Holz
  */
 @Entity
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class SupportMessage extends PersistentEntity {
 
     @NotEmpty(message = "Support Anfragen brauchen einen Betreff")
@@ -73,10 +77,12 @@ public class SupportMessage extends PersistentEntity {
         this.done = done;
     }
 
+    @JsonIgnore
     public String getAnswer() {
         return answer;
     }
 
+    @JsonProperty
     public void setAnswer(String answer) {
         this.answer = answer;
     }

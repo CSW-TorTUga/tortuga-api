@@ -1,6 +1,7 @@
 package st.ilu.rms4csw.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,10 +23,10 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * @author Mischa Holz
@@ -90,8 +91,6 @@ public class SupportMessageControllerTest {
                 .andExpect(jsonPath("$[1].id", is(two.getId())));
     }
 
-
-
     @Test
     public void testFindAllNotDone() throws Exception {
         mockMvc.perform(get("/api/v1/supportmessages?done=false").contentType(MediaType.APPLICATION_JSON))
@@ -99,5 +98,48 @@ public class SupportMessageControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(one.getId())));
+    }
+
+    @Test
+    public void testFindOne() throws Exception {
+        mockMvc.perform(get("/api/v1/supportmessages/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.id", is(one.getId())));
+    }
+
+    @Test
+    public void testPostSupportMessage() throws Exception {
+        SupportMessage three = new SupportMessage();
+        three.setBody("body");
+        three.setDone(true);
+        three.setEmail(Optional.empty());
+        three.setName(Optional.of("name"));
+        three.setSubject("subject");
+
+
+        String location = mockMvc.perform(post("/api/v1/supportmessages")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(three))
+        ).andExpect(jsonPath("$.id", is(three.getId())))
+                .andExpect(header().string("Location", Matchers.notNullValue()))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getHeader("Location");
+
+        mockMvc.perform(get(location).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", is(three.getId())))
+                .andExpect(jsonPath("$.name", is(three.getName().get())));
+    }
+
+    @Test
+    public void testDeleteRoomReservation() throws Exception {
+        mockMvc.perform(delete("/api/v1/supportmessages/" + one.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/v1/supportmessages/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }
