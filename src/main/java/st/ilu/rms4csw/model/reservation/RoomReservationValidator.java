@@ -23,6 +23,7 @@ public class RoomReservationValidator extends SpringInjectedValidator<RoomReserv
         List<RoomReservation> reservations = roomReservationRepository.findAll();
         Optional<RoomReservation> reservation = reservations.stream()
                 .filter(r -> !r.getId().equals(value.getId()))
+                .filter(RoomReservation::isApproved)
                 .filter(r -> r.getTimeSpan().intersects(value.getTimeSpan()))
                 .findAny();
 

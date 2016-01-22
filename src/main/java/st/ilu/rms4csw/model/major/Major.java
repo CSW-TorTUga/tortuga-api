@@ -1,5 +1,6 @@
 package st.ilu.rms4csw.model.major;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 
 import javax.persistence.Entity;
@@ -10,6 +11,7 @@ import javax.persistence.Entity;
 @Entity
 public class Major extends PersistentEntity {
 
+    @NotEmpty(message = "Der Name des Studiengangs darf nicht leer sein")
     private String name;
 
     public String getName() {

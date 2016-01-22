@@ -4,7 +4,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 
 import javax.persistence.Entity;
-import javax.validation.constraints.NotNull;
 
 /**
  * @author Mischa Holz
@@ -12,8 +11,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class DeviceCategory extends PersistentEntity {
 
-    @NotNull
-    @NotEmpty
+    @NotEmpty(message = "Der Kategorienname darf nicht leer sein")
     private String name;
 
     private Boolean active = false;

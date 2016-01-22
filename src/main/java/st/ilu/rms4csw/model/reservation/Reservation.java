@@ -15,11 +15,12 @@ import javax.validation.constraints.NotNull;
 public abstract class Reservation<T extends Reservation> extends PersistentEntity {
 
     @OneToOne
-    @NotNull
+    @NotNull(message = "Reeservierungen müssen einem Benutzer zugewiesen sein")
     private User user;
 
     @Embedded
-    @NotNull
+    @NotNull(message = "Reservierungen brauchen einen Zeitraum")
+    @TimeSpanIsValid
     private TimeSpan timeSpan;
 
     public User getUser() {

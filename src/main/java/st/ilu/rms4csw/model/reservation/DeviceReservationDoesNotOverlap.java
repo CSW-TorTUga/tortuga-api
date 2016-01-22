@@ -9,12 +9,12 @@ import java.lang.annotation.*;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = RoomReservationValidator.class)
+@Constraint(validatedBy = DeviceReservationValidator.class)
 @Documented
 @Inherited
-public @interface RoomReservationDoesNotIntersect {
+public @interface DeviceReservationDoesNotOverlap {
 
-    String message() default "Die Computerstudienwerkstatt ist in dem ausgewählten Zeitraum bereits reserviert.";
+    String message() default "Das Gerät ist in dem ausgewählten Zeitraum bereits reserviert.";
 
     Class<?>[] groups() default {};
 

@@ -18,10 +18,11 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class Device extends PersistentEntity {
 
+    @NotEmpty(message = "Der Gerätename darf nicht leer sein.")
     private String name;
 
     @OneToOne
-    @NotNull
+    @NotNull(message = "Geräte brauchen eine Gerätekategorie")
     private DeviceCategory category;
 
     private String description;
@@ -29,11 +30,11 @@ public class Device extends PersistentEntity {
     private String accessories;
 
     @Enumerated(EnumType.STRING)
-    @NotNull
+    @NotNull(message = "Geräte müssen in einem der Schränke gelagert sein")
     private Cabinet cabinet;
 
-    @NotEmpty
-    @NotNull
+    @NotEmpty(message = "Jedes Gerät braucht eine Inventarnummer")
+    @NotNull(message = "Jedes Gerät braucht eine Inventarnummer")
     private String inventoryNumber;
 
     @Access(AccessType.FIELD)

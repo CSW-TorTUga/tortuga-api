@@ -162,6 +162,42 @@ public class DeviceReservationControllerTest {
     }
 
     @Test
+    public void testPostOverlappingDeviceReservation() throws Exception {
+        DeviceReservation three = new DeviceReservation();
+        three.setTimeSpan(new TimeSpan(new Date(150), new Date(500)));
+        three.setBorrowed(false);
+        three.setDevice(device);
+        three.setUser(user);
+
+        String json = mockMvc.perform(post("/api/v1/devicereservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(three))
+        ).andExpect(status().is4xxClientError())
+                .andReturn().getResponse().getContentAsString();
+
+        System.out.println(json);
+    }
+
+    @Test
+    public void testPostDeviceReservationOverMidnight() throws Exception {
+        DeviceReservation three = new DeviceReservation();
+        three.setTimeSpan(new TimeSpan(new Date(0), new Date(86_401_000)));
+        three.setBorrowed(false);
+        three.setDevice(device);
+        three.setUser(user);
+
+        String json = mockMvc.perform(post("/api/v1/devicereservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(three))
+        ).andExpect(status().is4xxClientError())
+                .andReturn().getResponse().getContentAsString();
+
+        System.out.println(json);
+    }
+
+    @Test
     public void testPutDeviceReservation() throws Exception {
         two.setTimeSpan(new TimeSpan(new Date(700), new Date(800)));
 

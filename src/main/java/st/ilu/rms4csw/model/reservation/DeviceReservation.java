@@ -11,10 +11,11 @@ import java.util.Objects;
  * @author Mischa Holz
  */
 @Entity
+@DeviceReservationDoesNotOverlap
 public class DeviceReservation extends Reservation<DeviceReservation> {
 
     @OneToOne
-    @NotNull
+    @NotNull(message = "Jede Gerätereservierung braucht ein Gerät, das reserviert wird")
     private Device device;
 
     private Boolean borrowed;
