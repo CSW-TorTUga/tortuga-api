@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.repository.reservation.DeviceReservationRepository;
+import st.ilu.rms4csw.security.LoggedInUserHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +20,8 @@ import java.util.List;
 public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservation> {
 
     public static final String API_BASE = "devicereservations";
+
+    private LoggedInUserHolder loggedInUserHolder;
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
@@ -35,6 +38,8 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     @Override
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<DeviceReservation> post(@RequestBody DeviceReservation newEntity, HttpServletResponse response) {
+        newEntity.setUser(loggedInUserHolder.getLoggedInUser());
+
         return super.post(newEntity, response);
     }
 
@@ -64,5 +69,10 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     @Autowired
     public void setReservationRepository(DeviceReservationRepository reservationRepository) {
         this.repository = reservationRepository;
+    }
+
+    @Autowired
+    public void setLoggedInUserHolder(LoggedInUserHolder loggedInUserHolder) {
+        this.loggedInUserHolder = loggedInUserHolder;
     }
 }

@@ -22,7 +22,6 @@ import st.ilu.rms4csw.repository.device.DeviceCategoryRepository;
 import st.ilu.rms4csw.repository.device.DeviceRepository;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
@@ -48,11 +47,13 @@ public class DeviceControllerTest {
 
     private MockMvc mockMvc;
 
-    private Device device1;
+    private Device one;
 
-    private Device device2;
+    private Device two;
 
-    DeviceCategory deviceCategory;
+    private DeviceCategory deviceCategory;
+
+    private DeviceCategory otherCategory;
 
     @Autowired
     private DeviceRepository deviceRepository;
@@ -70,25 +71,31 @@ public class DeviceControllerTest {
 
         deviceCategory = deviceCategoryRepository.save(deviceCategory);
 
-        device1 = new Device();
-        device1.setName("Device 1");
-        device1.setAccessories("Accessories");
-        device1.setAcquisitionDate(Optional.of(new Date()));
-        device1.setCabinet(Cabinet.CABINET_6);
-        device1.setCategory(deviceCategory);
-        device1.setDescription("description");
-        device1.setInventoryNumber("1234");
+        otherCategory = new DeviceCategory();
+        otherCategory.setName("Other");
 
-        device2 = new Device();
-        device2.setName("Device 2");
-        device2.setAccessories("Accessories");
-        device2.setAcquisitionDate(Optional.of(new Date()));
-        device2.setCabinet(Cabinet.CABINET_6);
-        device2.setCategory(deviceCategory);
-        device2.setDescription("description");
-        device2.setInventoryNumber("1234");
+        otherCategory = deviceCategoryRepository.save(otherCategory);
 
-        deviceRepository.save(Arrays.asList(device1, device2));
+        one = new Device();
+        one.setName("Device 1");
+        one.setAccessories("Accessories");
+        one.setAcquisitionDate(Optional.of(new Date()));
+        one.setCabinet(Cabinet.CABINET_6);
+        one.setCategory(deviceCategory);
+        one.setDescription("description");
+        one.setInventoryNumber("1234");
+
+        two = new Device();
+        two.setName("Device 2");
+        two.setAccessories("Accessories");
+        two.setAcquisitionDate(Optional.of(new Date()));
+        two.setCabinet(Cabinet.CABINET_6);
+        two.setCategory(otherCategory);
+        two.setDescription("description");
+        two.setInventoryNumber("1234");
+
+        one = deviceRepository.save(one);
+        two = deviceRepository.save(two);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
@@ -105,25 +112,41 @@ public class DeviceControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(device1.getId())))
-                .andExpect(jsonPath("$[0].name", is(device1.getName())))
-                .andExpect(jsonPath("$[1].id", is(device2.getId())));
+                .andExpect(jsonPath("$[0].id", is(one.getId())))
+                .andExpect(jsonPath("$[0].name", is(one.getName())))
+                .andExpect(jsonPath("$[1].id", is(two.getId())));
 
-        mockMvc.perform(get("/api/v1/devices?name=" + device1.getName()).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/v1/devices?name=" + one.getName()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", is(device1.getId())))
-                .andExpect(jsonPath("$[0].name", is(device1.getName())));
+                .andExpect(jsonPath("$[0].id", is(one.getId())))
+                .andExpect(jsonPath("$[0].name", is(one.getName())));
     }
 
     @Test
     public void testFindOne() throws Exception {
-        mockMvc.perform(get("/api/v1/devices/" + device1.getId()).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/v1/devices/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.id", is(device1.getId())))
-                .andExpect(jsonPath("$.name", is(device1.getName())));
+                .andExpect(jsonPath("$.id", is(one.getId())))
+                .andExpect(jsonPath("$.name", is(one.getName())));
+    }
+
+    @Test
+    public void testIllegalSuggestionQuery() throws Exception {
+        mockMvc.perform(get("/api/v1/devices?beginningTime=1234").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void testFilterByCategory() throws Exception {
+        mockMvc.perform(get("/api/v1/devices?category=" + one.getCategory().getId()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id", is(one.getId())))
+                .andExpect(jsonPath("$[0].name", is(one.getName())));
     }
 
     @Test
@@ -154,16 +177,16 @@ public class DeviceControllerTest {
 
     @Test
     public void testPutDevice() throws Exception {
-        device2.setName("Device 3");
+        two.setName("Device 3");
 
-         mockMvc.perform(put("/api/v1/devices/" + device2.getId())
+         mockMvc.perform(put("/api/v1/devices/" + two.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(device2))
+                .content(objectMapper.writeValueAsString(two))
         )
                  .andExpect(status().isOk())
-                 .andExpect(jsonPath("$.id", is(device2.getId())))
-                 .andExpect(jsonPath("$.name", is(device2.getName())));
+                 .andExpect(jsonPath("$.id", is(two.getId())))
+                 .andExpect(jsonPath("$.name", is(two.getName())));
     }
 
     @Test
@@ -172,24 +195,24 @@ public class DeviceControllerTest {
         devicePatch.setName("Device3");
         devicePatch.setId(null);
 
-        mockMvc.perform(patch("/api/v1/devices/" + device1.getId())
+        mockMvc.perform(patch("/api/v1/devices/" + one.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(devicePatch))
         )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(device1.getId())))
+                .andExpect(jsonPath("$.id", is(one.getId())))
                 .andExpect(jsonPath("$.name", is("Device3")));
     }
 
     @Test
     public void testDeleteDevice() throws Exception {
-        mockMvc.perform(delete("/api/v1/devices/" + device1.getId())
+        mockMvc.perform(delete("/api/v1/devices/" + one.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/v1/devices/" + device1.getId()).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/v1/devices/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 }

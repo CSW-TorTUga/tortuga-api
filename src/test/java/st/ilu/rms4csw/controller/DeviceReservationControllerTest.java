@@ -54,7 +54,11 @@ public class DeviceReservationControllerTest {
 
     private Device device;
 
+    private Device otherDevice;
+
     private User user;
+
+    private User otherUser;
 
     private DeviceCategory deviceCategory;
 
@@ -93,8 +97,13 @@ public class DeviceReservationControllerTest {
         device = TestHelper.createDevice(deviceCategory);
         device = deviceRepository.save(device);
 
-        user = TestHelper.createUser();
-        user = userRepository.save(user);
+        otherDevice = TestHelper.createOtherDevice(deviceCategory);
+        otherDevice = deviceRepository.save(otherDevice);
+
+        otherUser = TestHelper.createUser();
+        otherUser = userRepository.save(otherUser);
+
+        user = mockLoggedInUserHolder.getLoggedInUser();
 
         one = new DeviceReservation();
         one.setTimeSpan(new TimeSpan(new Date(100), new Date(200)));
@@ -106,8 +115,8 @@ public class DeviceReservationControllerTest {
         two = new DeviceReservation();
         two.setTimeSpan(new TimeSpan(new Date(300), new Date(400)));
         two.setBorrowed(false);
-        two.setDevice(device);
-        two.setUser(user);
+        two.setDevice(otherDevice);
+        two.setUser(otherUser);
         two = deviceReservationRepository.save(two);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -138,6 +147,32 @@ public class DeviceReservationControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.id", is(one.getId())))
                 .andExpect(jsonPath("$.user.id", is(one.getUser().getId())));
+    }
+
+    @Test
+    public void testSuggestDeviceForReservationAndFindOldFavorite() throws Exception {
+        mockMvc.perform(get("/api/v1/devices?beginningTime=600&endTime=700&category=" + deviceCategory.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id", is(one.getDevice().getId())))
+                .andExpect(jsonPath("$[1].id", is(two.getDevice().getId())));
+    }
+
+    @Test
+    public void testSuggestDeviceForReservationAndFindAvailableNonFavorite() throws Exception {
+        mockMvc.perform(get("/api/v1/devices?beginningTime=50&endTime=150&category=" + deviceCategory.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id", is(two.getDevice().getId())));
+    }
+
+    @Test
+    public void testSuggestDeviceForReservationAndFindNoOldReservations() throws Exception {
+        deviceReservationRepository.deleteAllInBatch();
+
+        mockMvc.perform(get("/api/v1/devices?beginningTime=50&endTime=150&category=" + deviceCategory.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)));
     }
 
     @Test

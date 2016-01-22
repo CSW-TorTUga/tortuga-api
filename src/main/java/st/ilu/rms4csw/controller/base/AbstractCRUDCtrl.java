@@ -1,8 +1,7 @@
 package st.ilu.rms4csw.controller.base;
 
-import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,11 +10,12 @@ import st.ilu.rms4csw.controller.base.exception.NotFoundException;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 import st.ilu.rms4csw.patch.Patch;
 import st.ilu.rms4csw.repository.base.JpaSpecificationRepository;
+import st.ilu.rms4csw.service.PersistentEntityService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Mischa Holz
@@ -23,6 +23,8 @@ import java.util.List;
 public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
 
     protected JpaSpecificationRepository<T, String> repository;
+
+    protected PersistentEntityService persistentEntityService;
 
     public abstract String getApiBase();
 
@@ -41,64 +43,16 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
         return new Sort(dir, sortValue.split(","));
     }
 
+    public List<T> findAll() {
+        return repository.findAll();
+    }
+
     public List<T> findAll(HttpServletRequest request) {
-        List<PersistentEntitySpecification<T>> specifications = new ArrayList<>();
+        return findAll(request.getParameterMap(), buildSortObject(request));
+    }
 
-        request.getParameterMap().forEach((key, valueArray) -> {
-            for(String value : valueArray) {
-                FilterCriteria criteria;
-                if(value.startsWith("<")) {
-                    criteria = new FilterCriteria();
-                    criteria.setKey(key);
-                    criteria.setOperation(FilterCriteria.Operation.LESS_THAN);
-                    criteria.setValue(value.substring(1));
-                } else if(value.startsWith(">")) {
-                    criteria = new FilterCriteria();
-                    criteria.setKey(key);
-                    criteria.setOperation(FilterCriteria.Operation.GREATER_THAN);
-                    criteria.setValue(value.substring(1));
-                } else {
-                    criteria = new FilterCriteria();
-                    criteria.setKey(key);
-                    criteria.setOperation(FilterCriteria.Operation.EQUALS);
-                    criteria.setValue(value);
-                }
-                specifications.add(new PersistentEntitySpecification<>(criteria));
-            }
-        });
-
-        if(specifications.size() > 0) {
-            boolean first = true;
-            Specifications<T> spec = null;
-            for(PersistentEntitySpecification<T> specification : specifications) {
-                if(first) {
-                    spec = Specifications.where(specification);
-                    first = false;
-                } else {
-                    spec = spec.and(specification);
-                }
-            }
-
-            Sort sort = buildSortObject(request);
-            if(sort == null) {
-                try {
-                    return repository.findAll(spec);
-                } catch(InvalidDataAccessApiUsageException e) {
-                    throw (RuntimeException) e.getCause();
-                }
-            }
-            try {
-                return repository.findAll(spec, sort);
-            } catch(InvalidDataAccessApiUsageException e) {
-                throw (RuntimeException) e.getCause();
-            }
-        }
-
-        Sort sort = buildSortObject(request);
-        if(sort == null) {
-            return repository.findAll();
-        }
-        return repository.findAll(buildSortObject(request));
+    public List<T> findAll(Map<String, String[]> params, Sort sort) {
+        return persistentEntityService.findAll(params, sort, repository);
     }
 
     public T findOne(String id) {
@@ -141,5 +95,10 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
         T patched = Patch.patch(original, entity);
 
         return repository.save(patched);
+    }
+
+    @Autowired
+    public void setPersistentEntityService(PersistentEntityService persistentEntityService) {
+        this.persistentEntityService = persistentEntityService;
     }
 }

@@ -4,9 +4,12 @@ import org.springframework.stereotype.Repository;
 import st.ilu.rms4csw.model.device.Device;
 import st.ilu.rms4csw.repository.base.JpaSpecificationRepository;
 
+import java.util.List;
+
 /**
  * @author Mischa Holz
  */
 @Repository
 public interface DeviceRepository extends JpaSpecificationRepository<Device, String> {
+    List<Device> findByCategoryId(String categoryId);
 }
