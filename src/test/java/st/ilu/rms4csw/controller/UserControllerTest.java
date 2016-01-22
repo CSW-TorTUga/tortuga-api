@@ -15,10 +15,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import st.ilu.rms4csw.TestContext;
+import st.ilu.rms4csw.TestHelper;
 import st.ilu.rms4csw.controller.base.advice.RestExceptionHandler;
+import st.ilu.rms4csw.model.major.Major;
 import st.ilu.rms4csw.model.user.Gender;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
+import st.ilu.rms4csw.repository.user.MajorRepository;
 import st.ilu.rms4csw.repository.user.UserRepository;
 
 import javax.annotation.Resource;
@@ -28,9 +31,7 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -51,11 +52,16 @@ public class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private MajorRepository majorRepository;
+
     private MockMvc mockMvc;
 
     private User user1;
 
     private User user2;
+
+    private Major major1;
 
     @Before
     public void setUp() throws Exception {
@@ -88,6 +94,8 @@ public class UserControllerTest {
         user2.setPassword("change me.");
 
         userRepository.save(Arrays.asList(user1, user2));
+
+        major1 = majorRepository.save(TestHelper.createMajor());
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
@@ -203,8 +211,8 @@ public class UserControllerTest {
         user3.setFirstName("Team");
         user3.setLastName("Teamington");
         user3.setGender(Optional.of(Gender.FEMALE));
-        user3.setStudentId(Optional.empty());
-        user3.setMajor(Optional.empty());
+        user3.setStudentId(Optional.of("1234567"));
+        user3.setMajor(Optional.of(major1));
         user3.setEmail("testuser@ilu.st");
         user3.setLoginName("test_user2");
         user3.setPassword("change me.");

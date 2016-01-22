@@ -3,6 +3,7 @@ package st.ilu.rms4csw;
 import st.ilu.rms4csw.model.cabinet.Cabinet;
 import st.ilu.rms4csw.model.device.Device;
 import st.ilu.rms4csw.model.devicecategory.DeviceCategory;
+import st.ilu.rms4csw.model.major.Major;
 import st.ilu.rms4csw.model.user.Gender;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
@@ -18,6 +19,12 @@ public class TestHelper {
         User user = createUser();
         user.setLoginName("eirungirungvije");
         return user;
+    }
+
+    public static Major createMajor() {
+        Major major = new Major();
+        major.setName("some major");
+        return major;
     }
 
     public static User createUser() {
