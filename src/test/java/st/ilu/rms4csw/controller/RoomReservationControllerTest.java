@@ -135,7 +135,7 @@ public class RoomReservationControllerTest {
         three.setTimeSpan(new TimeSpan(new Date(150), new Date(500)));
         three.setOpen(true);
         three.setApproved(true);
-        three.setDescription("beschreibung");
+        three.setTitel("titel");
 
         String json = mockMvc.perform(post("/api/v1/roomreservations")
                 .contentType(MediaType.APPLICATION_JSON)
