@@ -1,5 +1,7 @@
 package st.ilu.rms4csw.model.reservation;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import javax.persistence.Entity;
 
 /**
@@ -13,6 +15,7 @@ public class RoomReservation extends Reservation<RoomReservation> {
 
     private Boolean approved;
 
+    @NotEmpty(message = "Raumbuchungen brauchen einen Titel")
     private String title;
 
     private Boolean open;

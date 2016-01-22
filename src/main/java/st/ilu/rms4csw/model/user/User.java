@@ -3,6 +3,8 @@ package st.ilu.rms4csw.model.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 import st.ilu.rms4csw.model.major.Major;
@@ -21,12 +23,17 @@ import java.util.Optional;
 public class User extends PersistentEntity {
 
     @Column(unique = true)
+    @NotEmpty(message = "Benutzer brauchen einen Anmeldenamen")
     private String loginName;
 
+    @NotEmpty(message = "Benutzer brauchen einen Vornamen")
     private String firstName;
 
+    @NotEmpty(message = "Benutzer brauchen einen Nachnamen")
     private String lastName;
 
+    @NotEmpty(message = "Benutzer brauchen eine Email")
+    @Email
     private String email;
 
     @Access(AccessType.FIELD)
@@ -40,12 +47,13 @@ public class User extends PersistentEntity {
     @Access(AccessType.FIELD)
     private Long studentId;
 
+    @NotEmpty(message = "Benutzer brauchen eine Telefonnummer")
     private String phoneNumber;
 
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @NotNull
+    @NotNull(message = "Jeder Benutzer braucht eine Rolle")
     private Role role;
 
     @Access(AccessType.FIELD)
@@ -142,6 +150,10 @@ public class User extends PersistentEntity {
 
     @JsonProperty
     public void setPassword(String password) {
+        if(password.length() < 6) {
+            throw new IllegalArgumentException("Passwörter müssen mindestens 6 Zeichen lang sein");
+        }
+
         this.password = new BCryptPasswordEncoder().encode(password);
     }
 

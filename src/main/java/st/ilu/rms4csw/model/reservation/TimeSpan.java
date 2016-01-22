@@ -2,6 +2,7 @@ package st.ilu.rms4csw.model.reservation;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -11,9 +12,11 @@ import java.util.Date;
 public class TimeSpan {
 
     @Column(name = "beginning_timestamp")
+    @NotNull(message = "Zeiträume brauchen einen Zeitstempel für den Anfang")
     private Date beginning;
 
     @Column(name = "end_timestamp")
+    @NotNull(message = "Zeiträume brauchen einen Zeitstempel für das Ende")
     private Date end;
 
     public TimeSpan() {
