@@ -6,11 +6,9 @@ import st.ilu.rms4csw.model.device.Device;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
-import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
 
 import java.util.Date;
-import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -43,18 +41,7 @@ public class ReservationTests {
 
     @BeforeClass
     public static void setUp() {
-        user = new User();
-        user.setExpirationDate(Optional.empty());
-        user.setStudentId(Optional.empty());
-        user.setPassword("");
-        user.setLoginName("admin");
-        user.setGender(Optional.empty());
-        user.setEmail("mail@mail.de");
-        user.setFirstName("admin");
-        user.setLastName("admin");
-        user.setMajor(Optional.empty());
-        user.setRole(Role.ADMIN);
-        user.setPhoneNumber("");
+        user = TestHelper.createUser();
     }
 
     @Test
