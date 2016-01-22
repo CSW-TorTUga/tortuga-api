@@ -6,6 +6,7 @@ import javax.persistence.Entity;
  * @author Mischa Holz
  */
 @Entity
+@RoomReservationDoesNotIntersect
 public class RoomReservation extends Reservation<RoomReservation> {
 
     private static final long OPEN_EXPAND_MILLIS = 15 * 60 * 1000;
