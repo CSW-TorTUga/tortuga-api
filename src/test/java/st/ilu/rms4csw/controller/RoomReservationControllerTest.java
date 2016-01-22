@@ -172,6 +172,29 @@ public class RoomReservationControllerTest {
                 .andExpect(jsonPath("$.open", is(false)));
     }
 
+
+    @Test
+    public void testTimeSpanTest() throws Exception {
+
+        String json = "{\"title\":\"Test\",\"timeSpan\":{\"beginning\":1453474800000,\"end\":1453478400000}," +
+                "\"user\":{\"id\":\"ab2fa9b1a0ea4653b7024105edf34718\",\"loginName\":\"admin\",\"firstName\":\"Ilu\"," +
+                "\"lastName\":\"St\",\"email\":\"bp@ilu.st\",\"phoneNumber\":\"\",\"role\":\"ADMIN\"}}";
+
+        String location = mockMvc.perform(post("/api/v1/roomreservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json)
+        ).andExpect(header().string("Location", Matchers.notNullValue()))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getHeader("Location");
+
+        mockMvc.perform(get(location).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.user.id", is(mockLoggedInUserHolder.getLoggedInUser().getId())))
+                .andExpect(jsonPath("$.approved", is(false)))
+                .andExpect(jsonPath("$.open", is(false)));
+
+    }
+
     @Test
     public void testDeleteRoomReservation() throws Exception {
         mockMvc.perform(delete("/api/v1/roomreservations/" + one.getId())
