@@ -20,13 +20,13 @@ public class SupportMessageController extends AbstractCRUDCtrl<SupportMessage> {
     public static final String API_BASE = "supportmessages";
 
     @Override
-    @RequestMapping
+    @RequestMapping(method = RequestMethod.GET)
     public List<SupportMessage> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
-    @RequestMapping("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public SupportMessage findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }

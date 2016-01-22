@@ -29,18 +29,20 @@ public class UserController extends AbstractCRUDCtrl<User> {
     }
 
     @Override
-    @RequestMapping
+    @RequestMapping(method = RequestMethod.GET)
     public List<User> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
-    @RequestMapping("/{id}")
+    @Override
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public User findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
+    @Override
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<User> postUser(@RequestBody User user, HttpServletResponse response) {
+    public ResponseEntity<User> post(@RequestBody User user, HttpServletResponse response) {
         if(user.getRole() == Role.STUDENT) {
             Date expires = User.calculateNextSemesterEnd(new Date());
             user.setExpirationDate(Optional.of(expires));
@@ -53,8 +55,9 @@ public class UserController extends AbstractCRUDCtrl<User> {
         return super.post(user, response);
     }
 
+    @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public User putUser(@PathVariable("id") String id, @RequestBody User user) {
+    public User put(@PathVariable("id") String id, @RequestBody User user) {
         User beforeUpdate = repository.findOne(id);
         if(beforeUpdate != null && user.getExpirationDate().isPresent() && !beforeUpdate.getExpirationDate().equals(user.getExpirationDate())) {
             throw new IllegalArgumentException("Can't set the expiration date of a user!");
@@ -63,13 +66,15 @@ public class UserController extends AbstractCRUDCtrl<User> {
         return super.put(id, user);
     }
 
+    @Override
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity deleteUser(@PathVariable("id") String id) {
+	public ResponseEntity delete(@PathVariable("id") String id) {
         return super.delete(id);
 	}
 
+    @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public User patchUser(@PathVariable("id") String id, @RequestBody User user) {
+    public User patch(@PathVariable("id") String id, @RequestBody User user) {
         User beforeUpdate = repository.findOne(id);
         if(beforeUpdate != null && user.getExpirationDate().isPresent() && !beforeUpdate.getExpirationDate().equals(user.getExpirationDate())) {
             throw new IllegalArgumentException("Can't set the expiration date of a user!");

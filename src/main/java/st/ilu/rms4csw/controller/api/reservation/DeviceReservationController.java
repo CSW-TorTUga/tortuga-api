@@ -21,13 +21,13 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     public static final String API_BASE = "devicereservations";
 
     @Override
-    @RequestMapping
+    @RequestMapping(method = RequestMethod.GET)
     public List<DeviceReservation> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
-    @RequestMapping("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public DeviceReservation findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }

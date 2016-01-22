@@ -21,13 +21,13 @@ public class MajorController extends AbstractCRUDCtrl<Major> {
 	public final static String API_BASE = "majors";
 
     @Override
-    @RequestMapping
+    @RequestMapping(method = RequestMethod.GET)
     public List<Major> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
-    @RequestMapping("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Major findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }

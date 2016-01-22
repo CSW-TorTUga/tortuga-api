@@ -25,13 +25,13 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
     private UserService userService;
 
     @Override
-    @RequestMapping
+    @RequestMapping(method = RequestMethod.GET)
     public List<RoomReservation> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
-    @RequestMapping("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public RoomReservation findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }

@@ -21,13 +21,13 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
     public static final String API_BASE = "devices";
 
     @Override
-    @RequestMapping
+    @RequestMapping(method = RequestMethod.GET)
     public List<Device> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
-    @RequestMapping("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Device findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
