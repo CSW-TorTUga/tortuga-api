@@ -44,7 +44,7 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
         } else if(beginningTime != null && endTime != null && categoryId != null) {
             return suggestDevice(beginningTime, endTime, categoryId);
         } else {
-            throw new IllegalArgumentException("Um Geräte vorgeschlagen zu bekommen müssen beginningTime, endTime und category angegeben sein");
+            throw new IllegalArgumentException("Um Geräte vorgeschlagen zu bekommen müssen beginningTime, endTime und category Parameter vorhanden sein");
         }
     }
 
