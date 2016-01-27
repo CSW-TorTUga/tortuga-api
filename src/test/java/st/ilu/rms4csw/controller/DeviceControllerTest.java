@@ -111,10 +111,7 @@ public class DeviceControllerTest {
         mockMvc.perform(get("/api/v1/devices").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(one.getId())))
-                .andExpect(jsonPath("$[0].name", is(one.getName())))
-                .andExpect(jsonPath("$[1].id", is(two.getId())));
+                .andExpect(jsonPath("$", hasSize(2)));
 
         mockMvc.perform(get("/api/v1/devices?name=" + one.getName()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

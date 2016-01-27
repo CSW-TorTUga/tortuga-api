@@ -62,7 +62,7 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     public DeviceReservation patch(@PathVariable("id") String id, @RequestBody DeviceReservation entity) {
         DeviceReservation reservation = super.patch(id, entity);
-        if(entity.isBorrowed() && reservation.isBorrowed()) {
+        if(entity.isBorrowed() != null && (entity.isBorrowed() && reservation.isBorrowed())) {
             doorOpener.openCabinetDoor(reservation.getDevice().getCabinet());
         }
 

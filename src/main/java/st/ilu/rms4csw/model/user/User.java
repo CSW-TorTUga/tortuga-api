@@ -61,6 +61,8 @@ public class User extends PersistentEntity {
     @Access(AccessType.FIELD)
     private Date expirationDate;
 
+    private String passcode;
+
     public String getLoginName() {
         return loginName;
     }
@@ -149,6 +151,16 @@ public class User extends PersistentEntity {
         }
 
         this.password = new BCryptPasswordEncoder().encode(password);
+    }
+
+    @JsonIgnore
+    public Optional<String> getPasscode() {
+        return Optional.ofNullable(passcode);
+    }
+
+    @JsonProperty
+    public void setPasscode(Optional<String> passcode) {
+        this.passcode = passcode.map(p -> new BCryptPasswordEncoder().encode(p)).orElse(null);
     }
 
     public Role getRole() {

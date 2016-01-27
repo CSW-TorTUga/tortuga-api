@@ -1,5 +1,6 @@
 package st.ilu.rms4csw.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -14,6 +15,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import st.ilu.rms4csw.MockLoggedInUserHolder;
 import st.ilu.rms4csw.TestContext;
 import st.ilu.rms4csw.TestHelper;
 import st.ilu.rms4csw.controller.base.advice.RestExceptionHandler;
@@ -25,9 +27,7 @@ import st.ilu.rms4csw.repository.user.MajorRepository;
 import st.ilu.rms4csw.repository.user.UserRepository;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -55,6 +55,9 @@ public class UserControllerTest {
     @Autowired
     private MajorRepository majorRepository;
 
+    @Autowired
+    private MockLoggedInUserHolder loggedInUserHolder;
+
     private MockMvc mockMvc;
 
     private User user1;
@@ -68,18 +71,8 @@ public class UserControllerTest {
         userRepository.deleteAllInBatch();
         majorRepository.deleteAllInBatch();
 
-        user1 = new User();
-        user1.setExpirationDate(Optional.empty());
-        user1.setPhoneNumber("123456789");
-        user1.setRole(Role.ADMIN);
-        user1.setFirstName("Admin");
-        user1.setLastName("Admington");
-        user1.setGender(Optional.of(Gender.FEMALE));
-        user1.setStudentId(Optional.empty());
-        user1.setMajor(Optional.empty());
-        user1.setEmail("admin@ilu.st");
-        user1.setLoginName("admin");
-        user1.setPassword("change me.");
+        loggedInUserHolder.setUp();
+        user1 = loggedInUserHolder.getLoggedInUser();
 
         user2 = new User();
         user2.setExpirationDate(Optional.empty());
@@ -94,7 +87,7 @@ public class UserControllerTest {
         user2.setLoginName("team");
         user2.setPassword("change me.");
 
-        userRepository.save(Arrays.asList(user1, user2));
+        userRepository.save(Arrays.asList(user2));
 
         major1 = majorRepository.save(TestHelper.createMajor());
 
@@ -112,10 +105,7 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/v1/users").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(user1.getId())))
-                .andExpect(jsonPath("$[0].loginName", is(user1.getLoginName())))
-                .andExpect(jsonPath("$[1].id", is(user2.getId())));
+                .andExpect(jsonPath("$", hasSize(2)));
     }
 
     @Test
@@ -152,6 +142,38 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.loginName", is("test_user")));
     }
 
+    @Test
+    public void testGeneratePasscode() throws Exception {
+        String json = mockMvc.perform(post("/api/v1/users/" + loggedInUserHolder.getLoggedInUser().getId() + "/passcode")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        Map<String, Object> response = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+
+        assertNotNull(response.get("passcode"));
+
+        @SuppressWarnings("unchecked")
+        List<String> code = (List<String>) response.get("passcode");
+        assertTrue(code.size() == 5);
+    }
+
+    @Test
+    public void testGeneratePasscodeForExistingUserButNotMyself() throws Exception {
+        mockMvc.perform(post("/api/v1/users/" + user2.getId() + "/passcode")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void testGeneratePasscodeForNonExistingUser() throws Exception {
+        mockMvc.perform(post("/api/v1/users/blabla/passcode")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andExpect(status().isNotFound());
+    }
 
     @Test
     public void testPostStudentWithoutMajor() throws Exception {
@@ -187,21 +209,6 @@ public class UserControllerTest {
     public void testUserNotFound() throws Exception {
         mockMvc.perform(get("/api/v1/users/asas").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void testPutUser() throws Exception {
-        user1.setEmail("bla@ilu.st");
-        user1.setExpirationDate(Optional.empty());
-
-        mockMvc.perform(put("/api/v1/users/" + user1.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user1))
-        )
-                .andExpect(jsonPath("$.loginName", is(user1.getLoginName())))
-                .andExpect(jsonPath("$.email", is("bla@ilu.st")))
-                .andReturn().getResponse().getContentAsString();
     }
 
     @Test

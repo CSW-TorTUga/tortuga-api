@@ -4,9 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
+import st.ilu.rms4csw.controller.base.exception.NotFoundException;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.user.UserRepository;
+import st.ilu.rms4csw.security.LoggedInUserHolder;
+import st.ilu.rms4csw.service.PasscodeService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +31,10 @@ public class UserController extends AbstractCRUDCtrl<User> {
         return USER_API_BASE;
     }
 
+    private LoggedInUserHolder loggedInUserHolder;
+
+    private PasscodeService passcodeService;
+
     @Override
     @RequestMapping(method = RequestMethod.GET)
     public List<User> findAll(HttpServletRequest request) {
@@ -38,6 +45,32 @@ public class UserController extends AbstractCRUDCtrl<User> {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public User findOne(@PathVariable("id") String id) {
         return super.findOne(id);
+    }
+
+    @RequestMapping(value = "/{id}/passcode", method = RequestMethod.POST)
+    public Object generatePasscode(@PathVariable("id") String id) throws InterruptedException {
+        Thread.sleep(500);
+
+        User user = repository.findOne(id);
+        if(user == null) {
+            throw new NotFoundException("Didn't find user");
+        }
+        if(!user.getId().equals(loggedInUserHolder.getLoggedInUser().getId())) {
+            throw new IllegalArgumentException("You can't reset the passcode of other users");
+        }
+
+        String passcodeStr = passcodeService.generateRandomPassword();
+        user.setPasscode(Optional.of(passcodeStr));
+
+        repository.save(user);
+
+        return new Object() {
+            public List<String> passcode = passcodeService.splitEmojiString(passcodeStr);
+
+            public List<String> getPasscode() {
+                return passcode;
+            }
+        };
     }
 
     @Override
@@ -53,17 +86,6 @@ public class UserController extends AbstractCRUDCtrl<User> {
         }
 
         return super.post(user, response);
-    }
-
-    @Override
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public User put(@PathVariable("id") String id, @RequestBody User user) {
-        User beforeUpdate = repository.findOne(id);
-        if(beforeUpdate != null && user.getExpirationDate().isPresent() && !beforeUpdate.getExpirationDate().equals(user.getExpirationDate())) {
-            throw new IllegalArgumentException("Can't set the expiration date of a user!");
-        }
-
-        return super.put(id, user);
     }
 
     @Override
@@ -86,5 +108,15 @@ public class UserController extends AbstractCRUDCtrl<User> {
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.repository = userRepository;
+    }
+
+    @Autowired
+    public void setLoggedInUserHolder(LoggedInUserHolder loggedInUserHolder) {
+        this.loggedInUserHolder = loggedInUserHolder;
+    }
+
+    @Autowired
+    public void setPasscodeService(PasscodeService passcodeService) {
+        this.passcodeService = passcodeService;
     }
 }
