@@ -17,6 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import st.ilu.rms4csw.TestContext;
 import st.ilu.rms4csw.model.major.Major;
 import st.ilu.rms4csw.repository.user.MajorRepository;
+import st.ilu.rms4csw.repository.user.UserRepository;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -49,8 +50,12 @@ public class MajorControllerTest {
     @Autowired
     private MajorRepository majorRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Before
     public void setUp() throws Exception {
+        userRepository.deleteAllInBatch();
         majorRepository.deleteAllInBatch();
 
         major1 = new Major();
@@ -66,6 +71,7 @@ public class MajorControllerTest {
 
     @After
     public void tearDown() throws Exception {
+        userRepository.deleteAllInBatch();
         majorRepository.deleteAllInBatch();
     }
 

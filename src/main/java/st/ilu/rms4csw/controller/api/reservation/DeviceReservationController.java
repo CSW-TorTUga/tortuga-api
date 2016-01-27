@@ -7,6 +7,7 @@ import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.repository.reservation.DeviceReservationRepository;
 import st.ilu.rms4csw.security.LoggedInUserHolder;
+import st.ilu.rms4csw.service.door.DoorOpener;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +23,8 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     public static final String API_BASE = "devicereservations";
 
     private LoggedInUserHolder loggedInUserHolder;
+
+    private DoorOpener doorOpener;
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
@@ -58,7 +61,12 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     public DeviceReservation patch(@PathVariable("id") String id, @RequestBody DeviceReservation entity) {
-        return super.patch(id, entity);
+        DeviceReservation reservation = super.patch(id, entity);
+        if(entity.isBorrowed() && reservation.isBorrowed()) {
+            doorOpener.openCabinetDoor(reservation.getDevice().getCabinet());
+        }
+
+        return reservation;
     }
 
     @Override
@@ -74,5 +82,10 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     @Autowired
     public void setLoggedInUserHolder(LoggedInUserHolder loggedInUserHolder) {
         this.loggedInUserHolder = loggedInUserHolder;
+    }
+
+    @Autowired
+    public void setDoorOpener(DoorOpener doorOpener) {
+        this.doorOpener = doorOpener;
     }
 }

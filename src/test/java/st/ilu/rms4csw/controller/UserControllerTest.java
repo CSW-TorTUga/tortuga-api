@@ -66,6 +66,7 @@ public class UserControllerTest {
     @Before
     public void setUp() throws Exception {
         userRepository.deleteAllInBatch();
+        majorRepository.deleteAllInBatch();
 
         user1 = new User();
         user1.setExpirationDate(Optional.empty());
@@ -103,6 +104,7 @@ public class UserControllerTest {
     @After
     public void tearDown() throws Exception {
         userRepository.deleteAllInBatch();
+        majorRepository.deleteAllInBatch();
     }
 
     @Test

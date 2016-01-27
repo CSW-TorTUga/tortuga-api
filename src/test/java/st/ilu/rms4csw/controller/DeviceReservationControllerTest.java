@@ -3,6 +3,7 @@ package st.ilu.rms4csw.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,7 @@ import org.springframework.web.context.WebApplicationContext;
 import st.ilu.rms4csw.MockLoggedInUserHolder;
 import st.ilu.rms4csw.TestContext;
 import st.ilu.rms4csw.TestHelper;
+import st.ilu.rms4csw.controller.base.advice.RestExceptionHandler;
 import st.ilu.rms4csw.model.device.Device;
 import st.ilu.rms4csw.model.devicecategory.DeviceCategory;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
@@ -187,7 +189,7 @@ public class DeviceReservationControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(three))
-        ).andExpect(jsonPath("$.id", is(three.getId())))
+        )
                 .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
@@ -197,9 +199,21 @@ public class DeviceReservationControllerTest {
     }
 
     @Test
-    public void testPostOverlappingDeviceReservation() throws Exception {
+    public void testPostDeviceFromInactiveCategory() throws Exception {
+        deviceReservationRepository.deleteAllInBatch();
+        deviceRepository.deleteAllInBatch();
+        deviceCategoryRepository.deleteAllInBatch();
+
+        deviceCategory = TestHelper.createDeviceCategory();
+        deviceCategory.setActive(false);
+
+        deviceCategory = deviceCategoryRepository.save(deviceCategory);
+
+        device = TestHelper.createDevice(deviceCategory);
+        device = deviceRepository.save(device);
+
         DeviceReservation three = new DeviceReservation();
-        three.setTimeSpan(new TimeSpan(new Date(150), new Date(500)));
+        three.setTimeSpan(new TimeSpan(new Date(900), new Date(950)));
         three.setBorrowed(false);
         three.setDevice(device);
         three.setUser(user);
@@ -211,7 +225,25 @@ public class DeviceReservationControllerTest {
         ).andExpect(status().is4xxClientError())
                 .andReturn().getResponse().getContentAsString();
 
-        System.out.println(json);
+
+        RestExceptionHandler.ValidationError error = objectMapper.readValue(json, RestExceptionHandler.ValidationError.class);
+        Assert.assertFalse("Device from inactive category", error.getErrors().get("device").isEmpty());
+    }
+
+    @Test
+    public void testPostOverlappingDeviceReservation() throws Exception {
+        DeviceReservation three = new DeviceReservation();
+        three.setTimeSpan(new TimeSpan(new Date(150), new Date(500)));
+        three.setBorrowed(false);
+        three.setDevice(device);
+        three.setUser(user);
+
+        mockMvc.perform(post("/api/v1/devicereservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(three))
+        ).andExpect(status().is4xxClientError())
+                .andReturn().getResponse().getContentAsString();
     }
 
     @Test
@@ -223,14 +255,12 @@ public class DeviceReservationControllerTest {
         three.setUser(user);
         three.setId(null);
 
-        String json = mockMvc.perform(post("/api/v1/devicereservations")
+        mockMvc.perform(post("/api/v1/devicereservations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(three))
         ).andExpect(status().is4xxClientError())
                 .andReturn().getResponse().getContentAsString();
-
-        System.out.println(json);
     }
 
     @Test

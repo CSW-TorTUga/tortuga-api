@@ -18,6 +18,7 @@ public class DeviceReservation extends Reservation<DeviceReservation> {
 
     @OneToOne
     @NotNull(message = "Jede Gerätereservierung braucht ein Gerät, das reserviert wird")
+    @BorrowedDeviceFromActiveCategory
     private Device device;
 
     private Boolean borrowed;
