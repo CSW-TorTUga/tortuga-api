@@ -1,8 +1,10 @@
 package st.ilu.rms4csw.config;
 
 import org.postgresql.Driver;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 import java.net.URI;
@@ -14,6 +16,9 @@ import java.net.URISyntaxException;
 @Configuration
 public class DataSourceConfig {
 
+    @Autowired
+    private Environment environment;
+
     @Bean
     public SimpleDriverDataSource dataSource() throws URISyntaxException {
         String url = System.getenv("DATABASE_URL");
@@ -21,7 +26,11 @@ public class DataSourceConfig {
             // default. if you need a different configuration for development just
             // set the environment variable in your runner using the same format as
             // below
-            url = "postgres://postgres:password@localhost:5432/rms4csw";
+            if(environment.acceptsProfiles("TEST")) {
+                url = "postgres://postgres:password@localhost:5432/rms4csw_test";
+            } else {
+                url = "postgres://postgres:password@localhost:5432/rms4csw";
+            }
         }
 
         URI dbUri = new URI(url);
