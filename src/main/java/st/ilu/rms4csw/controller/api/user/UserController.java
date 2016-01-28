@@ -2,6 +2,9 @@ package st.ilu.rms4csw.controller.api.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.exception.NotFoundException;
@@ -37,17 +40,20 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
+    @PostFilter("(filterObject.id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
     public List<User> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @PostAuthorize("(returnObject.id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
     public User findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
     @RequestMapping(value = "/{id}/passcode", method = RequestMethod.POST)
+    @PreAuthorize("(#id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
     public Object generatePasscode(@PathVariable("id") String id) throws InterruptedException {
         Thread.sleep(500);
 
@@ -75,6 +81,7 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
+    @PreAuthorize("(hasAuthority('OP_TEAM') && #user.getRole() != st.ilu.rms4csw.model.user.Role.ADMIN) || hasAuthority('OP_ADMIN')")
     public ResponseEntity<User> post(@RequestBody User user, HttpServletResponse response) {
         if(user.getRole() == Role.STUDENT) {
             Date expires = User.calculateNextSemesterEnd(new Date());
@@ -90,12 +97,16 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
     @Override
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+
+    //@PreAuthorize("@userService.isAdminAccount(#id)")
+    // todo
 	public ResponseEntity delete(@PathVariable("id") String id) {
         return super.delete(id);
 	}
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    @PreAuthorize("#id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
     public User patch(@PathVariable("id") String id, @RequestBody User user) {
         User beforeUpdate = repository.findOne(id);
         if(beforeUpdate != null && user.getExpirationDate().isPresent() && !beforeUpdate.getExpirationDate().equals(user.getExpirationDate())) {
