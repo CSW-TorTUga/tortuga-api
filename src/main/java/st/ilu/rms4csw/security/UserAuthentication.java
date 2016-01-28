@@ -52,4 +52,8 @@ public class UserAuthentication implements Authentication {
     public String getName() {
         return null;
     }
+
+    public User getUser() {
+        return user;
+    }
 }

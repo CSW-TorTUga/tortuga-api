@@ -1,6 +1,7 @@
 package st.ilu.rms4csw.model.reservation;
 
 import st.ilu.rms4csw.model.base.PersistentEntity;
+import st.ilu.rms4csw.model.base.PossessedEntity;
 import st.ilu.rms4csw.model.user.User;
 
 import javax.persistence.Embedded;
@@ -12,7 +13,7 @@ import javax.validation.constraints.NotNull;
  * @author Mischa Holz
  */
 @MappedSuperclass
-public abstract class Reservation<T extends Reservation> extends PersistentEntity {
+public abstract class Reservation<T extends Reservation> extends PersistentEntity implements PossessedEntity {
 
     @OneToOne
     @NotNull(message = "Reeservierungen müssen einem Benutzer zugewiesen sein")

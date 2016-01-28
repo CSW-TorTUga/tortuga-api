@@ -20,6 +20,7 @@ import st.ilu.rms4csw.TestContext;
 import st.ilu.rms4csw.TestHelper;
 import st.ilu.rms4csw.controller.base.advice.RestExceptionHandler;
 import st.ilu.rms4csw.model.major.Major;
+import st.ilu.rms4csw.model.terminal.PasscodeAuthenticationRequest;
 import st.ilu.rms4csw.model.user.Gender;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
@@ -144,6 +145,10 @@ public class UserControllerTest {
 
     @Test
     public void testGeneratePasscode() throws Exception {
+        getPasscode();
+    }
+
+    private String getPasscode() throws Exception {
         String json = mockMvc.perform(post("/api/v1/users/" + loggedInUserHolder.getLoggedInUser().getId() + "/passcode")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
@@ -157,6 +162,38 @@ public class UserControllerTest {
         @SuppressWarnings("unchecked")
         List<String> code = (List<String>) response.get("passcode");
         assertTrue(code.size() == 5);
+
+        return code.stream().reduce("", (a, b) -> a + b);
+    }
+
+    @Test
+    public void testAuthenticateWithPasscode() throws Exception {
+        String passcode = getPasscode();
+
+        PasscodeAuthenticationRequest par = new PasscodeAuthenticationRequest();
+        par.setPasscode(passcode);
+
+        String json = mockMvc.perform(post("/api/v1/terminal/authenticate")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(par)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        Map<String, Object> response = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+
+        assertNotNull(response.get("success"));
+        assertTrue((Boolean) response.get("success"));
+    }
+
+    @Test
+    public void testNonExistentPasscode() throws Exception {
+        PasscodeAuthenticationRequest par = new PasscodeAuthenticationRequest();
+        par.setPasscode("blabla");
+
+        mockMvc.perform(post("/api/v1/terminal/authenticate")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(par)))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

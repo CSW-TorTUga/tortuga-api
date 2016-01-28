@@ -3,6 +3,7 @@ package st.ilu.rms4csw.controller.api.device;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.device.Device;
@@ -97,24 +98,28 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
+    @PreAuthorize("hasAuthority('OP_TEAM')")
     public ResponseEntity<Device> post(@RequestBody Device newEntity, HttpServletResponse response) {
         return super.post(newEntity, response);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @PreAuthorize("hasAuthority('OP_TEAM')")
     public Device put(@PathVariable("id") String id, @RequestBody Device entity) {
         return super.put(id, entity);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @PreAuthorize("hasAuthority('OP_TEAM')")
     public ResponseEntity delete(@PathVariable("id") String id) {
         return super.delete(id);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    @PreAuthorize("hasAuthority('OP_TEAM')")
     public Device patch(@PathVariable("id") String id, @RequestBody Device entity) {
         return super.patch(id, entity);
     }
