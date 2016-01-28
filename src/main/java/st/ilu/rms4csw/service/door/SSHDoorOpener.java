@@ -44,7 +44,7 @@ public class SSHDoorOpener implements DoorOpener {
                 cmd.join(5, TimeUnit.SECONDS);
             }
         } catch(IOException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 

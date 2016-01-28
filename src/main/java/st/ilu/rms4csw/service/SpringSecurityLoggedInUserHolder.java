@@ -16,7 +16,6 @@ public class SpringSecurityLoggedInUserHolder implements LoggedInUserHolder {
     private UserRepository userRepository;
 
     public SpringSecurityLoggedInUserHolder() {
-        System.out.println("hi!!!");
     }
 
     @Override
