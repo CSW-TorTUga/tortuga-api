@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import st.ilu.rms4csw.model.terminal.PasscodeAuthenticationRequest;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.service.PasscodeService;
+import st.ilu.rms4csw.service.door.DoorOpener;
 
 import java.util.Optional;
 
@@ -22,12 +23,16 @@ public class TerminalController {
 
     private PasscodeService passcodeService;
 
+    private DoorOpener doorOpener;
+
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> authenticate(@RequestBody PasscodeAuthenticationRequest passcodeAuthenticationRequest) {
         Optional<User> user = passcodeService.getUserFromPasscode(passcodeAuthenticationRequest.getPasscode());
         if(!user.isPresent()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+
+        doorOpener.openRoomDoor();
 
         return new ResponseEntity<>(new Object() {
             private boolean success = true;
@@ -41,5 +46,10 @@ public class TerminalController {
     @Autowired
     public void setPasscodeService(PasscodeService passcodeService) {
         this.passcodeService = passcodeService;
+    }
+
+    @Autowired
+    public void setDoorOpener(DoorOpener doorOpener) {
+        this.doorOpener = doorOpener;
     }
 }
