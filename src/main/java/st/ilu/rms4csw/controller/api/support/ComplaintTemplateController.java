@@ -2,6 +2,7 @@ package st.ilu.rms4csw.controller.api.support;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.support.ComplaintTemplate;
@@ -34,24 +35,28 @@ public class ComplaintTemplateController extends AbstractCRUDCtrl<ComplaintTempl
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
+    @PreAuthorize("hasAuthority('OP_TEAM')")
     public ResponseEntity<ComplaintTemplate> post(@RequestBody ComplaintTemplate newEntity, HttpServletResponse response) {
         return super.post(newEntity, response);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @PreAuthorize("hasAuthority('OP_TEAM')")
     public ComplaintTemplate put(@PathVariable("id") String id, @RequestBody ComplaintTemplate entity) {
         return super.put(id, entity);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @PreAuthorize("hasAuthority('OP_TEAM')")
     public ResponseEntity delete(@PathVariable("id") String id) {
         return super.delete(id);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    @PreAuthorize("hasAuthority('OP_TEAM')")
     public ComplaintTemplate patch(@PathVariable("id") String id, @RequestBody ComplaintTemplate entity) {
         return super.patch(id, entity);
     }
