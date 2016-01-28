@@ -65,13 +65,14 @@ public class UserController extends AbstractCRUDCtrl<User> {
             throw new IllegalArgumentException("You can't reset the passcode of other users");
         }
 
-        String passcodeStr = passcodeService.generateRandomPassword();
+        List<String> passcodeList = passcodeService.generateRandomPasscode();
+        String passcodeStr = passcodeList.stream().reduce("", (a, b) -> a + b);
         user.setPasscode(Optional.of(passcodeStr));
 
         repository.save(user);
 
         return new Object() {
-            public List<String> passcode = passcodeService.splitEmojiString(passcodeStr);
+            public List<String> passcode = passcodeList;
 
             public List<String> getPasscode() {
                 return passcode;

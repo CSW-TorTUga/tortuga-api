@@ -62,7 +62,7 @@ public class PasscodeService {
         return characters;
     }
 
-    public String generateRandomPassword() {
+    public List<String> generateRandomPasscode() {
         SecureRandom random = new SecureRandom();
 
         List<String> characters = new ArrayList<>();
@@ -74,7 +74,7 @@ public class PasscodeService {
             characters.add(possibleCharacters.get(index));
         }
 
-        return characters.stream().reduce("", (a, b) -> a + b);
+        return characters;
     }
 
     public Optional<User> getUserFromPasscode(String passcode) {
