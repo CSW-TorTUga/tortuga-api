@@ -61,6 +61,8 @@ public class User extends PersistentEntity {
     @Access(AccessType.FIELD)
     private Date expirationDate;
 
+    @Access(AccessType.FIELD)
+    @Column(unique = true)
     private String passcode;
 
     public String getLoginName() {

@@ -1,11 +1,16 @@
 package st.ilu.rms4csw.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import st.ilu.rms4csw.model.user.User;
+import st.ilu.rms4csw.repository.user.UserRepository;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Mischa Holz
@@ -16,6 +21,8 @@ public class PasscodeService {
 
     @Value("${emojis}")
     private String emojis;
+
+    private UserRepository userRepository;
 
     private boolean isMarker(char ch) {
         return ch == 0xD83C || ch == 0xD83D || ch == 0xD83E;
@@ -70,4 +77,16 @@ public class PasscodeService {
         return characters.stream().reduce("", (a, b) -> a + b);
     }
 
+    public Optional<User> getUserFromPasscode(String passcode) {
+        String hash = new BCryptPasswordEncoder().encode(passcode);
+
+        User user = userRepository.findOneByPasscode(hash);
+
+        return Optional.ofNullable(user);
+    }
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 }
