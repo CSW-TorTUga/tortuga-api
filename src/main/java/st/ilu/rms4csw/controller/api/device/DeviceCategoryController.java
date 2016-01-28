@@ -2,6 +2,7 @@ package st.ilu.rms4csw.controller.api.device;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.devicecategory.DeviceCategory;
@@ -34,24 +35,28 @@ public class DeviceCategoryController extends AbstractCRUDCtrl<DeviceCategory> {
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
+    @PreAuthorize("hasAuthority('OP_TEAM')")
     public ResponseEntity<DeviceCategory> post(@RequestBody DeviceCategory newEntity, HttpServletResponse response) {
         return super.post(newEntity, response);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @PreAuthorize("hasAuthority('OP_TEAM')")
     public DeviceCategory put(@PathVariable String id, @RequestBody DeviceCategory entity) {
         return super.put(id, entity);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @PreAuthorize("hasAuthority('OP_TEAM')")
     public ResponseEntity delete(@PathVariable String id) {
         return super.delete(id);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    @PreAuthorize("hasAuthority('OP_TEAM')")
     public DeviceCategory patch(@PathVariable String id, @RequestBody DeviceCategory entity) {
         return super.patch(id, entity);
     }

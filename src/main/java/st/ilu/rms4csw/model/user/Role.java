@@ -14,11 +14,10 @@ import java.util.stream.Collectors;
 public enum Role {
 
 
-    STUDENT(),
-    LECTURER(),
-    CSW_TEAM(),
-    ADMIN("OP_TEST"),
-    ;
+    STUDENT("OP_STUDENT"),
+    LECTURER("OP_STUDENT", "OP_LECTURER"),
+    CSW_TEAM("OP_STUDENT", "OP_LECTURER", "OP_TEAM"),
+    ADMIN("OP_STUDENT", "OP_LECTURER", "OP_TEAM", "OP_ADMIN");
 
     private String[] privileges;
 

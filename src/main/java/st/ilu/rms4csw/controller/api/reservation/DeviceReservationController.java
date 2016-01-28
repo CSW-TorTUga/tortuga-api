@@ -46,6 +46,7 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
+    @PreAuthorize("#newEntity.user.id == authentication.getUser().getId() || hasAuthority('OP_TEAM')")
     public ResponseEntity<DeviceReservation> post(@RequestBody DeviceReservation newEntity, HttpServletResponse response) {
         newEntity.setUser(loggedInUserHolder.getLoggedInUser());
 
@@ -54,7 +55,7 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    @PreAuthorize("entity.user.id == authentication.getUser().getId() || hasAuthority('OP_TEAM')")
+    @PreAuthorize("#entity.user.id == authentication.getUser().getId() || hasAuthority('OP_TEAM')")
     public DeviceReservation put(@PathVariable("id") String id, @RequestBody DeviceReservation entity) {
         return super.put(id, entity);
     }
