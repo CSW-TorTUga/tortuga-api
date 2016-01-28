@@ -296,6 +296,19 @@ public class DeviceReservationControllerTest {
     }
 
     @Test
+    public void testPatchInvalidDevice() throws Exception {
+        DeviceReservation patch = new DeviceReservation();
+        patch.setId(null);
+
+        mockMvc.perform(patch("/api/v1/devicereservations/blabla")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(patch))
+        )
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testBorrowDevice() throws Exception {
         try (ByteArrayOutputStream outContent = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(outContent));
