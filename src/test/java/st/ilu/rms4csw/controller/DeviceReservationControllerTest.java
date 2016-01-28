@@ -30,12 +30,14 @@ import st.ilu.rms4csw.repository.reservation.DeviceReservationRepository;
 import st.ilu.rms4csw.repository.user.UserRepository;
 
 import javax.annotation.Resource;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Date;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -291,6 +293,31 @@ public class DeviceReservationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(one.getId())))
                 .andExpect(jsonPath("$.timeSpan.beginning", is(900)));
+    }
+
+    @Test
+    public void testBorrowDevice() throws Exception {
+        try (ByteArrayOutputStream outContent = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(outContent));
+
+            DeviceReservation patch = new DeviceReservation();
+            patch.setId(null);
+            patch.setBorrowed(true);
+
+            mockMvc.perform(patch("/api/v1/devicereservations/" + one.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(patch))
+            )
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id", is(one.getId())))
+                    .andExpect(jsonPath("$.borrowed", is(true)));
+
+            assertTrue(outContent.toString().contains("OPEN"));
+        } finally {
+            System.setOut(null);
+        }
+
     }
 
     @Test
