@@ -17,6 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import st.ilu.rms4csw.TestContext;
 import st.ilu.rms4csw.model.devicecategory.DeviceCategory;
 import st.ilu.rms4csw.repository.device.DeviceCategoryRepository;
+import st.ilu.rms4csw.repository.device.DeviceRepository;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -49,8 +50,12 @@ public class DeviceCategoryControllerTest {
     @Autowired
     private DeviceCategoryRepository deviceCategoryRepository;
 
+    @Autowired
+    private DeviceRepository deviceRepository;
+
     @Before
     public void setUp() throws Exception {
+        deviceRepository.deleteAllInBatch();
         deviceCategoryRepository.deleteAllInBatch();
 
         deviceCategory1 = new DeviceCategory();
@@ -68,6 +73,7 @@ public class DeviceCategoryControllerTest {
 
     @After
     public void tearDown() throws Exception {
+        deviceRepository.deleteAllInBatch();
         deviceCategoryRepository.deleteAllInBatch();
     }
 
