@@ -67,20 +67,20 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-//    @PreAuthorize("entity.user.id == authentication.getUser().getId() || hasAuthority('OP_TEAM')")
+    @PreAuthorize("#entity.user.id == authentication.getUser().getId() || hasAuthority('OP_TEAM')")
     public DeviceReservation patch(@PathVariable("id") String id, @RequestBody DeviceReservation entity) {
         DeviceReservation old = repository.findOne(id);
         if(old == null) {
             throw new NotFoundException("Could not find DeviceReservation with id " + id);
         }
 
-        Boolean oldBorrowed = old.isBorrowed();
+        Boolean oldBorrowed = old.isBorrowed() == null ? false : old.isBorrowed();
 
         DeviceReservation reservation = super.patch(id, entity);
 
-        Boolean newBorrowed = reservation.isBorrowed();
+        Boolean newBorrowed = reservation.isBorrowed() == null ? false : reservation.isBorrowed();
 
-        if(((oldBorrowed == null || !oldBorrowed) && newBorrowed) || (oldBorrowed != null && oldBorrowed && !newBorrowed)) {
+        if(oldBorrowed != newBorrowed) {
             doorOpener.openCabinetDoor(reservation.getDevice().getCabinet());
         }
 
