@@ -40,20 +40,20 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
-    @PostFilter("(filterObject.id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
+    @PostFilter("filterObject.id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
     public List<User> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @PostAuthorize("(returnObject.id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
+    @PostAuthorize("returnObject.id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
     public User findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
     @RequestMapping(value = "/{id}/passcode", method = RequestMethod.POST)
-    @PreAuthorize("(#id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
+    @PreAuthorize("#id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
     public Object generatePasscode(@PathVariable("id") String id) throws InterruptedException {
         Thread.sleep(500);
 
