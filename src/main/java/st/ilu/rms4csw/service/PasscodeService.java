@@ -78,11 +78,11 @@ public class PasscodeService {
     }
 
     public Optional<User> getUserFromPasscode(String passcode) {
-        String hash = new BCryptPasswordEncoder().encode(passcode);
+        List<User> users = userRepository.findAll();
 
-        User user = userRepository.findOneByPasscode(hash);
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-        return Optional.ofNullable(user);
+        return users.stream().filter(u -> u.getPasscode().isPresent()).filter(u -> encoder.matches(passcode, u.getPasscode().get())).findAny();
     }
 
     @Autowired

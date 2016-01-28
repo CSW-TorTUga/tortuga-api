@@ -2,6 +2,8 @@ package st.ilu.rms4csw.service.door;
 
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import st.ilu.rms4csw.model.cabinet.Cabinet;
@@ -14,6 +16,8 @@ import java.util.concurrent.TimeUnit;
  * @author Mischa Holz
  */
 public class SSHDoorOpener implements DoorOpener {
+
+    private static Logger logger = LoggerFactory.getLogger(DoorOpener.class);
 
     private String host;
 
@@ -45,6 +49,10 @@ public class SSHDoorOpener implements DoorOpener {
     }
 
     private boolean isLocalNetworkRequest() {
+        if("true".equals(System.getenv("ALLOW_DOOR_FROM_EVERYWHERE"))) {
+            return true;
+        }
+
         ServletRequestAttributes sra = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
         if(sra == null) {
             return false;
@@ -67,8 +75,11 @@ public class SSHDoorOpener implements DoorOpener {
     @Override
     public void openCabinetDoor(Cabinet cabinet) {
         if(!isLocalNetworkRequest()) {
+            logger.warn("NOT OPENING DOOR {} BECAUSE NOT LOCAL NETWORK", cabinet);
             return;
         }
+
+        logger.warn("OPENING CABINET DOOR {}", cabinet);
 
         String cmdStr = "~/cabinet";
         if(cabinet == Cabinet.CABINET_6) {
@@ -86,8 +97,11 @@ public class SSHDoorOpener implements DoorOpener {
     @Override
     public void openRoomDoor() {
         if(!isLocalNetworkRequest()) {
+            logger.warn("NOT OPENING ROOM DOOR BECAUSE NOT LOCAL NETWORK");
             return;
         }
+
+        logger.warn("OPENING ROOM DOOR");
 
         executeCommandOnHost("~/doorOpen.sh 3");
     }
