@@ -12,6 +12,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * @author Mischa Holz
@@ -26,11 +27,12 @@ public class StatelessAuthenticationFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        Authentication authentication = tokenAuthenticationService.getAuthentication((HttpServletRequest) servletRequest);
+        Optional<Authentication> authentication = tokenAuthenticationService.getAuthentication((HttpServletRequest) servletRequest);
+        if(authentication.isPresent()) {
+            tokenAuthenticationService.addAuthentication((HttpServletResponse) servletResponse, (User) authentication.get().getDetails());
 
-        tokenAuthenticationService.addAuthentication((HttpServletResponse) servletResponse, (User) authentication.getDetails());
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication.get());
+        }
 
         filterChain.doFilter(servletRequest, servletResponse);
     }

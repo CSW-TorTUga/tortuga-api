@@ -29,7 +29,6 @@ public class TerminalController {
     public ResponseEntity<?> authenticate(@RequestBody PasscodeAuthenticationRequest passcodeAuthenticationRequest) {
         Optional<User> user = passcodeService.getUserFromPasscode(passcodeAuthenticationRequest.getPasscode());
         if(!user.isPresent()) {
-
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 

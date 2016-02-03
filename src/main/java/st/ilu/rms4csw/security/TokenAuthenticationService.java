@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.user.UserRepository;
 import st.ilu.rms4csw.security.token.Token;
-import st.ilu.rms4csw.security.token.TokenException;
 import st.ilu.rms4csw.security.token.TokenHandler;
 
 import javax.servlet.http.Cookie;
@@ -18,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * @author Mischa Holz
@@ -55,7 +55,7 @@ public class TokenAuthenticationService {
         response.setHeader("X-Next-Auth-Token", strToken);
     }
 
-    public Authentication getAuthentication(HttpServletRequest request) {
+    public Optional<Authentication> getAuthentication(HttpServletRequest request) {
         String strToken = Arrays
                 .stream(request.getCookies() == null ? new Cookie[0] : request.getCookies())
                 .filter(c -> COOKIE_NAME.equals(c.getName()))
@@ -76,17 +76,17 @@ public class TokenAuthenticationService {
                     return value;
                 });
         if(strToken == null) {
-            throw new TokenException("No token in either the cookie " + COOKIE_NAME + " or the header " + HttpHeaders.AUTHORIZATION);
+            return Optional.empty();
         }
 
         Token token = tokenHandler.validateToken(strToken);
 
         User user = userRepository.findOne(token.getId());
         if(user == null) {
-            throw new TokenException("Can't find user with given id");
+            return Optional.empty();
         }
 
-        return new UserAuthentication(user);
+        return Optional.of(new UserAuthentication(user));
     }
 
     @Autowired
