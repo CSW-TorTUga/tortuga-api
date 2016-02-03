@@ -124,7 +124,7 @@ public class UserController extends AbstractCRUDCtrl<User> {
             user.setExpirationDate(Optional.of(expires));
         }
 
-        if(user.getRole() != Role.STUDENT) {
+        if(beforeUpdate.getRole() != Role.STUDENT && user.getRole() != Role.STUDENT) {
             user.setExpirationDate(Optional.empty());
         }
 
