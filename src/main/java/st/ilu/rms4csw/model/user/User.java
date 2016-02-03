@@ -36,6 +36,7 @@ public class User extends PersistentEntity {
 
     @NotEmpty(message = "Benutzer brauchen eine Email")
     @Email
+    @Column(unique = true)
     private String email;
 
     @Access(AccessType.FIELD)
