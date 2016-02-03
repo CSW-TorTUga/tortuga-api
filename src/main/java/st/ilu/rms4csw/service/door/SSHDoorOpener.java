@@ -49,27 +49,36 @@ public class SSHDoorOpener implements DoorOpener {
     }
 
     private boolean isLocalNetworkRequest() {
-        if("true".equals(System.getenv("ALLOW_DOOR_FROM_EVERYWHERE"))) {
-            return true;
-        }
-
         ServletRequestAttributes sra = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
         if(sra == null) {
+            logger.info("No request attached to this thread.");
             return false;
         }
 
         HttpServletRequest request = sra.getRequest();
+        String realIp = request.getHeader("X-Real-IP");
+        logger.info("X-Real-IP: {}", realIp);
+
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        logger.info("X-Forwarded-For: {}", forwardedFor);
+
+        String remoteAddr = request.getRemoteAddr();
+        logger.info("RemoteAddr: {}", remoteAddr);
+
+
+        if("true".equals(System.getenv("ALLOW_DOOR_FROM_EVERYWHERE"))) {
+            return true;
+        }
+
         if(request.getHeader("X-Real-IP") != null) {
-            String ip = request.getHeader("X-Real-IP");
-            return ip.startsWith("192.168");
+            return realIp.startsWith("192.168");
         }
 
         if(request.getHeader("X-Forwarded-For") != null) {
-            String ip = request.getHeader("X-Forwarded-For");
-            return ip.startsWith("192.168");
+            return forwardedFor.startsWith("192.168");
         }
 
-        return request.getRemoteAddr().startsWith("192.168");
+        return remoteAddr.startsWith("192.168");
     }
 
     @Override
