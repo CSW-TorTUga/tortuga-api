@@ -25,6 +25,7 @@ import java.util.Optional;
 public class User extends PersistentEntity {
 
     @Column(unique = true)
+    @UsersHaveUniqueLoginNames
     @NotEmpty(message = "Benutzer brauchen einen Anmeldenamen")
     private String loginName;
 
@@ -37,6 +38,7 @@ public class User extends PersistentEntity {
     @NotEmpty(message = "Benutzer brauchen eine Email")
     @Email
     @Column(unique = true)
+    @UsersHaveUniqueEmails
     private String email;
 
     @Access(AccessType.FIELD)

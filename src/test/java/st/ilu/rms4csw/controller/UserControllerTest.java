@@ -144,6 +144,29 @@ public class UserControllerTest {
     }
 
     @Test
+    public void testPostUserWithExistingEmail() throws Exception {
+        User user3 = new User();
+        user3.setExpirationDate(Optional.empty());
+        user3.setPhoneNumber("123456789");
+        user3.setRole(Role.ADMIN);
+        user3.setFirstName("Team");
+        user3.setLastName("Teamington");
+        user3.setGender(Optional.of(Gender.FEMALE));
+        user3.setStudentId(Optional.empty());
+        user3.setMajor(Optional.empty());
+        user3.setEmail("team@ilu.st");
+        user3.setLoginName("some_other_user_totally");
+        user3.setPassword("change me.");
+        user3.setId(null);
+
+        mockMvc.perform(post("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user3)))
+
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
     public void testGeneratePasscode() throws Exception {
         getPasscode();
     }

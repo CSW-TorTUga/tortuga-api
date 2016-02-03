@@ -13,6 +13,6 @@ public interface UserRepository extends JpaSpecificationRepository<User, String>
 
     User findOneByLoginName(@Param("loginName") String loginName);
 
-    User findOneByPasscode(@Param("passcode") String passcode);
+    User findOneByEmail(@Param("email") String email);
 
 }
