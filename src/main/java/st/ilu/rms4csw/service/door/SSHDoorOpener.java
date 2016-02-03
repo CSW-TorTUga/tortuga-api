@@ -34,7 +34,7 @@ public class SSHDoorOpener implements DoorOpener {
     private void executeCommandOnHost(String cmdStr) {
         Thread thread = new Thread(() -> {
             try(SSHClient ssh = new SSHClient()) {
-                ssh.loadKnownHosts();
+//                ssh.loadKnownHosts();
 
                 ssh.connect(host);
 
