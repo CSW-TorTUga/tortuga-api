@@ -18,6 +18,7 @@ public class TestHelper {
     public static User createLoginUser() {
         User user = createUser();
         user.setLoginName("eirungirungvije");
+        user.setEmail("someothermail@ilu.st");
         return user;
     }
 
