@@ -25,16 +25,20 @@ public class SSHDoorOpener implements DoorOpener {
 
     private String password;
 
-    public SSHDoorOpener(String host, String user, String password) {
+    private String fingerPrint;
+
+    public SSHDoorOpener(String host, String user, String password, String fingerPrint) {
         this.host = host;
         this.user = user;
         this.password = password;
+        this.fingerPrint = fingerPrint;
     }
 
     private void executeCommandOnHost(String cmdStr) {
         Thread thread = new Thread(() -> {
             try(SSHClient ssh = new SSHClient()) {
 //                ssh.loadKnownHosts();
+                ssh.addHostKeyVerifier(fingerPrint);
 
                 ssh.connect(host);
 

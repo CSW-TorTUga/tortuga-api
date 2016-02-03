@@ -18,9 +18,10 @@ public class DoorOpenerConfig {
     @Bean
     public static DoorOpener doorOpener(@Value("${SSH_DOOR_HOST:NO_HOST}") String sshHost,
                                         @Value("${SSH_DOOR_USER:NO_USER}") String sshUser,
-                                        @Value("${SSH_DOOR_PASSWORD:NO_PASSWORD}") String sshPassword) {
+                                        @Value("${SSH_DOOR_PASSWORD:NO_PASSWORD}") String sshPassword,
+                                        @Value("${SSH_FINGER_PRINT:PRINT}") String fingerPrint) {
         if(sshHost != null && !sshHost.equals("NO_HOST")) {
-            return new SSHDoorOpener(sshHost, sshUser, sshPassword);
+            return new SSHDoorOpener(sshHost, sshUser, sshPassword, fingerPrint);
         } else {
             return new DoorOpener() {
                 @Override
