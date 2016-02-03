@@ -34,13 +34,7 @@ public class TerminalController {
 
         doorOpener.openRoomDoor();
 
-        return new ResponseEntity<>(new Object() {
-            private boolean success = true;
-
-            public boolean isSuccess() {
-                return success;
-            }
-        }, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Autowired

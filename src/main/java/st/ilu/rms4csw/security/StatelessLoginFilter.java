@@ -56,7 +56,16 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
             return null;
         }
 
+
         LoginRequest loginRequest = objectMapper.readValue(httpServletRequest.getInputStream(), LoginRequest.class);
+
+        User user = userRepository.findOneByLoginName(loginRequest.getLoginName());
+        if(user != null && (!user.isActiveUser())) {
+            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+            return null;
+        }
+
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getLoginName(), loginRequest.getPassword());
 
         return getAuthenticationManager().authenticate(usernamePasswordAuthenticationToken);

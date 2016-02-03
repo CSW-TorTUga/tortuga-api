@@ -40,20 +40,20 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
-    @PostFilter("filterObject.id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
+    @PostFilter("filterObject.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
     public List<User> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @PostAuthorize("returnObject.id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
+    @PostAuthorize("returnObject.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
     public User findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
     @RequestMapping(value = "/{id}/passcode", method = RequestMethod.POST)
-    @PreAuthorize("#id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
+    @PreAuthorize("#id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
     public Object generatePasscode(@PathVariable("id") String id) throws InterruptedException {
         Thread.sleep(500);
 
@@ -98,14 +98,14 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
     @Override
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    @PreAuthorize("@userService.canUserDelete(authentication.getUser(), #id)")
+    @PreAuthorize("@userService.canUserDelete(authentication.getDetails(), #id)")
 	public ResponseEntity delete(@PathVariable("id") String id) {
         return super.delete(id);
 	}
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    @PreAuthorize("#id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
+    @PreAuthorize("#id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
     public User patch(@PathVariable("id") String id, @RequestBody User user) {
         User beforeUpdate = repository.findOne(id);
         if(beforeUpdate != null && user.getExpirationDate().isPresent() && !beforeUpdate.getExpirationDate().equals(user.getExpirationDate())) {

@@ -55,7 +55,7 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    @PreAuthorize("@possessedEntityPermissionElevator.checkOwner(@roomReservationRepository, #id, authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
+    @PreAuthorize("@possessedEntityPermissionElevator.checkOwner(@roomReservationRepository, #id, authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
     public ResponseEntity delete(@PathVariable("id") String id) {
         return super.delete(id);
     }
