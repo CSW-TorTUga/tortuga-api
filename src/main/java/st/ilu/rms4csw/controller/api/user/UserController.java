@@ -107,11 +107,6 @@ public class UserController extends AbstractCRUDCtrl<User> {
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("#id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
     public User patch(@PathVariable("id") String id, @RequestBody User user) {
-        User beforeUpdate = repository.findOne(id);
-        if(beforeUpdate != null && user.getExpirationDate().isPresent() && !beforeUpdate.getExpirationDate().equals(user.getExpirationDate())) {
-            throw new IllegalArgumentException("Can't set the expiration date of a user!");
-        }
-
         return super.patch(id, user);
     }
 
