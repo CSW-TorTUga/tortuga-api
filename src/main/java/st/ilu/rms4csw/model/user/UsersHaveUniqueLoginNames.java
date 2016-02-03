@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 /**
  * @author Mischa Holz
  */
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = UsersHaveUniqueLoginNamesValidator.class)
 @Documented

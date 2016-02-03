@@ -11,13 +11,26 @@ import javax.validation.ConstraintValidatorContext;
  * @author Mischa Holz
  */
 @Component
-public class UsersHaveUniqueEmailsValidator extends SpringInjectedValidator<UsersHaveUniqueEmails, String> {
+public class UsersHaveUniqueEmailsValidator extends SpringInjectedValidator<UsersHaveUniqueEmails, User> {
 
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    protected boolean _isValid(String value, ConstraintValidatorContext context) {
-        return userRepository.findOneByEmail(value) == null;
+    protected boolean _isValid(User value, ConstraintValidatorContext context) {
+        User candidate = userRepository.findOneByEmail(value.getEmail());
+
+        if(candidate == null) {
+            return true;
+        }
+
+        boolean valid = candidate.getId().equals(value.getId());
+        if(!valid) {
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate("Diese Email Adresse wird bereits von einem anderen Benutzer verwendet.")
+                    .addPropertyNode("email").addConstraintViolation();
+        }
+
+        return valid;
     }
 }

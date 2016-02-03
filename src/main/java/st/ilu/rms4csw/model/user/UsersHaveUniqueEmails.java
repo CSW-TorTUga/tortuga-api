@@ -7,14 +7,14 @@ import java.lang.annotation.*;
 /**
  * @author Mischa Holz
  */
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = UsersHaveUniqueEmailsValidator.class)
 @Documented
 @Inherited
 public @interface UsersHaveUniqueEmails {
 
-    String message() default "Diese Email wird bereits benutzt.";
+    String message() default "Diese Email Adresse wird bereits von einem anderen Benutzer verwendet.";
 
     Class<?>[] groups() default {};
 

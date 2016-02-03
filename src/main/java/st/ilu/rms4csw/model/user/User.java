@@ -22,10 +22,11 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @StudentsHaveToHaveAMajor
 @StudentsHaveToHaveAStudentId
+@UsersHaveUniqueEmails
+@UsersHaveUniqueLoginNames
 public class User extends PersistentEntity {
 
     @Column(unique = true)
-    @UsersHaveUniqueLoginNames
     @NotEmpty(message = "Benutzer brauchen einen Anmeldenamen")
     private String loginName;
 
@@ -38,7 +39,6 @@ public class User extends PersistentEntity {
     @NotEmpty(message = "Benutzer brauchen eine Email")
     @Email
     @Column(unique = true)
-    @UsersHaveUniqueEmails
     private String email;
 
     @Access(AccessType.FIELD)
@@ -63,6 +63,8 @@ public class User extends PersistentEntity {
 
     @Access(AccessType.FIELD)
     private Date expirationDate;
+
+    private Boolean enabled;
 
     @Access(AccessType.FIELD)
     @Column(unique = true)

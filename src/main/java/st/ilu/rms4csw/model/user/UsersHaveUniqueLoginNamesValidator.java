@@ -11,13 +11,26 @@ import javax.validation.ConstraintValidatorContext;
  * @author Mischa Holz
  */
 @Component
-public class UsersHaveUniqueLoginNamesValidator extends SpringInjectedValidator<UsersHaveUniqueLoginNames, String> {
+public class UsersHaveUniqueLoginNamesValidator extends SpringInjectedValidator<UsersHaveUniqueLoginNames, User> {
 
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    protected boolean _isValid(String value, ConstraintValidatorContext context) {
-        return userRepository.findOneByLoginName(value) == null;
+    protected boolean _isValid(User value, ConstraintValidatorContext context) {
+        User candidate = userRepository.findOneByLoginName(value.getLoginName());
+
+        if(candidate == null) {
+            return true;
+        }
+
+        boolean valid = candidate.getId().equals(value.getId());
+        if(!valid) {
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate("Dieser Loginname wird bereits von einem anderen Benutzer verwendet.")
+                    .addPropertyNode("loginName").addConstraintViolation();
+        }
+
+        return valid;
     }
 }

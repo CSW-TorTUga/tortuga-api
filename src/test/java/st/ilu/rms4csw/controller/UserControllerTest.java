@@ -343,6 +343,7 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(patch)))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.loginName", is(user1.getLoginName())))
                 .andExpect(jsonPath("$.email", is("bla@ilu.st")));
     }
