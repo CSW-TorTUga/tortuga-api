@@ -53,6 +53,29 @@ public class UserService implements UserDetailsService {
         return user.getRole() == Role.ADMIN;
     }
 
+    @SuppressWarnings("unused")
+    public boolean canUserDelete(User subject, String objectId) {
+        if(subject.getRole() == Role.ADMIN) {
+            return true;
+        }
+
+        if(subject.getRole() != Role.CSW_TEAM) {
+            return false;
+        }
+
+        User object = userRepository.findOne(objectId);
+
+        if(object == null) {
+            return true;
+        }
+
+        if(object.getRole() == Role.ADMIN || object.getRole() == Role.CSW_TEAM) {
+            return false;
+        }
+
+        return true;
+    }
+
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;

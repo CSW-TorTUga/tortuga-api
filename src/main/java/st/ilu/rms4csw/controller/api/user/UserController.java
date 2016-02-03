@@ -98,9 +98,7 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
     @Override
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-
-    //@PreAuthorize("@userService.isAdminAccount(#id)")
-    // todo
+    @PreAuthorize("@userService.canUserDelete(authentication.getUser(), #id)")
 	public ResponseEntity delete(@PathVariable("id") String id) {
         return super.delete(id);
 	}
