@@ -108,8 +108,8 @@ public class SSHDoorOpener implements DoorOpener {
         }
         cmdStr += "Open.sh";
 
-        logger.info("NOT OPENING DOOR CAUSE DISABLED");
-//        executeCommandOnHost(cmdStr);
+//        logger.info("NOT OPENING DOOR CAUSE DISABLED");
+        executeCommandOnHost(cmdStr);
     }
 
     @Override
@@ -121,7 +121,7 @@ public class SSHDoorOpener implements DoorOpener {
 
         logger.warn("OPENING ROOM DOOR");
 
-        logger.info("NOT OPENING DOOR CAUSE DISABLED");
-//        executeCommandOnHost("~/doorOpen.sh 3");
+//        logger.info("NOT OPENING DOOR CAUSE DISABLED");
+        executeCommandOnHost("~/doorOpen.sh 3");
     }
 }
