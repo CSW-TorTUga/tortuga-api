@@ -32,20 +32,24 @@ public class SSHDoorOpener implements DoorOpener {
     }
 
     private void executeCommandOnHost(String cmdStr) {
-        try(SSHClient ssh = new SSHClient()) {
-            ssh.loadKnownHosts();
+        Thread thread = new Thread(() -> {
+            try(SSHClient ssh = new SSHClient()) {
+                ssh.loadKnownHosts();
 
-            ssh.connect(host);
+                ssh.connect(host);
 
-            ssh.authPassword(user, password);
+                ssh.authPassword(user, password);
 
-            try(Session session = ssh.startSession()) {
-                Session.Command cmd = session.exec(cmdStr);
-                cmd.join(5, TimeUnit.SECONDS);
+                try(Session session = ssh.startSession()) {
+                    Session.Command cmd = session.exec(cmdStr);
+                    cmd.join(5, TimeUnit.SECONDS);
+                }
+            } catch(IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch(IOException e) {
-            throw new RuntimeException(e);
-        }
+        });
+
+        thread.start();
     }
 
     private boolean isLocalNetworkRequest() {
