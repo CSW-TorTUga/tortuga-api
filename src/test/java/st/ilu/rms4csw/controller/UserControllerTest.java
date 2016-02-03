@@ -87,6 +87,7 @@ public class UserControllerTest {
         user2.setEmail("team@ilu.st");
         user2.setLoginName("team");
         user2.setPassword("change me.");
+        user2.setEnabled(true);
 
         userRepository.save(Arrays.asList(user2));
 
@@ -133,6 +134,7 @@ public class UserControllerTest {
         user3.setLoginName("test_user");
         user3.setPassword("change me.");
         user3.setId(null);
+        user3.setEnabled(true);
 
         mockMvc.perform(post("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -196,16 +198,10 @@ public class UserControllerTest {
         PasscodeAuthenticationRequest par = new PasscodeAuthenticationRequest();
         par.setPasscode(passcode);
 
-        String json = mockMvc.perform(post("/api/v1/terminal/authenticate")
+        mockMvc.perform(post("/api/v1/terminal/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(par)))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        Map<String, Object> response = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
-
-        assertNotNull(response.get("success"));
-        assertTrue((Boolean) response.get("success"));
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -250,6 +246,7 @@ public class UserControllerTest {
         user3.setLoginName("test_user");
         user3.setPassword("change me.");
         user3.setId(null);
+        user3.setEnabled(true);
 
         String json = mockMvc.perform(post("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -286,6 +283,7 @@ public class UserControllerTest {
         user3.setLoginName("test_user2");
         user3.setPassword("change me.");
         user3.setId(null);
+        user3.setEnabled(true);
 
         String location = mockMvc.perform(post("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
