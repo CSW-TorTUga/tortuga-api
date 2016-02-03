@@ -1,7 +1,7 @@
 package st.ilu.rms4csw.model.reservation;
 
 import st.ilu.rms4csw.model.base.PersistentEntity;
-import st.ilu.rms4csw.model.base.PossessedEntity;
+import st.ilu.rms4csw.model.user.PossessedEntity;
 import st.ilu.rms4csw.model.user.User;
 
 import javax.persistence.Embedded;

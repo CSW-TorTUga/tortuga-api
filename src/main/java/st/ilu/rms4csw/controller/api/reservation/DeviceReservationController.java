@@ -95,11 +95,6 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     }
 
     @Autowired
-    public void setReservationRepository(DeviceReservationRepository reservationRepository) {
-        this.repository = reservationRepository;
-    }
-
-    @Autowired
     public void setLoggedInUserHolder(LoggedInUserHolder loggedInUserHolder) {
         this.loggedInUserHolder = loggedInUserHolder;
     }

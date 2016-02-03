@@ -1,12 +1,10 @@
 package st.ilu.rms4csw.controller.api.support;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.support.SupportMessage;
-import st.ilu.rms4csw.repository.support.SupportMessageRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,10 +55,5 @@ public class SupportMessageController extends AbstractCRUDCtrl<SupportMessage> {
     @Override
     public String getApiBase() {
         return API_BASE;
-    }
-
-    @Autowired
-    public void setReservationRepository(SupportMessageRepository reservationRepository) {
-        this.repository = reservationRepository;
     }
 }

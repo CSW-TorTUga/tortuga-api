@@ -1,12 +1,10 @@
 package st.ilu.rms4csw.controller.api.device;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.devicecategory.DeviceCategory;
-import st.ilu.rms4csw.repository.device.DeviceCategoryRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,11 +57,6 @@ public class DeviceCategoryController extends AbstractCRUDCtrl<DeviceCategory> {
     @PreAuthorize("hasAuthority('OP_TEAM')")
     public DeviceCategory patch(@PathVariable String id, @RequestBody DeviceCategory entity) {
         return super.patch(id, entity);
-    }
-
-    @Autowired
-    public void setDeviceCategoryRepository(DeviceCategoryRepository deviceCategoryRepository) {
-        this.repository = deviceCategoryRepository;
     }
 
     @Override

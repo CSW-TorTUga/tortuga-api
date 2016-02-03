@@ -116,11 +116,6 @@ public class UserController extends AbstractCRUDCtrl<User> {
     }
 
     @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.repository = userRepository;
-    }
-
-    @Autowired
     public void setLoggedInUserHolder(LoggedInUserHolder loggedInUserHolder) {
         this.loggedInUserHolder = loggedInUserHolder;
     }

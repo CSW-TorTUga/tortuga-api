@@ -82,7 +82,11 @@ public class PasscodeService {
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-        return users.stream().filter(u -> u.getPasscode().isPresent()).filter(u -> encoder.matches(passcode, u.getPasscode().get())).findAny();
+        return users.stream()
+                .filter(User::isActiveUser)
+                .filter(u -> u.getPasscode().isPresent())
+                .filter(u -> encoder.matches(passcode, u.getPasscode().get()))
+                .findAny();
     }
 
     @Autowired

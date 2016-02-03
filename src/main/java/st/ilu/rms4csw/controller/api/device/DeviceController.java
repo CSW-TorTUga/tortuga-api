@@ -126,7 +126,6 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
 
     @Autowired
     public void setDeviceRepository(DeviceRepository deviceRepository) {
-        this.repository = deviceRepository;
         this.deviceRepository = deviceRepository;
     }
 

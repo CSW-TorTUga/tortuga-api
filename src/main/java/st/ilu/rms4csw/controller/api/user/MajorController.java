@@ -1,12 +1,10 @@
 package st.ilu.rms4csw.controller.api.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.major.Major;
-import st.ilu.rms4csw.repository.user.MajorRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,11 +59,6 @@ public class MajorController extends AbstractCRUDCtrl<Major> {
     @PreAuthorize("hasAuthority('OP_TEAM')")
     public Major patch(@PathVariable("id") String id, @RequestBody Major entity) {
         return super.patch(id, entity);
-    }
-
-    @Autowired
-    public void setMajorRepository(MajorRepository majorRepository) {
-        this.repository = majorRepository;
     }
 
     @Override

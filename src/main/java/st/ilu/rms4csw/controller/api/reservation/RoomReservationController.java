@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.model.user.User;
-import st.ilu.rms4csw.repository.reservation.RoomReservationRepository;
 import st.ilu.rms4csw.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -71,11 +70,6 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
     @Override
     public String getApiBase() {
         return API_BASE;
-    }
-
-    @Autowired
-    public void setReservationRepository(RoomReservationRepository reservationRepository) {
-        this.repository = reservationRepository;
     }
 
     @Autowired

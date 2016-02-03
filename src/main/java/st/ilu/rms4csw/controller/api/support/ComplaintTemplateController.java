@@ -1,12 +1,10 @@
 package st.ilu.rms4csw.controller.api.support;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.model.support.ComplaintTemplate;
-import st.ilu.rms4csw.repository.support.ComplaintTemplateRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,11 +57,6 @@ public class ComplaintTemplateController extends AbstractCRUDCtrl<ComplaintTempl
     @PreAuthorize("hasAuthority('OP_TEAM')")
     public ComplaintTemplate patch(@PathVariable("id") String id, @RequestBody ComplaintTemplate entity) {
         return super.patch(id, entity);
-    }
-
-    @Autowired
-    public void setComplaintTemplateRepository(ComplaintTemplateRepository majorRepository) {
-        this.repository = majorRepository;
     }
 
     @Override

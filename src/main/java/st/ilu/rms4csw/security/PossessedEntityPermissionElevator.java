@@ -2,7 +2,7 @@ package st.ilu.rms4csw.security;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-import st.ilu.rms4csw.model.base.PossessedEntity;
+import st.ilu.rms4csw.model.user.PossessedEntity;
 
 import java.io.Serializable;
 

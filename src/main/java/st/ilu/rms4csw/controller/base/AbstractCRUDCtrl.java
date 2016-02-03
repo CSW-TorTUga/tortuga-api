@@ -24,7 +24,7 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
 
     protected JpaSpecificationRepository<T, String> repository;
 
-    protected PersistentEntityService persistentEntityService;
+    private PersistentEntityService persistentEntityService;
 
     public abstract String getApiBase();
 
@@ -100,5 +100,10 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
     @Autowired
     public void setPersistentEntityService(PersistentEntityService persistentEntityService) {
         this.persistentEntityService = persistentEntityService;
+    }
+
+    @Autowired
+    public void setRepository(JpaSpecificationRepository<T, String> repository) {
+        this.repository = repository;
     }
 }

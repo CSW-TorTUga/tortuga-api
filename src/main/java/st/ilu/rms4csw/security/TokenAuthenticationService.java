@@ -86,7 +86,11 @@ public class TokenAuthenticationService {
             return Optional.empty();
         }
 
-        return Optional.of(new UserAuthentication(user));
+        if(user.isActiveUser()) {
+            return Optional.of(new UserAuthentication(user));
+        }
+
+        return Optional.empty();
     }
 
     @Autowired

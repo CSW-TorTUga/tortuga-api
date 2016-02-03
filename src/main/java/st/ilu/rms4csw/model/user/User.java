@@ -64,6 +64,7 @@ public class User extends PersistentEntity {
     @Access(AccessType.FIELD)
     private Date expirationDate;
 
+    @NotNull
     private Boolean enabled;
 
     @Access(AccessType.FIELD)
@@ -192,6 +193,24 @@ public class User extends PersistentEntity {
         } else {
             this.expirationDate = null;
         }
+    }
+
+    public Boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    @JsonIgnore
+    public boolean isActiveUser() {
+        boolean date = true;
+        if(getExpirationDate().isPresent()) {
+            date = getExpirationDate().get().after(new Date());
+        }
+
+        return isEnabled() && date;
     }
 
     public static Date calculateNextSemesterEnd(Date from) {

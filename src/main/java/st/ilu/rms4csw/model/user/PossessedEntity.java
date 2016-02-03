@@ -1,6 +1,4 @@
-package st.ilu.rms4csw.model.base;
-
-import st.ilu.rms4csw.model.user.User;
+package st.ilu.rms4csw.model.user;
 
 /**
  * @author Mischa Holz

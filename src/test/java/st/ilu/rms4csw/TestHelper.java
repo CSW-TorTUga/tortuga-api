@@ -19,6 +19,7 @@ public class TestHelper {
         User user = createUser();
         user.setLoginName("eirungirungvije");
         user.setEmail("someothermail@ilu.st");
+        user.setEnabled(true);
         return user;
     }
 
@@ -41,6 +42,7 @@ public class TestHelper {
         user.setEmail("admin@ilu.st");
         user.setLoginName("admin");
         user.setPassword("change me.");
+        user.setEnabled(true);
         return user;
     }
 
