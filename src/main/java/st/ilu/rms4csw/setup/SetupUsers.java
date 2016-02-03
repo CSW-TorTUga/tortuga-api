@@ -39,6 +39,7 @@ public class SetupUsers implements CommandLineRunner {
             user.setPassword("change me.");
             user.setStudentId(Optional.empty());
             user.setPhoneNumber("123456789");
+            user.setEnabled(true);
 
             userRepository.save(user);
 
