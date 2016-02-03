@@ -69,7 +69,7 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    @PreAuthorize("#entity.user.id.equals(authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
+    @PreAuthorize("@possessedEntityPermissionElevator.checkOwner(@deviceReservationRepository, #id, authentication.getUser().getId()) || hasAuthority('OP_TEAM')")
     public DeviceReservation patch(@PathVariable("id") String id, @RequestBody DeviceReservation entity) {
         DeviceReservation old = repository.findOne(id);
         if(old == null) {

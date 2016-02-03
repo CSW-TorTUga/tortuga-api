@@ -82,7 +82,7 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
-    @PreAuthorize("(hasAuthority('OP_TEAM') && #user.getRole() != st.ilu.rms4csw.model.user.Role.ADMIN) || hasAuthority('OP_ADMIN')")
+    @PreAuthorize("(hasAuthority('OP_TEAM') && #user.getRole() != T(st.ilu.rms4csw.model.user.Role).ADMIN) || hasAuthority('OP_ADMIN')")
     public ResponseEntity<User> post(@RequestBody User user, HttpServletResponse response) {
         if(user.getRole() == Role.STUDENT) {
             Date expires = User.calculateNextSemesterEnd(new Date());
