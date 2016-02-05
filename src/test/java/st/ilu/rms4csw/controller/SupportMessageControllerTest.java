@@ -19,13 +19,10 @@ import st.ilu.rms4csw.model.support.SupportMessage;
 import st.ilu.rms4csw.repository.support.SupportMessageRepository;
 
 import javax.annotation.Resource;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -149,22 +146,14 @@ public class SupportMessageControllerTest {
 
         String patchJson = "{\"done\": true, \"answer\": \"answer\"}";
 
-        try (ByteArrayOutputStream outContent = new ByteArrayOutputStream()) {
-            System.setOut(new PrintStream(outContent));
-
-            mockMvc.perform(patch("/api/v1/supportmessages/" + one.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .content(patchJson)
-            )
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id", is(one.getId())))
-                    .andExpect(jsonPath("$.answer", is("answer")))
-                    .andExpect(jsonPath("$.done", is(true)));
-
-            assertTrue(outContent.toString().contains("DUMMY MAIL"));
-        } finally {
-            System.setOut(null);
-        }
+        mockMvc.perform(patch("/api/v1/supportmessages/" + one.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(patchJson)
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(one.getId())))
+                .andExpect(jsonPath("$.answer", is("answer")))
+                .andExpect(jsonPath("$.done", is(true)));
     }
 }
