@@ -220,7 +220,7 @@ public class UserControllerTest {
         mockMvc.perform(post("/api/v1/users/" + user2.getId() + "/passcode")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isOk());
     }
 
     @Test
