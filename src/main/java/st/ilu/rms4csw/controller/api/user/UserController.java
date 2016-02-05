@@ -125,6 +125,10 @@ public class UserController extends AbstractCRUDCtrl<User> {
             user.setExpirationDate(Optional.empty());
         }
 
+        if(user.getPassword() != null) {
+
+        }
+
         return super.patch(id, user);
     }
 

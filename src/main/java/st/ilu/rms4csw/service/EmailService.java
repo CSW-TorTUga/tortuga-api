@@ -1,7 +1,11 @@
 package st.ilu.rms4csw.service;
 
 import com.sun.mail.imap.IMAPFolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import st.ilu.rms4csw.model.support.SupportMessage;
@@ -20,10 +24,34 @@ import java.util.stream.Stream;
  * @author Mischa Holz
  */
 @Service
-public class EmailPollingService {
+public class EmailService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
     @Autowired
     private SupportMessageRepository supportMessageRepository;
+
+    @Autowired
+    private MailSender mailSender;
+
+    @Autowired
+    private SimpleMailMessage template;
+
+    public void sendEmail(String to, String subject, String body) {
+        Thread thread = new Thread(() -> {
+            logger.info("Starting to send email...");
+            SimpleMailMessage message = new SimpleMailMessage(template);
+
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(body);
+
+            mailSender.send(message);
+            logger.info("Sent email.");
+        });
+
+        thread.start();
+    }
 
     @Scheduled(fixedRate = 10 * 60_000)
     public void pollForEmails() throws MessagingException, IOException {
