@@ -22,7 +22,7 @@ public class SpringSecurityLoggedInUserHolder implements LoggedInUserHolder {
     public User getLoggedInUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof String) {
-            return userRepository.findOneByLoginName((String) principal);
+            return userRepository.findOne((String) principal);
         } else if(principal instanceof User) {
             return (User) principal;
         } else {
