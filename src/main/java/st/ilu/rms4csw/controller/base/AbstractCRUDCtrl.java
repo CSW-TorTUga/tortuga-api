@@ -14,6 +14,7 @@ import st.ilu.rms4csw.service.PersistentEntityService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +53,10 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
     }
 
     public List<T> findAll(Map<String, String[]> params, Sort sort) {
+        params = new HashMap<>(params);
+        params.remove("direction");
+        params.remove("sort");
+
         return persistentEntityService.findAll(params, sort, repository);
     }
 

@@ -4,7 +4,6 @@ import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.UUID;
 
 /**
  * @author Mischa Holz
@@ -22,7 +21,7 @@ public abstract class PersistentEntity implements Serializable {
     private String id;
 
     public PersistentEntity() {
-        this.id = UUID.randomUUID().toString().replace("-", "");
+        this.id = IdGenerator.generate();
     }
 
     public String getId() {

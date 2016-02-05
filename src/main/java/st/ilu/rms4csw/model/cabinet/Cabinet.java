@@ -24,9 +24,9 @@ public enum Cabinet {
 
     @JsonCreator
     public static Cabinet fromValue(String val) {
-        for (Cabinet condition : Cabinet.values()) {
-            if(condition.displayName().equals(val)) {
-                return condition;
+        for (Cabinet cabinet : Cabinet.values()) {
+            if(cabinet.displayName().equals(val)) {
+                return cabinet;
             }
         }
 

@@ -19,6 +19,7 @@ import st.ilu.rms4csw.MockLoggedInUserHolder;
 import st.ilu.rms4csw.TestContext;
 import st.ilu.rms4csw.TestHelper;
 import st.ilu.rms4csw.controller.base.advice.RestExceptionHandler;
+import st.ilu.rms4csw.model.reservation.RepeatOption;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
 import st.ilu.rms4csw.model.user.User;
@@ -28,10 +29,12 @@ import st.ilu.rms4csw.repository.user.UserRepository;
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -146,6 +149,44 @@ public class RoomReservationControllerTest {
 
         RestExceptionHandler.ValidationError error = objectMapper.readValue(json, RestExceptionHandler.ValidationError.class);
         Assert.assertFalse("RoomtReservations overlapping has to be a global error", error.getErrors().get(RestExceptionHandler.ValidationError.GLOBAL_ERROR_KEY).isEmpty());
+    }
+
+    @Test
+    public void testRepeatRoomReservations() throws Exception {
+        roomReservationRepository.deleteAllInBatch();
+
+        RoomReservation three = new RoomReservation();
+        three.setTimeSpan(new TimeSpan(new Date(0), new Date(500)));
+        three.setTitle("beschreibung");
+        three.setId(null);
+        three.setRepeatOption(Optional.of(RepeatOption.WEEKLY));
+        three.setRepeatUntil(Optional.of(new Date(3 * 7 * 24 * 60 * 60 * 1000 + 5)));
+
+        String json = mockMvc.perform(post("/api/v1/roomreservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(three)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        RoomReservation master = objectMapper.readValue(json, RoomReservation.class);
+        String sharedId = master.getSharedId().orElseThrow(() -> new AssertionError("Shared Id needs to be present"));
+
+        assertTrue(master.getSharedId().isPresent());
+
+        //noinspection PointlessArithmeticExpression
+        mockMvc.perform(get("/api/v1/roomreservations?approved=false&sort=timeSpan.beginning&direction=ASC").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(4)))
+                .andExpect(jsonPath("$[0].timeSpan.beginning", is(0)))
+                .andExpect(jsonPath("$[0].sharedId", is(sharedId)))
+                .andExpect(jsonPath("$[1].timeSpan.beginning", is(1 * 7 * 24 * 60 * 60 * 1000)))
+                .andExpect(jsonPath("$[1].sharedId", is(sharedId)))
+                .andExpect(jsonPath("$[2].timeSpan.beginning", is(2 * 7 * 24 * 60 * 60 * 1000)))
+                .andExpect(jsonPath("$[2].sharedId", is(sharedId)))
+                .andExpect(jsonPath("$[3].timeSpan.beginning", is(3 * 7 * 24 * 60 * 60 * 1000)))
+                .andExpect(jsonPath("$[3].sharedId", is(sharedId)));
     }
 
     @Test

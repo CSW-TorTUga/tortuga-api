@@ -55,6 +55,10 @@ public class UserService implements UserDetailsService {
 
     @SuppressWarnings("unused")
     public boolean canUserDelete(User subject, String objectId) {
+        if(subject.getId().equals(objectId)) {
+            return false;
+        }
+
         if(subject.getRole() == Role.ADMIN) {
             return true;
         }

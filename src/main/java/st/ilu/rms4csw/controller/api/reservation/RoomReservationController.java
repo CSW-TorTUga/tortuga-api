@@ -1,19 +1,27 @@
 package st.ilu.rms4csw.controller.api.reservation;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import st.ilu.rms4csw.Main;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
+import st.ilu.rms4csw.model.base.IdGenerator;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
+import st.ilu.rms4csw.model.reservation.TimeSpan;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Mischa Holz
@@ -49,6 +57,51 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
 
         newEntity.setApproved(false);
         newEntity.setOpen(false);
+
+        if(newEntity.getRepeatOption().isPresent()) {
+            if(!newEntity.getRepeatUntil().isPresent()) {
+                throw new IllegalArgumentException("if you specify a repeat option you also have to specify an end date");
+            }
+
+            String sharedId = IdGenerator.generate();
+            newEntity.setSharedId(Optional.of(sharedId));
+
+            long length = newEntity.getTimeSpan().getEnd().getTime() - newEntity.getTimeSpan().getBeginning().getTime();
+
+            List<Date> beginningDates = newEntity.getRepeatOption().get().calculateDates(newEntity.getTimeSpan().getBeginning(), newEntity.getRepeatUntil().get());
+
+            List<RoomReservation> reservations = beginningDates.stream().map(d -> {
+                Date endDate = new Date(d.getTime() + length);
+
+                TimeSpan timeSpan = new TimeSpan(d, endDate);
+
+                RoomReservation roomReservation = new RoomReservation();
+                roomReservation.setSharedId(Optional.of(sharedId));
+                roomReservation.setUser(newEntity.getUser());
+                roomReservation.setApproved(false);
+                roomReservation.setOpen(false);
+                roomReservation.setRepeatUntil(Optional.empty());
+                roomReservation.setRepeatOption(Optional.empty());
+                roomReservation.setTimeSpan(timeSpan);
+                roomReservation.setTitle(newEntity.getTitle());
+
+                return roomReservation;
+            }).collect(Collectors.toList());
+
+            RoomReservation master = reservations.stream().filter(r -> r.getTimeSpan().getBeginning().equals(newEntity.getTimeSpan().getBeginning())).findAny().get();
+            master.setRepeatUntil(newEntity.getRepeatUntil());
+            master.setRepeatOption(newEntity.getRepeatOption());
+
+            reservations = repository.save(reservations);
+
+            response.setHeader(HttpHeaders.LOCATION, Main.getApiBase() + "/" + getApiBase() + "/" + master.getId());
+
+            return new ResponseEntity<>(master, HttpStatus.CREATED);
+        } else {
+            newEntity.setRepeatOption(Optional.empty());
+            newEntity.setRepeatUntil(Optional.empty());
+            newEntity.setSharedId(Optional.empty());
+        }
 
         return super.post(newEntity, response);
     }
