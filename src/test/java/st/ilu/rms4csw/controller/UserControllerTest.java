@@ -329,7 +329,7 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(patch))
-        ).andExpect(status().is4xxClientError());
+        ).andExpect(status().isOk());
     }
 
     @Test
