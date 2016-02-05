@@ -13,16 +13,14 @@ import java.util.List;
  */
 public enum RepeatOption {
 
-    WEEKLY("wöchentlich", 1),
-    BIWEEKLY("alle zwei Wochen", 2),
-    TRIWEEKLY("alle drei Wochen", 3),
-    QUADWEEKLY("alle vier Wochen", 4);
+    WEEKLY(1),
+    BIWEEKLY(2),
+    TRIWEEKLY(3),
+    QUADWEEKLY(4);
 
     private final int weekDiff;
-    private String displayName;
 
-    RepeatOption(String displayName, int weekDiff) {
-        this.displayName = displayName;
+    RepeatOption(int weekDiff) {
         this.weekDiff = weekDiff;
     }
 
@@ -49,21 +47,5 @@ public enum RepeatOption {
         }
 
         return ret;
-    }
-
-    @JsonValue
-    public String displayName() {
-        return displayName;
-    }
-
-    @JsonCreator
-    public static RepeatOption fromValue(String val) {
-        for (RepeatOption repeatOption : RepeatOption.values()) {
-            if(repeatOption.displayName().equals(val)) {
-                return repeatOption;
-            }
-        }
-
-        throw new IllegalArgumentException("Could not map '" + val + "' to any RepeatOption");
     }
 }
