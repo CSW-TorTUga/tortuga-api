@@ -61,9 +61,6 @@ public class UserController extends AbstractCRUDCtrl<User> {
         if(user == null) {
             throw new NotFoundException("Didn't find user");
         }
-        if(!user.getId().equals(loggedInUserHolder.getLoggedInUser().getId())) {
-            throw new IllegalArgumentException("You can't reset the passcode of other users");
-        }
 
         List<String> passcodeList = passcodeService.generateRandomPasscode();
         String passcodeStr = passcodeList.stream().reduce("", (a, b) -> a + b);
