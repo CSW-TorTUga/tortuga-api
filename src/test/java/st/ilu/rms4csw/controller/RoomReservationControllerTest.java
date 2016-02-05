@@ -227,6 +227,18 @@ public class RoomReservationControllerTest {
                 .andExpect(jsonPath("$.open", is(false)));
     }
 
+    @Test
+    public void testIllegalRepeatOption() throws Exception {
+        RoomReservation three = new RoomReservation();
+        three.setRepeatOption(Optional.of(RepeatOption.WEEKLY));
+
+        mockMvc.perform(post("/api/v1/roomreservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(three))
+        )
+                .andExpect(status().is4xxClientError());
+    }
 
     @Test
     public void testTimeSpanTest() throws Exception {
