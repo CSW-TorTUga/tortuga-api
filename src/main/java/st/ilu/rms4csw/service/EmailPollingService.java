@@ -1,0 +1,131 @@
+package st.ilu.rms4csw.service;
+
+import com.sun.mail.imap.IMAPFolder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import st.ilu.rms4csw.model.support.SupportMessage;
+import st.ilu.rms4csw.repository.support.SupportMessageRepository;
+
+import javax.mail.*;
+import javax.mail.internet.MimeMultipart;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.stream.Stream;
+
+/**
+ * @author Mischa Holz
+ */
+@Service
+public class EmailPollingService {
+
+    @Autowired
+    private SupportMessageRepository supportMessageRepository;
+
+    @Scheduled(fixedRate = 10 * 60_000)
+    public void pollForEmails() throws MessagingException, IOException {
+        String imapHost = System.getenv("RMS_IMAP_HOST");
+        if(imapHost == null) {
+            return;
+        }
+
+        String imapUser = System.getenv("RMS_IMAP_USER");
+        if(imapUser == null) {
+            throw new RuntimeException("You have to set the RMS_IMAP_USER environment variable");
+        }
+
+        String imapPassword = System.getenv("RMS_IMAP_PASSWORD");
+        if(imapPassword == null) {
+            throw new RuntimeException("You have to set the RMS_IMAP_PASSWORD environment variable");
+        }
+
+        String imapPort = System.getenv("RMS_IMAP_PORT");
+        if(imapPort == null) {
+            throw new RuntimeException("You have to set the RMS_IMAP_PASSWORD environment variable");
+        }
+
+        Properties properties = new Properties();
+        properties.setProperty("mail.debug", "true");
+        properties.setProperty("mail.imap.starttls.enable", "true");
+        properties.setProperty("mail.imap.port", imapPort);
+
+
+        Session session = Session.getDefaultInstance(properties);
+        Store store = session.getStore("imap");
+        store.connect(imapHost, imapUser, imapPassword);
+
+        IMAPFolder folder = (IMAPFolder) store.getFolder("INBOX");
+        folder.open(IMAPFolder.READ_ONLY);
+        Message[] messages = folder.getMessages();
+
+        FetchProfile fetchProfile = new FetchProfile();
+        fetchProfile.add("subject");
+        fetchProfile.add("body");
+        fetchProfile.add("data");
+
+        folder.fetch(messages, fetchProfile);
+
+        for(Message message : messages) {
+            String id = message.getHeader("Message-Id")[0];
+
+            List<SupportMessage> supportMessagesWithId = supportMessageRepository.findByEmailId(id);
+            if(!supportMessagesWithId.isEmpty()) {
+                continue;
+            }
+
+            String body = null;
+            Object content = message.getContent();
+
+            if(content instanceof MimeMultipart) {
+                MimeMultipart multipart = ((MimeMultipart) message.getContent());
+
+                int count = multipart.getCount();
+
+                for(int i = 0; i < count; i++) {
+                    BodyPart bodyPart = multipart.getBodyPart(i);
+                    if(bodyPart.getContentType().toLowerCase().contains("text/plain")) {
+                        body = (String) bodyPart.getContent();
+                        break;
+                    }
+                }
+
+                if(body == null) {
+                    throw new AssertionError("Didn't find any part of this multipart message that is text/plain");
+                }
+            } else if(content instanceof String) {
+                body = (String) content;
+            } else {
+                throw new AssertionError("Don't know how to deal with this message. Content type: " + message.getContent().getClass());
+            }
+
+            System.out.println(body);
+
+            String subject = message.getSubject();
+            Address[] replyAddresses = message.getReplyTo();
+            String addresses = Stream.of(replyAddresses).map(Address::toString).reduce("", (a, b) -> a + ", " + b);
+
+            Address[] fromAddresses = message.getFrom();
+            if(fromAddresses.length == 0) {
+                continue;
+            }
+            String from = fromAddresses[0].toString();
+
+
+            SupportMessage supportMessage = new SupportMessage();
+            supportMessage.setOpenedAt(new Date());
+            supportMessage.setSubject(subject);
+            supportMessage.setName(Optional.of(from));
+            supportMessage.setEmail(Optional.of(addresses));
+            supportMessage.setAnswer(Optional.empty());
+            supportMessage.setBody(body);
+            supportMessage.setDone(false);
+            supportMessage.setEmailId(id);
+
+            supportMessageRepository.save(supportMessage);
+        }
+    }
+
+}

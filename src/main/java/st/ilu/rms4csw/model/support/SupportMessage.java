@@ -1,12 +1,11 @@
 package st.ilu.rms4csw.model.support;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.validator.constraints.NotEmpty;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.util.Date;
 import java.util.Optional;
 
@@ -18,15 +17,19 @@ import java.util.Optional;
 public class SupportMessage extends PersistentEntity {
 
     @NotEmpty(message = "Support Anfragen brauchen einen Betreff")
+    @Column(length = 2048)
     private String subject;
 
     @NotEmpty(message = "Support Anfragen brauchen einen Text")
+    @Column(columnDefinition = "TEXT")
     private String body;
 
     @Access(AccessType.FIELD)
+    @Column(columnDefinition = "TEXT")
     private String email;
 
     @Access(AccessType.FIELD)
+    @Column(columnDefinition = "TEXT")
     private String name;
 
     private Boolean done = false;
@@ -34,7 +37,10 @@ public class SupportMessage extends PersistentEntity {
     private Date openedAt;
 
     @Access(AccessType.FIELD)
+    @Column(columnDefinition = "TEXT")
     private String answer;
+
+    private String emailId;
 
     public String getSubject() {
         return subject;
@@ -90,5 +96,15 @@ public class SupportMessage extends PersistentEntity {
 
     public void setOpenedAt(Date openedAt) {
         this.openedAt = openedAt;
+    }
+
+    @JsonIgnore
+    public String getEmailId() {
+        return emailId;
+    }
+
+    @JsonIgnore
+    public void setEmailId(String emailId) {
+        this.emailId = emailId;
     }
 }
