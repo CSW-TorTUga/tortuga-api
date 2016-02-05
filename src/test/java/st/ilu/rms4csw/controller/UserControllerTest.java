@@ -87,6 +87,7 @@ public class UserControllerTest {
         user2.setEmail("team@ilu.st");
         user2.setLoginName("team");
         user2.setPassword("change me.");
+        user2.setEnabled(true);
 
         userRepository.save(Arrays.asList(user2));
 
@@ -133,6 +134,7 @@ public class UserControllerTest {
         user3.setLoginName("test_user");
         user3.setPassword("change me.");
         user3.setId(null);
+        user3.setEnabled(true);
 
         mockMvc.perform(post("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -196,16 +198,10 @@ public class UserControllerTest {
         PasscodeAuthenticationRequest par = new PasscodeAuthenticationRequest();
         par.setPasscode(passcode);
 
-        String json = mockMvc.perform(post("/api/v1/terminal/authenticate")
+        mockMvc.perform(post("/api/v1/terminal/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(par)))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        Map<String, Object> response = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
-
-        assertNotNull(response.get("success"));
-        assertTrue((Boolean) response.get("success"));
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -224,7 +220,7 @@ public class UserControllerTest {
         mockMvc.perform(post("/api/v1/users/" + user2.getId() + "/passcode")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -250,6 +246,7 @@ public class UserControllerTest {
         user3.setLoginName("test_user");
         user3.setPassword("change me.");
         user3.setId(null);
+        user3.setEnabled(true);
 
         String json = mockMvc.perform(post("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -286,6 +283,7 @@ public class UserControllerTest {
         user3.setLoginName("test_user2");
         user3.setPassword("change me.");
         user3.setId(null);
+        user3.setEnabled(true);
 
         String location = mockMvc.perform(post("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -311,32 +309,62 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testPutUserWithExpirationDate() throws Exception {
-        user1.setExpirationDate(Optional.of(new Date()));
-
-        mockMvc.perform(put("/api/v1/users/" + user1.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user1))
-        ).andExpect(status().is4xxClientError());
-    }
-
-
-    @Test
     public void testPatchUserWithExpirationDate() throws Exception {
         User patch = new User();
+        patch.setId(null);
         patch.setExpirationDate(Optional.of(new Date()));
+        patch.setRole(Role.STUDENT);
+        patch.setMajor(Optional.of(major1));
+        patch.setStudentId(Optional.of("1234"));
 
-        mockMvc.perform(patch("/api/v1/users/" + user1.getId())
+        String json = mockMvc.perform(patch("/api/v1/users/" + user1.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(patch))
-        ).andExpect(status().is4xxClientError());
+        )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        User returned = objectMapper.readValue(json, User.class);
+
+        assertTrue(returned.getExpirationDate().isPresent());
+        assertTrue(returned.getRole() == Role.STUDENT);
+
+        patch = new User();
+        patch.setId(null);
+        patch.setEmail("blabla@bla.de");
+        patch.setExpirationDate(Optional.empty());
+
+        json = mockMvc.perform(patch("/api/v1/users/" + user1.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(patch))
+        )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        returned = objectMapper.readValue(json, User.class);
+
+        assertTrue(returned.getExpirationDate().isPresent());
+    }
+
+    @Test
+    public void testPatchNonExistentUser() throws Exception {
+        User patch = new User();
+        patch.setId(null);
+        patch.setEmail("bla@ilu.st");
+
+        mockMvc.perform(patch("/api/v1/users/blabla")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(patch)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     public void testPatchUser() throws Exception {
         User patch = new User();
+        patch.setId(null);
         patch.setEmail("bla@ilu.st");
 
         mockMvc.perform(patch("/api/v1/users/" + user1.getId())

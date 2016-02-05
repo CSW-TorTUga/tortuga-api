@@ -61,9 +61,6 @@ public class UserController extends AbstractCRUDCtrl<User> {
         if(user == null) {
             throw new NotFoundException("Didn't find user");
         }
-        if(!user.getId().equals(loggedInUserHolder.getLoggedInUser().getId())) {
-            throw new IllegalArgumentException("You can't reset the passcode of other users");
-        }
 
         List<String> passcodeList = passcodeService.generateRandomPasscode();
         String passcodeStr = passcodeList.stream().reduce("", (a, b) -> a + b);
@@ -108,8 +105,24 @@ public class UserController extends AbstractCRUDCtrl<User> {
     @PreAuthorize("#id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
     public User patch(@PathVariable("id") String id, @RequestBody User user) {
         User beforeUpdate = repository.findOne(id);
-        if(beforeUpdate != null && user.getExpirationDate().isPresent() && !beforeUpdate.getExpirationDate().equals(user.getExpirationDate())) {
-            throw new IllegalArgumentException("Can't set the expiration date of a user!");
+        if(beforeUpdate == null) {
+            throw new NotFoundException("Can't find user");
+        }
+
+        if(beforeUpdate.getRole() == Role.STUDENT && (user.getRole() == null || user.getRole() == Role.STUDENT)) {
+            if(!user.getExpirationDate().isPresent()) {
+                Date expires = beforeUpdate.getExpirationDate().orElse(User.calculateNextSemesterEnd(new Date()));
+                user.setExpirationDate(Optional.of(expires));
+            }
+        }
+
+        if(user.getRole() == Role.STUDENT && (!beforeUpdate.getExpirationDate().isPresent())) {
+            Date expires = User.calculateNextSemesterEnd(new Date());
+            user.setExpirationDate(Optional.of(expires));
+        }
+
+        if(beforeUpdate.getRole() != Role.STUDENT && user.getRole() != Role.STUDENT) {
+            user.setExpirationDate(Optional.empty());
         }
 
         return super.patch(id, user);
