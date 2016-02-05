@@ -309,32 +309,62 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testPutUserWithExpirationDate() throws Exception {
-        user1.setExpirationDate(Optional.of(new Date()));
-
-        mockMvc.perform(put("/api/v1/users/" + user1.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user1))
-        ).andExpect(status().is4xxClientError());
-    }
-
-
-    @Test
     public void testPatchUserWithExpirationDate() throws Exception {
         User patch = new User();
+        patch.setId(null);
         patch.setExpirationDate(Optional.of(new Date()));
+        patch.setRole(Role.STUDENT);
+        patch.setMajor(Optional.of(major1));
+        patch.setStudentId(Optional.of("1234"));
 
-        mockMvc.perform(patch("/api/v1/users/" + user1.getId())
+        String json = mockMvc.perform(patch("/api/v1/users/" + user1.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(patch))
-        ).andExpect(status().isOk());
+        )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        User returned = objectMapper.readValue(json, User.class);
+
+        assertTrue(returned.getExpirationDate().isPresent());
+        assertTrue(returned.getRole() == Role.STUDENT);
+
+        patch = new User();
+        patch.setId(null);
+        patch.setEmail("blabla@bla.de");
+        patch.setExpirationDate(Optional.empty());
+
+        json = mockMvc.perform(patch("/api/v1/users/" + user1.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(patch))
+        )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        returned = objectMapper.readValue(json, User.class);
+
+        assertTrue(returned.getExpirationDate().isPresent());
+    }
+
+    @Test
+    public void testPatchNonExistentUser() throws Exception {
+        User patch = new User();
+        patch.setId(null);
+        patch.setEmail("bla@ilu.st");
+
+        mockMvc.perform(patch("/api/v1/users/blabla")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(patch)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     public void testPatchUser() throws Exception {
         User patch = new User();
+        patch.setId(null);
         patch.setEmail("bla@ilu.st");
 
         mockMvc.perform(patch("/api/v1/users/" + user1.getId())
