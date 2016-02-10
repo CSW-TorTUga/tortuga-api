@@ -1,11 +1,14 @@
 package st.ilu.rms4csw.model.reservation;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import st.ilu.rms4csw.model.device.Device;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -23,6 +26,12 @@ public class DeviceReservation extends Reservation<DeviceReservation> {
 
     private Boolean borrowed;
 
+    @ElementCollection
+    @CollectionTable(joinColumns = @JoinColumn(name = "device_reservation_id"))
+    private List<TimeSpan> borrowedTimeSpans = new ArrayList<>();
+
+    private Date borrowedBeginning;
+
     public Boolean isBorrowed() {
         return borrowed;
     }
@@ -37,6 +46,26 @@ public class DeviceReservation extends Reservation<DeviceReservation> {
 
     public void setDevice(Device device) {
         this.device = device;
+    }
+
+    @JsonIgnore
+    public List<TimeSpan> getBorrowedTimeSpans() {
+        return borrowedTimeSpans;
+    }
+
+    @JsonIgnore
+    public void setBorrowedTimeSpans(List<TimeSpan> borrowedTimeSpans) {
+        this.borrowedTimeSpans = borrowedTimeSpans;
+    }
+
+    @JsonIgnore
+    public Date getBorrowedBeginning() {
+        return borrowedBeginning;
+    }
+
+    @JsonIgnore
+    public void setBorrowedBeginning(Date borrowedBeginning) {
+        this.borrowedBeginning = borrowedBeginning;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package st.ilu.rms4csw.controller.api.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
@@ -8,9 +9,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.exception.NotFoundException;
+import st.ilu.rms4csw.model.base.IdGenerator;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
-import st.ilu.rms4csw.repository.user.UserRepository;
 import st.ilu.rms4csw.security.LoggedInUserHolder;
 import st.ilu.rms4csw.service.PasscodeService;
 
@@ -123,10 +124,6 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
         if(beforeUpdate.getRole() != Role.STUDENT && user.getRole() != Role.STUDENT) {
             user.setExpirationDate(Optional.empty());
-        }
-
-        if(user.getPassword() != null) {
-
         }
 
         return super.patch(id, user);
