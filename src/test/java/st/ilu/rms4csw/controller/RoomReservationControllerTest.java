@@ -272,4 +272,12 @@ public class RoomReservationControllerTest {
         mockMvc.perform(get("/api/v1/roomreservations/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void testDeleteNonExistentRoomReservation() throws Exception {
+        mockMvc.perform(delete("/api/v1/roomreservations/blabla")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 }
