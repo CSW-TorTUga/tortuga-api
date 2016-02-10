@@ -63,7 +63,7 @@ public class MailConfiguration {
         mailSender.setPort(Integer.parseInt(smtpPort));
 
         Properties properties = new Properties();
-        properties.setProperty("mail.debug", "true");
+        properties.setProperty("mail.debug", "false");
         properties.setProperty("mail.smtp.starttls.enable", "true");
         properties.setProperty("mail.smtp.host", smtpHost);
         properties.setProperty("mail.smtp.auth", "true");

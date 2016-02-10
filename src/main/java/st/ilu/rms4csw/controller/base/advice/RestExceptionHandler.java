@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -130,6 +131,12 @@ public class RestExceptionHandler {
             msg = "Resource not found";
         }
         return handleException(HttpStatus.NOT_FOUND, msg, e);
+    }
+
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> emptyResultDataAccessExceptionHandler(Exception e) throws Exception {
+        return notFoundExceptionHandler(e);
     }
 
     @ExceptionHandler(TypeMismatchException.class)

@@ -228,6 +228,24 @@ public class RoomReservationControllerTest {
     }
 
     @Test
+    public void testOpenRoomWithRoomReservation() throws Exception {
+        RoomReservation open = new RoomReservation();
+        open.setTimeSpan(new TimeSpan(new Date(new Date().getTime() - 30 * 60 * 1000), new Date(new Date().getTime() + 30 * 60 * 1000)));
+        open.setOpen(true);
+        open.setApproved(true);
+        open.setTitle("title");
+        open.setUser(mockLoggedInUserHolder.getLoggedInUser());
+
+        roomReservationRepository.save(open);
+
+        mockMvc.perform(patch("/api/v1/terminal/door")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content("{\"open\":true}"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
     public void testIllegalRepeatOption() throws Exception {
         RoomReservation three = new RoomReservation();
         three.setRepeatOption(Optional.of(RepeatOption.WEEKLY));
@@ -270,6 +288,14 @@ public class RoomReservationControllerTest {
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/v1/roomreservations/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testDeleteNonExistentRoomReservation() throws Exception {
+        mockMvc.perform(delete("/api/v1/roomreservations/blabla")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 }

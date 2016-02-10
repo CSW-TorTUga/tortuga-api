@@ -76,7 +76,7 @@ public class EmailService {
         }
 
         Properties properties = new Properties();
-        properties.setProperty("mail.debug", "true");
+        properties.setProperty("mail.debug", "false");
         properties.setProperty("mail.imap.starttls.enable", "true");
         properties.setProperty("mail.imap.port", imapPort);
 
@@ -128,8 +128,6 @@ public class EmailService {
             } else {
                 throw new AssertionError("Don't know how to deal with this message. Content type: " + message.getContent().getClass());
             }
-
-            System.out.println(body);
 
             String subject = message.getSubject();
             Address[] replyAddresses = message.getReplyTo();

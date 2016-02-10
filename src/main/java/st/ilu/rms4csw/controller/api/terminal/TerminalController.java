@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import st.ilu.rms4csw.model.terminal.OpenDoorRequest;
 import st.ilu.rms4csw.model.terminal.PasscodeAuthenticationRequest;
 import st.ilu.rms4csw.model.user.User;
+import st.ilu.rms4csw.repository.reservation.RoomReservationRepository;
 import st.ilu.rms4csw.service.PasscodeService;
 import st.ilu.rms4csw.service.door.DoorOpener;
 
@@ -25,14 +27,32 @@ public class TerminalController {
 
     private DoorOpener doorOpener;
 
+    private RoomReservationRepository roomReservationRepository;
+
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<?> authenticate(@RequestBody PasscodeAuthenticationRequest passcodeAuthenticationRequest) {
+    public ResponseEntity<Void> authenticate(@RequestBody PasscodeAuthenticationRequest passcodeAuthenticationRequest) {
         Optional<User> user = passcodeService.getUserFromPasscode(passcodeAuthenticationRequest.getPasscode());
         if(!user.isPresent()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         doorOpener.openRoomDoor();
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @RequestMapping(value = "/door", method = RequestMethod.PATCH)
+    public ResponseEntity<Void> openDoorWithOpenRoomReservation(@RequestBody OpenDoorRequest openDoorRequest) {
+        if(openDoorRequest.getOpen()) {
+            if(roomReservationRepository.findByApprovedAndOpen(true, true).stream().filter(
+                    r -> r.getOpenedTimeSpan().isCurrent())
+                    .findAny()
+                    .isPresent()) {
+                doorOpener.openRoomDoor();
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        }
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -45,5 +65,10 @@ public class TerminalController {
     @Autowired
     public void setDoorOpener(DoorOpener doorOpener) {
         this.doorOpener = doorOpener;
+    }
+
+    @Autowired
+    public void setRoomReservationRepository(RoomReservationRepository roomReservationRepository) {
+        this.roomReservationRepository = roomReservationRepository;
     }
 }
