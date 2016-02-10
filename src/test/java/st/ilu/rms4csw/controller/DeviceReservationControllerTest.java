@@ -88,7 +88,10 @@ public class DeviceReservationControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        deviceReservationRepository.deleteAllInBatch();
+        for(DeviceReservation reservation : deviceReservationRepository.findAll()) {
+            deviceReservationRepository.delete(reservation);
+        }
+
         deviceRepository.deleteAllInBatch();
         deviceCategoryRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
@@ -128,7 +131,10 @@ public class DeviceReservationControllerTest {
 
     @After
     public void tearDown() throws Exception {
-        deviceReservationRepository.deleteAllInBatch();
+        for(DeviceReservation reservation : deviceReservationRepository.findAll()) {
+            deviceReservationRepository.delete(reservation);
+        }
+
         deviceRepository.deleteAllInBatch();
         deviceCategoryRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
@@ -325,6 +331,17 @@ public class DeviceReservationControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id", is(one.getId())))
                     .andExpect(jsonPath("$.borrowed", is(true)));
+
+            patch.setBorrowed(false);
+
+            mockMvc.perform(patch("/api/v1/devicereservations/" + one.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(patch))
+            )
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id", is(one.getId())))
+                    .andExpect(jsonPath("$.borrowed", is(false)));
 
             assertTrue(outContent.toString().contains("OPEN"));
         } finally {

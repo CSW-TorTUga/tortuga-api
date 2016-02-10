@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.exception.NotFoundException;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
-import st.ilu.rms4csw.repository.reservation.DeviceReservationRepository;
+import st.ilu.rms4csw.model.reservation.TimeSpan;
 import st.ilu.rms4csw.security.LoggedInUserHolder;
 import st.ilu.rms4csw.service.door.DoorOpener;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -84,6 +85,18 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
 
         if(oldBorrowed != newBorrowed) {
             doorOpener.openCabinetDoor(reservation.getDevice().getCabinet());
+            if(newBorrowed) {
+                reservation.setBorrowedBeginning(new Date());
+            } else {
+                TimeSpan timeSpan = new TimeSpan();
+                timeSpan.setBeginning(old.getBorrowedBeginning());
+                timeSpan.setEnd(new Date());
+
+                reservation.setBorrowedBeginning(null);
+                reservation.getBorrowedTimeSpans().add(timeSpan);
+            }
+
+            repository.save(reservation);
         }
 
         return reservation;
