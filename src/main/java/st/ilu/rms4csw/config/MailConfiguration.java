@@ -9,6 +9,9 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
 import java.util.Properties;
 
 /**
@@ -64,15 +67,20 @@ public class MailConfiguration {
 
         Properties properties = new Properties();
         properties.setProperty("mail.debug", "false");
-        properties.setProperty("mail.smtp.starttls.enable", "true");
         properties.setProperty("mail.smtp.host", smtpHost);
+        properties.setProperty("mail.smtp.socketFactory.port", smtpPort);
+        properties.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         properties.setProperty("mail.smtp.auth", "true");
-        properties.setProperty("mail.smtp.user", smtpUser);
-        properties.setProperty("mail.smtp.password", smtpPassword);
         properties.setProperty("mail.smtp.port", smtpPort);
 
+        Session session = Session.getDefaultInstance(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(smtpUser, smtpPassword);
+            }
+        });
 
-        mailSender.setJavaMailProperties(properties);
+        mailSender.setSession(session);
 
         return mailSender;
     }
