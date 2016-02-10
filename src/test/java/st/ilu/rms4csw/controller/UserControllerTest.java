@@ -121,49 +121,43 @@ public class UserControllerTest {
 
     @Test
     public void testPostUser() throws Exception {
-        User user3 = new User();
-        user3.setExpirationDate(Optional.empty());
-        user3.setPhoneNumber("123456789");
-        user3.setRole(Role.ADMIN);
-        user3.setFirstName("Team");
-        user3.setLastName("Teamington");
-        user3.setGender(Optional.of(Gender.FEMALE));
-        user3.setStudentId(Optional.empty());
-        user3.setMajor(Optional.empty());
-        user3.setEmail("testuser@ilu.st");
-        user3.setLoginName("test_user");
-        user3.setPassword("change me.");
-        user3.setId(null);
-        user3.setEnabled(true);
+        String postJson = "{" +
+                "\"loginName\":\"test_user\"," +
+                "\"firstName\":\"first name\"," +
+                "\"lastName\":\"studentington\"," +
+                "\"email\":\"testuser@ilu.st\"," +
+                "\"gender\":\"FEMALE\"," +
+                "\"phoneNumber\":\"123456789\"," +
+                "\"role\":\"ADMIN\"," +
+                "\"enabled\":true," +
+                "\"password\":\"change me.\"" +
+                "}";
 
         mockMvc.perform(post("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user3)))
-
-                .andExpect(header().string("Location", Matchers.notNullValue()))
+                .content(postJson))
                 .andExpect(status().isCreated())
+                .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(jsonPath("$.loginName", is("test_user")));
     }
 
     @Test
     public void testPostUserWithExistingEmail() throws Exception {
-        User user3 = new User();
-        user3.setExpirationDate(Optional.empty());
-        user3.setPhoneNumber("123456789");
-        user3.setRole(Role.ADMIN);
-        user3.setFirstName("Team");
-        user3.setLastName("Teamington");
-        user3.setGender(Optional.of(Gender.FEMALE));
-        user3.setStudentId(Optional.empty());
-        user3.setMajor(Optional.empty());
-        user3.setEmail("team@ilu.st");
-        user3.setLoginName("some_other_user_totally");
-        user3.setPassword("change me.");
-        user3.setId(null);
+        String postJson = "{" +
+                "\"loginName\":\"some_other_user_totally\"," +
+                "\"firstName\":\"first name\"," +
+                "\"lastName\":\"studentington\"," +
+                "\"email\":\"team@ilu.st\"," +
+                "\"gender\":\"FEMALE\"," +
+                "\"phoneNumber\":\"123456789\"," +
+                "\"role\":\"ADMIN\"," +
+                "\"enabled\":true," +
+                "\"password\":\"change me.\"," +
+                "}";
 
         mockMvc.perform(post("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user3)))
+                .content(postJson))
 
                 .andExpect(status().is4xxClientError());
     }
@@ -233,24 +227,21 @@ public class UserControllerTest {
 
     @Test
     public void testPostStudentWithoutMajor() throws Exception {
-        User user3 = new User();
-        user3.setExpirationDate(Optional.empty());
-        user3.setPhoneNumber("123456789");
-        user3.setRole(Role.STUDENT);
-        user3.setFirstName("");
-        user3.setLastName("studentington");
-        user3.setGender(Optional.of(Gender.FEMALE));
-        user3.setStudentId(Optional.empty());
-        user3.setMajor(Optional.empty());
-        user3.setEmail("testuser@ilu.st");
-        user3.setLoginName("test_user");
-        user3.setPassword("change me.");
-        user3.setId(null);
-        user3.setEnabled(true);
+        String postJson = "{" +
+                "\"loginName\":\"test_user\"," +
+                "\"firstName\":\"\"," +
+                "\"lastName\":\"studentington\"," +
+                "\"email\":\"testuser@ilu.st\"," +
+                "\"gender\":\"FEMALE\"," +
+                "\"phoneNumber\":\"123456789\"," +
+                "\"role\":\"STUDENT\"," +
+                "\"enabled\":true," +
+                "\"password\":\"change me.\"" +
+                "}";
 
         String json = mockMvc.perform(post("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user3)))
+                .content(postJson))
 
                 .andExpect(status().is4xxClientError())
                 .andReturn().getResponse().getContentAsString();
@@ -259,7 +250,8 @@ public class UserControllerTest {
         assertFalse("There has to be an error message for the major field", validationError.getErrors().get("major").isEmpty());
         assertFalse("There has to be an error message for the firstName field", validationError.getErrors().get("firstName").isEmpty());
         assertFalse("There has to be an error message for the studentId field", validationError.getErrors().get("studentId").isEmpty());
-        assertEquals("There have to be 3 errors", validationError.getErrors().size(), 3);
+
+        assertEquals("There have to be 3 errors", 3, validationError.getErrors().size());
     }
 
     @Test
@@ -270,27 +262,27 @@ public class UserControllerTest {
 
     @Test
     public void testPostStudent() throws Exception {
-        User user3 = new User();
-        user3.setExpirationDate(Optional.empty());
-        user3.setPhoneNumber("123456789");
-        user3.setRole(Role.STUDENT);
-        user3.setFirstName("Team");
-        user3.setLastName("Teamington");
-        user3.setGender(Optional.of(Gender.FEMALE));
-        user3.setStudentId(Optional.of("1234567"));
-        user3.setMajor(Optional.of(major1));
-        user3.setEmail("testuser@ilu.st");
-        user3.setLoginName("test_user2");
-        user3.setPassword("change me.");
-        user3.setId(null);
-        user3.setEnabled(true);
+        String majorJson = objectMapper.writeValueAsString(major1);
+
+        String postJson = "{" +
+                "\"loginName\":\"test_user2\"," +
+                "\"firstName\":\"first name\"," +
+                "\"lastName\":\"studentington\"," +
+                "\"email\":\"testuser@ilu.st\"," +
+                "\"gender\":\"FEMALE\"," +
+                "\"phoneNumber\":\"123456789\"," +
+                "\"role\":\"STUDENT\"," +
+                "\"enabled\":true," +
+                "\"password\":\"change me.\"," +
+                "\"major\":" + majorJson + "," +
+                "\"studentId\":\"1234\"" +
+                "}";
 
         String location = mockMvc.perform(post("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user3)))
-
-                .andExpect(header().string("Location", Matchers.notNullValue()))
+                .content(postJson))
                 .andExpect(status().isCreated())
+                .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(jsonPath("$.loginName", is("test_user2")))
                 .andReturn().getResponse().getHeader("Location");
 
