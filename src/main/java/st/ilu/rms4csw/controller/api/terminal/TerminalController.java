@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.model.terminal.OpenDoorRequest;
 import st.ilu.rms4csw.model.terminal.PasscodeAuthenticationRequest;
 import st.ilu.rms4csw.model.user.User;
@@ -43,13 +42,15 @@ public class TerminalController {
     }
 
     @RequestMapping(value = "/door", method = RequestMethod.PATCH)
-    public ResponseEntity<Void> openDoor(@RequestBody OpenDoorRequest openDoorRequest) {
+    public ResponseEntity<Void> openDoorWithOpenRoomReservation(@RequestBody OpenDoorRequest openDoorRequest) {
         if(openDoorRequest.getOpen()) {
             if(roomReservationRepository.findByApprovedAndOpen(true, true).stream().filter(
                     r -> r.getOpenedTimeSpan().isCurrent())
                     .findAny()
                     .isPresent()) {
                 doorOpener.openRoomDoor();
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
         }
 
