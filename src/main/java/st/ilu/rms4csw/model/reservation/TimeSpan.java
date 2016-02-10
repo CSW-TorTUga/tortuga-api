@@ -71,4 +71,8 @@ public class TimeSpan {
 
         return false;
     }
+
+    public boolean isCurrent() {
+        return intersects(new TimeSpan(new Date(), new Date()));
+    }
 }

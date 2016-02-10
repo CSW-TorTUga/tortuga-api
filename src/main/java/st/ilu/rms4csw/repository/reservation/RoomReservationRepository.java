@@ -14,4 +14,5 @@ public interface RoomReservationRepository extends JpaSpecificationRepository<Ro
 
     List<RoomReservation> findByApproved(Boolean approved);
 
+    List<RoomReservation> findByApprovedAndOpen(Boolean approved, Boolean open);
 }

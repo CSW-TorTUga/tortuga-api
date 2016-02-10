@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.model.terminal.OpenDoorRequest;
 import st.ilu.rms4csw.model.terminal.PasscodeAuthenticationRequest;
 import st.ilu.rms4csw.model.user.User;
+import st.ilu.rms4csw.repository.reservation.RoomReservationRepository;
 import st.ilu.rms4csw.service.PasscodeService;
 import st.ilu.rms4csw.service.door.DoorOpener;
 
@@ -26,6 +28,8 @@ public class TerminalController {
 
     private DoorOpener doorOpener;
 
+    private RoomReservationRepository roomReservationRepository;
+
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<Void> authenticate(@RequestBody PasscodeAuthenticationRequest passcodeAuthenticationRequest) {
         Optional<User> user = passcodeService.getUserFromPasscode(passcodeAuthenticationRequest.getPasscode());
@@ -41,10 +45,15 @@ public class TerminalController {
     @RequestMapping(value = "/door", method = RequestMethod.PATCH)
     public ResponseEntity<Void> openDoor(@RequestBody OpenDoorRequest openDoorRequest) {
         if(openDoorRequest.getOpen()) {
-            doorOpener.openRoomDoor();
+            if(roomReservationRepository.findByApprovedAndOpen(true, true).stream().filter(
+                    r -> r.getOpenedTimeSpan().isCurrent())
+                    .findAny()
+                    .isPresent()) {
+                doorOpener.openRoomDoor();
+            }
         }
 
-        return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Autowired
@@ -55,5 +64,10 @@ public class TerminalController {
     @Autowired
     public void setDoorOpener(DoorOpener doorOpener) {
         this.doorOpener = doorOpener;
+    }
+
+    @Autowired
+    public void setRoomReservationRepository(RoomReservationRepository roomReservationRepository) {
+        this.roomReservationRepository = roomReservationRepository;
     }
 }
