@@ -55,6 +55,7 @@ public class User extends PersistentEntity {
     @NotEmpty(message = "Benutzer brauchen eine Telefonnummer")
     private String phoneNumber;
 
+    @NotNull(message = "Benutzer brauchen ein Passwort")
     private String password;
 
     @Enumerated(EnumType.STRING)
