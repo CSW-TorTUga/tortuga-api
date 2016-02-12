@@ -36,7 +36,7 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
-    @PostFilter("(filterObject.approved != null && filterObject.approved) || hasAuthority('OP_TEAM')")
+    @PostFilter("(filterObject.approved != null && filterObject.approved) || hasAuthority('OP_TEAM') || filterObject.user.id.equals(authentication.getPrincipal())")
     public List<RoomReservation> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }

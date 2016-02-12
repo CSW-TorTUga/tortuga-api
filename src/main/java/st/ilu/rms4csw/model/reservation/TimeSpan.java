@@ -76,7 +76,7 @@ public class TimeSpan {
 
     @JsonIgnore
     public boolean endIsInPast() {
-        return new Date().getTime() > getBeginning().getTime();
+        return new Date().getTime() > getEnd().getTime();
     }
 
     public boolean isCurrent() {
