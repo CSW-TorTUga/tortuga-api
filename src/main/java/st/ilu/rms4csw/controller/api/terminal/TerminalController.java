@@ -53,12 +53,24 @@ public class TerminalController {
     @RequestMapping(value = "/door", method = RequestMethod.PATCH)
     public ResponseEntity<Void> openDoorWithOpenRoomReservation(
             @RequestParam(value = "token", required = false) Long token,
+            @RequestParam(value = "passcode", required = false) String passcode,
             @RequestBody OpenDoorRequest openDoorRequest) {
         if(!openDoorRequest.getOpen()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
         logger.info("Received door opening request...");
+
+        if(passcode != null) {
+            Optional<User> user = passcodeService.getUserFromPasscode(passcode);
+            if(!user.isPresent()) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+            doorOpener.openRoomDoor();
+
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
 
         if(token != null) {
             logger.info("Using token to authenticate");
@@ -127,7 +139,7 @@ public class TerminalController {
     }
 
     @Autowired
-    public void setLoggedInUserHolder(LoggedInUserHolder loggedInUserHolder) {
+    public void setLoggedInUserHolder(@SuppressWarnings("SpringJavaAutowiringInspection") LoggedInUserHolder loggedInUserHolder) {
         this.loggedInUserHolder = loggedInUserHolder;
     }
 }
