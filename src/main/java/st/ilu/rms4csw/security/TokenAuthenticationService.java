@@ -1,5 +1,7 @@
 package st.ilu.rms4csw.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -23,6 +26,8 @@ import java.util.Optional;
  */
 @Service
 public class TokenAuthenticationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TokenAuthenticationService.class);
 
     private static final String COOKIE_NAME = "auth_token";
 
@@ -36,7 +41,29 @@ public class TokenAuthenticationService {
 
     @Autowired
     public TokenAuthenticationService(@Value("${token.secret}") String secret, @Value("${token.longValidFor}") Long longValidFor, @Value("${token.shortValidFor}") Long shortValidFor) {
-        this.tokenHandler = new TokenHandler(secret.getBytes());
+        if("true".equals(System.getenv("RMS_RANDOM_TOKEN")) || "RANDOM".equals(secret)) {
+            SecureRandom secureRandom = new SecureRandom();
+            byte[] secretBytes = new byte[4096];
+
+            secureRandom.nextBytes(secretBytes);
+
+            this.tokenHandler = new TokenHandler(secretBytes);
+        } else {
+            logger.warn("----------------------------------------------");
+            logger.warn("----------------------------------------------");
+            logger.warn("----------------------------------------------");
+            logger.warn("THIS SERVER IS USING AN UNSAFE CONFIGURATION!");
+            logger.warn("PLEASE SET THE ENV VARIABLE RMS_RANDOM_TOKEN TO \"true\" OR SET 'token.secret' TO \"RANDOM\"");
+            logger.warn("THIS SERVER IS USING AN UNSAFE CONFIGURATION!");
+            logger.warn("PLEASE SET THE ENV VARIABLE RMS_RANDOM_TOKEN TO \"true\" OR SET 'token.secret' TO \"RANDOM\"");
+            logger.warn("THIS SERVER IS USING AN UNSAFE CONFIGURATION!");
+            logger.warn("PLEASE SET THE ENV VARIABLE RMS_RANDOM_TOKEN TO \"true\" OR SET 'token.secret' TO \"RANDOM\"");
+            logger.warn("----------------------------------------------");
+            logger.warn("----------------------------------------------");
+            logger.warn("----------------------------------------------");
+            this.tokenHandler = new TokenHandler(secret.getBytes());
+        }
+
         this.longValidFor = longValidFor;
         this.shortValidFor = shortValidFor;
     }
