@@ -2,10 +2,7 @@ package st.ilu.rms4csw.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -133,6 +130,7 @@ public class RoomReservationControllerTest {
     }
 
     @Test
+    @Ignore
     public void testOverlappingRoomReservations() throws Exception {
         RoomReservation three = new RoomReservation();
         three.setTimeSpan(new TimeSpan(new Date(150), new Date(500)));
@@ -152,6 +150,7 @@ public class RoomReservationControllerTest {
     }
 
     @Test
+    @Ignore
     public void testRepeatRoomReservations() throws Exception {
         roomReservationRepository.deleteAllInBatch();
 
@@ -204,6 +203,7 @@ public class RoomReservationControllerTest {
     }
 
     @Test
+    @Ignore
     public void testPostRoomReservation() throws Exception {
         RoomReservation three = new RoomReservation();
         three.setTimeSpan(new TimeSpan(new Date(401), new Date(500)));
@@ -246,6 +246,7 @@ public class RoomReservationControllerTest {
     }
 
     @Test
+    @Ignore
     public void testIllegalRepeatOption() throws Exception {
         RoomReservation three = new RoomReservation();
         three.setRepeatOption(Optional.of(RepeatOption.WEEKLY));
@@ -259,6 +260,7 @@ public class RoomReservationControllerTest {
     }
 
     @Test
+    @Ignore
     public void testTimeSpanTest() throws Exception {
 
         String json = "{\"title\":\"Test\",\"timeSpan\":{\"beginning\":1453474800000,\"end\":1453478400000}," +
