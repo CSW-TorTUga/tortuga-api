@@ -5,10 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.model.terminal.OpenDoorRequest;
 import st.ilu.rms4csw.model.terminal.PasscodeAuthenticationRequest;
 import st.ilu.rms4csw.model.user.User;
@@ -26,8 +23,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/terminal")
 public class TerminalController {
-
-    private static final Logger logger = LoggerFactory.getLogger(TerminalController.class);
 
     private PasscodeService passcodeService;
 
@@ -52,22 +47,38 @@ public class TerminalController {
     }
 
     @RequestMapping(value = "/door", method = RequestMethod.PATCH)
-    public ResponseEntity<Void> openDoorWithOpenRoomReservation(@RequestBody OpenDoorRequest openDoorRequest) {
-        User user = loggedInUserHolder.getLoggedInUser();
-        logger.info("{}", user);
-
-        if(openDoorRequest.getOpen()) {
-            if(roomReservationRepository.findByApprovedAndOpen(true, true).stream().filter(
-                    r -> r.getOpenedTimeSpan().isCurrent())
-                    .findAny()
-                    .isPresent()) {
-                doorOpener.openRoomDoor();
-            } else {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
+    public ResponseEntity<Void> openDoorWithOpenRoomReservation(
+            @RequestParam(value = "token", required = false) Long token,
+            @RequestBody OpenDoorRequest openDoorRequest) {
+        if(!openDoorRequest.getOpen()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        if(token != null) {
+            User user = loggedInUserHolder.getLoggedInUser();
+            if(user == null) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+            if(timedTokenService.isValidToken(token)) {
+                doorOpener.openRoomDoor();
+
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if(roomReservationRepository.findByApprovedAndOpen(true, true).stream().filter(
+                r -> r.getOpenedTimeSpan().isCurrent())
+                .findAny()
+                .isPresent()) {
+            doorOpener.openRoomDoor();
+
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @RequestMapping(value = "/code", method = RequestMethod.GET)
