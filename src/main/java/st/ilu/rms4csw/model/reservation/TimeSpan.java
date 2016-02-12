@@ -72,6 +72,10 @@ public class TimeSpan {
         return false;
     }
 
+    public boolean endIsInPast() {
+        return new Date().getTime() > getBeginning().getTime();
+    }
+
     public boolean isCurrent() {
         return intersects(new TimeSpan(new Date(), new Date()));
     }

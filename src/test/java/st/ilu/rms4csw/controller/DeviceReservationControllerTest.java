@@ -272,20 +272,6 @@ public class DeviceReservationControllerTest {
     }
 
     @Test
-    public void testPutDeviceReservation() throws Exception {
-        two.setTimeSpan(new TimeSpan(new Date(700), new Date(800)));
-
-        mockMvc.perform(put("/api/v1/devicereservations/" + two.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(two))
-        )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(two.getId())))
-                .andExpect(jsonPath("$.timeSpan.beginning", is(700)));
-    }
-
-    @Test
     public void testPatchDeviceReservation() throws Exception {
         DeviceReservation patch = new DeviceReservation();
         patch.setId(null);
