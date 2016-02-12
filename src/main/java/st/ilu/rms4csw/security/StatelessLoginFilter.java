@@ -73,7 +73,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         boolean longToken;
         if(authResult.getDetails() instanceof LoginRequest) {
-            longToken = (!NetworkUtil.isLocalNetworkRequest()) && ((LoginRequest) authResult.getDetails()).getLongToken();
+            longToken = (!NetworkUtil.isLocalNetworkRequest(request)) && ((LoginRequest) authResult.getDetails()).getLongToken();
         } else {
             throw new AssertionError("Couldn't get the LoginRequest");
         }

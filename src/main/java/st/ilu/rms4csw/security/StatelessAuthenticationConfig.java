@@ -60,9 +60,10 @@ public class StatelessAuthenticationConfig extends WebSecurityConfigurerAdapter 
                 .antMatchers("/favicon.ico").permitAll()
 
                 .antMatchers(HttpMethod.POST, "/api/v1/terminal/authenticate").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/v1/health/health").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/terminal/code").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/health/health").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/v1/roomreservations").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/roomreservations").permitAll()
 
                 .and()
 
