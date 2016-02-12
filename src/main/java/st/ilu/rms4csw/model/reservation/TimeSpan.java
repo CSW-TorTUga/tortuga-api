@@ -1,5 +1,7 @@
 package st.ilu.rms4csw.model.reservation;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
@@ -72,6 +74,7 @@ public class TimeSpan {
         return false;
     }
 
+    @JsonIgnore
     public boolean endIsInPast() {
         return new Date().getTime() > getBeginning().getTime();
     }
