@@ -186,19 +186,6 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testAuthenticateWithPasscode() throws Exception {
-        String passcode = getPasscode();
-
-        PasscodeAuthenticationRequest par = new PasscodeAuthenticationRequest();
-        par.setPasscode(passcode);
-
-        mockMvc.perform(post("/api/v1/terminal/authenticate")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(par)))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
     public void testNonExistentPasscode() throws Exception {
         PasscodeAuthenticationRequest par = new PasscodeAuthenticationRequest();
         par.setPasscode("blabla");
@@ -215,14 +202,6 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    public void testGeneratePasscodeForNonExistingUser() throws Exception {
-        mockMvc.perform(post("/api/v1/users/blabla/passcode")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
-                .andExpect(status().isNotFound());
     }
 
     @Test
