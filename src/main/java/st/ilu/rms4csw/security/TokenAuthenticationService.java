@@ -90,16 +90,7 @@ public class TokenAuthenticationService {
 
         Cookie cookie = new Cookie(COOKIE_NAME, strToken);
         cookie.setPath("/");
-
-        if(oldToken.isPresent()) {
-            cookie.setMaxAge((int) (oldToken.get().getValidFor() / 1000));
-        } else {
-            if(longToken) {
-                cookie.setMaxAge((int) (longValidFor / 1000));
-            } else {
-                cookie.setMaxAge((int) (shortValidFor / 1000));
-            }
-        }
+        cookie.setMaxAge(100_000);
 
         response.addCookie(cookie);
 
