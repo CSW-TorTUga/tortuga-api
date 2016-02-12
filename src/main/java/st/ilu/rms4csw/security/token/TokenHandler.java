@@ -45,17 +45,20 @@ public class TokenHandler {
         }
     }
 
-    public String createTokenForUser(User user, long validFor) {
+    public Token createTokenForUser(User user, long validFor) {
         Token token = new Token();
         token.setLoginName(user.getLoginName());
         token.setId(user.getId());
         token.setRole(user.getRole());
         token.setUser(user);
 
-        Date in3Minutes = new Date((new Date()).getTime() + validFor);
+        token.setIssuedAt(new Date());
+        token.setValidFor(validFor);
 
-        token.setExpires(in3Minutes);
+        return token;
+    }
 
+    public String signToken(Token token) {
         byte[] userBytes = toJson(token);
         byte[] hash = createHmac(userBytes);
 
@@ -75,7 +78,7 @@ public class TokenHandler {
             try {
                 Token token = objectMapper.readValue(userBytes, Token.class);
 
-                if(new Date().before(token.getExpires())) {
+                if(new Date().before(new Date(token.getIssuedAt().getTime() + token.getValidFor()))) {
                     return token;
                 }
 

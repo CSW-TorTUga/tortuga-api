@@ -14,11 +14,13 @@ public class Token {
 
     private String id;
 
-    private Date expires;
-
     private Role role;
 
     private User user;
+
+    private Date issuedAt;
+
+    private long validFor;
 
     public String getLoginName() {
         return loginName;
@@ -36,14 +38,6 @@ public class Token {
         this.id = id;
     }
 
-    public Date getExpires() {
-        return expires;
-    }
-
-    public void setExpires(Date expires) {
-        this.expires = expires;
-    }
-
     public Role getRole() {
         return role;
     }
@@ -58,5 +52,21 @@ public class Token {
 
     public User getUser() {
         return user;
+    }
+
+    public Date getIssuedAt() {
+        return issuedAt;
+    }
+
+    public void setIssuedAt(Date issuedAt) {
+        this.issuedAt = issuedAt;
+    }
+
+    public long getValidFor() {
+        return validFor;
+    }
+
+    public void setValidFor(long validFor) {
+        this.validFor = validFor;
     }
 }

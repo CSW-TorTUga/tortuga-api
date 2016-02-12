@@ -9,6 +9,8 @@ public class LoginRequest {
 
     private String password;
 
+    private Boolean longToken = false;
+
     public String getLoginName() {
         return loginName;
     }
@@ -23,5 +25,13 @@ public class LoginRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Boolean getLongToken() {
+        return longToken;
+    }
+
+    public void setLongToken(Boolean longToken) {
+        this.longToken = longToken;
     }
 }

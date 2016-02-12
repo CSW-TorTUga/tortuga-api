@@ -1,6 +1,8 @@
 package st.ilu.rms4csw.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import st.ilu.rms4csw.model.user.User;
@@ -20,7 +22,22 @@ public class SpringSecurityLoggedInUserHolder implements LoggedInUserHolder {
 
     @Override
     public User getLoggedInUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        if(context == null) {
+            return null;
+        }
+
+        Authentication authentication = context.getAuthentication();
+        if(authentication == null) {
+            return null;
+        }
+
+        Object principal = authentication.getPrincipal();
+        if(principal == null) {
+            return null;
+        }
+
         if(principal instanceof String) {
             return userRepository.findOne((String) principal);
         } else if(principal instanceof User) {

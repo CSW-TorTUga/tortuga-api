@@ -15,12 +15,15 @@ import st.ilu.rms4csw.controller.base.advice.RestExceptionHandler;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.user.UserRepository;
 import st.ilu.rms4csw.security.json.LoginRequest;
+import st.ilu.rms4csw.security.token.Token;
+import st.ilu.rms4csw.util.NetworkUtil;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * @author Mischa Holz
@@ -59,18 +62,27 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 
         LoginRequest loginRequest = objectMapper.readValue(httpServletRequest.getInputStream(), LoginRequest.class);
 
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getLoginName(), loginRequest.getPassword());
+        UsernamePasswordAuthenticationToken authResult = new UsernamePasswordAuthenticationToken(loginRequest.getLoginName(), loginRequest.getPassword());
 
-        return getAuthenticationManager().authenticate(usernamePasswordAuthenticationToken);
+        authResult.setDetails(loginRequest);
+
+        return getAuthenticationManager().authenticate(authResult);
     }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+        boolean longToken;
+        if(authResult.getDetails() instanceof LoginRequest) {
+            longToken = (!NetworkUtil.isLocalNetworkRequest(request)) && ((LoginRequest) authResult.getDetails()).getLongToken();
+        } else {
+            throw new AssertionError("Couldn't get the LoginRequest");
+        }
+
         User user = userRepository.findOneByLoginName(authResult.getName());
 
-        UserAuthentication userAuthentication = new UserAuthentication(user);
+        Token token = tokenAuthenticationService.addAuthentication(response, user, longToken, Optional.empty());
 
-        tokenAuthenticationService.addAuthentication(response, user);
+        UserAuthentication userAuthentication = new UserAuthentication(user, token);
 
         SecurityContextHolder.getContext().setAuthentication(userAuthentication);
 

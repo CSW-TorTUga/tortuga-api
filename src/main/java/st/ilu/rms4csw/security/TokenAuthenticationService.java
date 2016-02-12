@@ -3,7 +3,6 @@ package st.ilu.rms4csw.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.user.UserRepository;
@@ -29,18 +28,33 @@ public class TokenAuthenticationService {
 
     private TokenHandler tokenHandler;
 
-    private long validFor;
+    private long longValidFor;
+
+    private long shortValidFor;
 
     private UserRepository userRepository;
 
     @Autowired
-    public TokenAuthenticationService(@Value("${token.secret}") String secret, @Value("${token.validFor}") Long validFor) {
+    public TokenAuthenticationService(@Value("${token.secret}") String secret, @Value("${token.longValidFor}") Long longValidFor, @Value("${token.shortValidFor}") Long shortValidFor) {
         this.tokenHandler = new TokenHandler(secret.getBytes());
-        this.validFor = validFor;
+        this.longValidFor = longValidFor;
+        this.shortValidFor = shortValidFor;
     }
 
-    public void addAuthentication(HttpServletResponse response, User user) {
-        String strToken = tokenHandler.createTokenForUser(user, validFor);
+    public Token addAuthentication(HttpServletResponse response, User user, boolean longToken, Optional<Token> oldToken) {
+        Token token;
+
+        if(oldToken.isPresent()) {
+            token = tokenHandler.createTokenForUser(user, oldToken.get().getValidFor());
+        } else {
+            if(longToken) {
+                token = tokenHandler.createTokenForUser(user, longValidFor);
+            } else {
+                token = tokenHandler.createTokenForUser(user, shortValidFor);
+            }
+        }
+
+        String strToken = tokenHandler.signToken(token);
         try {
             strToken = URLEncoder.encode(strToken, "UTF-8");
         } catch(UnsupportedEncodingException e) {
@@ -49,13 +63,25 @@ public class TokenAuthenticationService {
 
         Cookie cookie = new Cookie(COOKIE_NAME, strToken);
         cookie.setPath("/");
-        cookie.setMaxAge((int) (this.validFor / 1000));
+
+        if(oldToken.isPresent()) {
+            cookie.setMaxAge((int) (oldToken.get().getValidFor() / 1000));
+        } else {
+            if(longToken) {
+                cookie.setMaxAge((int) (longValidFor / 1000));
+            } else {
+                cookie.setMaxAge((int) (shortValidFor / 1000));
+            }
+        }
+
         response.addCookie(cookie);
 
         response.setHeader("X-Next-Auth-Token", strToken);
+
+        return token;
     }
 
-    public Optional<Authentication> getAuthentication(HttpServletRequest request) {
+    public Optional<UserAuthentication> getAuthentication(HttpServletRequest request) {
         String strToken = Arrays
                 .stream(request.getCookies() == null ? new Cookie[0] : request.getCookies())
                 .filter(c -> COOKIE_NAME.equals(c.getName()))
@@ -87,7 +113,7 @@ public class TokenAuthenticationService {
         }
 
         if(user.isActiveUser()) {
-            return Optional.of(new UserAuthentication(user));
+            return Optional.of(new UserAuthentication(user, token));
         }
 
         return Optional.empty();

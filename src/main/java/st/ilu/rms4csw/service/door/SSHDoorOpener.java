@@ -4,11 +4,9 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import st.ilu.rms4csw.model.cabinet.Cabinet;
+import st.ilu.rms4csw.util.NetworkUtil;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +35,6 @@ public class SSHDoorOpener implements DoorOpener {
     private void executeCommandOnHost(String cmdStr) {
         Thread thread = new Thread(() -> {
             try(SSHClient ssh = new SSHClient()) {
-//                ssh.loadKnownHosts();
                 ssh.addHostKeyVerifier(fingerPrint);
 
                 ssh.connect(host);
@@ -56,42 +53,9 @@ public class SSHDoorOpener implements DoorOpener {
         thread.start();
     }
 
-    private boolean isLocalNetworkRequest() {
-        ServletRequestAttributes sra = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
-        if(sra == null) {
-            logger.info("No request attached to this thread.");
-            return false;
-        }
-
-        HttpServletRequest request = sra.getRequest();
-        String realIp = request.getHeader("X-Real-IP");
-        logger.info("X-Real-IP: {}", realIp);
-
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-        logger.info("X-Forwarded-For: {}", forwardedFor);
-
-        String remoteAddr = request.getRemoteAddr();
-        logger.info("RemoteAddr: {}", remoteAddr);
-
-
-        if("true".equals(System.getenv("ALLOW_DOOR_FROM_EVERYWHERE"))) {
-            return true;
-        }
-
-        if(request.getHeader("X-Real-IP") != null) {
-            return realIp.startsWith("192.168");
-        }
-
-        if(request.getHeader("X-Forwarded-For") != null) {
-            return forwardedFor.startsWith("192.168");
-        }
-
-        return remoteAddr.startsWith("192.168");
-    }
-
     @Override
     public void openCabinetDoor(Cabinet cabinet) {
-        if(!isLocalNetworkRequest()) {
+        if(!NetworkUtil.isLocalNetworkRequest()) {
             logger.warn("NOT OPENING DOOR {} BECAUSE NOT LOCAL NETWORK", cabinet);
             return;
         }
@@ -113,7 +77,7 @@ public class SSHDoorOpener implements DoorOpener {
 
     @Override
     public void openRoomDoor() {
-        if(!isLocalNetworkRequest()) {
+        if(!NetworkUtil.isLocalNetworkRequest()) {
             logger.warn("NOT OPENING ROOM DOOR BECAUSE NOT LOCAL NETWORK");
             return;
         }

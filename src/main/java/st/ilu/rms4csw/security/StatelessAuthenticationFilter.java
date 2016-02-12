@@ -1,6 +1,5 @@
 package st.ilu.rms4csw.security;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 import st.ilu.rms4csw.model.user.User;
@@ -27,9 +26,14 @@ public class StatelessAuthenticationFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        Optional<Authentication> authentication = tokenAuthenticationService.getAuthentication((HttpServletRequest) servletRequest);
+        Optional<UserAuthentication> authentication = tokenAuthenticationService.getAuthentication((HttpServletRequest) servletRequest);
         if(authentication.isPresent()) {
-            tokenAuthenticationService.addAuthentication((HttpServletResponse) servletResponse, (User) authentication.get().getDetails());
+            tokenAuthenticationService.addAuthentication(
+                    (HttpServletResponse) servletResponse,
+                    (User) authentication.get().getDetails(),
+                    false,
+                    authentication.map(UserAuthentication::getToken)
+            );
 
             SecurityContextHolder.getContext().setAuthentication(authentication.get());
         }
