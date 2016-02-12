@@ -1,5 +1,7 @@
 package st.ilu.rms4csw.controller.api.terminal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/terminal")
 public class TerminalController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TerminalController.class);
 
     private PasscodeService passcodeService;
 
@@ -54,17 +58,27 @@ public class TerminalController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
+        logger.info("Received door opening request...");
+
         if(token != null) {
+            logger.info("Using token to authenticate");
+
             User user = loggedInUserHolder.getLoggedInUser();
             if(user == null) {
+                logger.info("User is not logged in");
+
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
             if(timedTokenService.isValidToken(token)) {
+                logger.info("Token is valid");
+
                 doorOpener.openRoomDoorWithoutCheckingNetwork();
 
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
+
+            logger.info("Token is invalid");
 
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
