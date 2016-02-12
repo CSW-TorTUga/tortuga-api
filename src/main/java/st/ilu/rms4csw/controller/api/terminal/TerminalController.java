@@ -1,7 +1,5 @@
 package st.ilu.rms4csw.controller.api.terminal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +12,9 @@ import st.ilu.rms4csw.security.LoggedInUserHolder;
 import st.ilu.rms4csw.service.PasscodeService;
 import st.ilu.rms4csw.service.TimedTokenService;
 import st.ilu.rms4csw.service.door.DoorOpener;
+import st.ilu.rms4csw.util.NetworkUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 /**
@@ -61,7 +61,7 @@ public class TerminalController {
             }
 
             if(timedTokenService.isValidToken(token)) {
-                doorOpener.openRoomDoor();
+                doorOpener.openRoomDoorWithoutCheckingNetwork();
 
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
@@ -82,7 +82,11 @@ public class TerminalController {
     }
 
     @RequestMapping(value = "/code", method = RequestMethod.GET)
-    public ResponseEntity<Long> getCurrentDoorOpenCode() {
+    public ResponseEntity<Long> getCurrentDoorOpenCode(HttpServletRequest request) {
+        if(!NetworkUtil.isLocalNetworkRequest(request)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         long currentCode = timedTokenService.getCurrentToken();
 
         return new ResponseEntity<>(currentCode, HttpStatus.OK);

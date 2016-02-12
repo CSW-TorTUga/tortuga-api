@@ -33,6 +33,11 @@ public class DoorOpenerConfig {
                 public void openRoomDoor() {
                     logger.warn("OPENING ROOM DOOR (FAKE)");
                 }
+
+                @Override
+                public void openRoomDoorWithoutCheckingNetwork() {
+                    logger.warn("OPENING ROOM DOOR (FAKE)");
+                }
             };
         }
     }
