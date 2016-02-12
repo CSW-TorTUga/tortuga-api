@@ -5,19 +5,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.model.terminal.OpenDoorRequest;
-import st.ilu.rms4csw.model.terminal.PasscodeAuthenticationRequest;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.reservation.RoomReservationRepository;
 import st.ilu.rms4csw.security.LoggedInUserHolder;
 import st.ilu.rms4csw.service.PasscodeService;
 import st.ilu.rms4csw.service.TimedTokenService;
 import st.ilu.rms4csw.service.door.DoorOpener;
+import st.ilu.rms4csw.util.NetworkUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 /**
@@ -39,39 +37,69 @@ public class TerminalController {
 
     private LoggedInUserHolder loggedInUserHolder;
 
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<Void> authenticate(@RequestBody PasscodeAuthenticationRequest passcodeAuthenticationRequest) {
-        Optional<User> user = passcodeService.getUserFromPasscode(passcodeAuthenticationRequest.getPasscode());
-        if(!user.isPresent()) {
+    @RequestMapping(value = "/door", method = RequestMethod.PATCH)
+    public ResponseEntity<Void> openDoorWithOpenRoomReservation(
+            @RequestParam(value = "token", required = false) Long token,
+            @RequestParam(value = "passcode", required = false) String passcode,
+            @RequestBody OpenDoorRequest openDoorRequest) {
+        if(!openDoorRequest.getOpen()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        logger.info("Received door opening request...");
+
+        if(passcode != null) {
+            Optional<User> user = passcodeService.getUserFromPasscode(passcode);
+            if(!user.isPresent()) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+            doorOpener.openRoomDoor();
+
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        if(token != null) {
+            logger.info("Using token to authenticate");
+
+            User user = loggedInUserHolder.getLoggedInUser();
+            if(user == null) {
+                logger.info("User is not logged in");
+
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+            if(timedTokenService.isValidToken(token)) {
+                logger.info("Token is valid");
+
+                doorOpener.openRoomDoorWithoutCheckingNetwork();
+
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+
+            logger.info("Token is invalid");
+
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        doorOpener.openRoomDoor();
+        if(roomReservationRepository.findByApprovedAndOpen(true, true).stream().filter(
+                r -> r.getOpenedTimeSpan().isCurrent())
+                .findAny()
+                .isPresent()) {
+            doorOpener.openRoomDoor();
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @RequestMapping(value = "/door", method = RequestMethod.PATCH)
-    public ResponseEntity<Void> openDoorWithOpenRoomReservation(@RequestBody OpenDoorRequest openDoorRequest) {
-        User user = loggedInUserHolder.getLoggedInUser();
-        logger.info("{}", user);
-
-        if(openDoorRequest.getOpen()) {
-            if(roomReservationRepository.findByApprovedAndOpen(true, true).stream().filter(
-                    r -> r.getOpenedTimeSpan().isCurrent())
-                    .findAny()
-                    .isPresent()) {
-                doorOpener.openRoomDoor();
-            } else {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @RequestMapping(value = "/code", method = RequestMethod.GET)
-    public ResponseEntity<Long> getCurrentDoorOpenCode() {
+    public ResponseEntity<Long> getCurrentDoorOpenCode(HttpServletRequest request) {
+        if(!NetworkUtil.isLocalNetworkRequest(request)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         long currentCode = timedTokenService.getCurrentToken();
 
         return new ResponseEntity<>(currentCode, HttpStatus.OK);
@@ -98,7 +126,7 @@ public class TerminalController {
     }
 
     @Autowired
-    public void setLoggedInUserHolder(LoggedInUserHolder loggedInUserHolder) {
+    public void setLoggedInUserHolder(@SuppressWarnings("SpringJavaAutowiringInspection") LoggedInUserHolder loggedInUserHolder) {
         this.loggedInUserHolder = loggedInUserHolder;
     }
 }

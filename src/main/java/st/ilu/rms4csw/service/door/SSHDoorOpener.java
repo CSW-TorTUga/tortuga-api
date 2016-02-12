@@ -82,6 +82,11 @@ public class SSHDoorOpener implements DoorOpener {
             return;
         }
 
+        openRoomDoorWithoutCheckingNetwork();
+    }
+
+    @Override
+    public void openRoomDoorWithoutCheckingNetwork() {
         logger.warn("OPENING ROOM DOOR");
 
         executeCommandOnHost("~/doorOpen.sh 3");

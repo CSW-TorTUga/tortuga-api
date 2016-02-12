@@ -11,4 +11,6 @@ public interface DoorOpener {
 
     void openRoomDoor();
 
+    void openRoomDoorWithoutCheckingNetwork();
+
 }

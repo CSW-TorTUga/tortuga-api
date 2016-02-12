@@ -20,7 +20,6 @@ import st.ilu.rms4csw.TestContext;
 import st.ilu.rms4csw.TestHelper;
 import st.ilu.rms4csw.controller.base.advice.RestExceptionHandler;
 import st.ilu.rms4csw.model.major.Major;
-import st.ilu.rms4csw.model.terminal.PasscodeAuthenticationRequest;
 import st.ilu.rms4csw.model.user.Gender;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
@@ -186,43 +185,11 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testAuthenticateWithPasscode() throws Exception {
-        String passcode = getPasscode();
-
-        PasscodeAuthenticationRequest par = new PasscodeAuthenticationRequest();
-        par.setPasscode(passcode);
-
-        mockMvc.perform(post("/api/v1/terminal/authenticate")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(par)))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    public void testNonExistentPasscode() throws Exception {
-        PasscodeAuthenticationRequest par = new PasscodeAuthenticationRequest();
-        par.setPasscode("blabla");
-
-        mockMvc.perform(post("/api/v1/terminal/authenticate")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(par)))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
     public void testGeneratePasscodeForExistingUserButNotMyself() throws Exception {
         mockMvc.perform(post("/api/v1/users/" + user2.getId() + "/passcode")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    public void testGeneratePasscodeForNonExistingUser() throws Exception {
-        mockMvc.perform(post("/api/v1/users/blabla/passcode")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
-                .andExpect(status().isNotFound());
     }
 
     @Test

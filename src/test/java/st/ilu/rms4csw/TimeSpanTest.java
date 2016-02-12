@@ -2,7 +2,9 @@ package st.ilu.rms4csw;
 
 import org.junit.Test;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
+import st.ilu.rms4csw.model.reservation.TimeSpanValidator;
 
+import javax.validation.ConstraintValidatorContext;
 import java.util.Date;
 
 import static org.junit.Assert.*;
@@ -57,6 +59,26 @@ public class TimeSpanTest {
         assertFalse("These two timespans should not intersect", one.intersects(two));
 
         assertFalse("These two timespans should not intersect", two.intersects(one));
+    }
+
+    @Test
+    public void testMustBeSameDay() {
+        TimeSpanValidator validator = new TimeSpanValidator();
+
+        TimeSpan sameDay = new TimeSpan(new Date(100), new Date(200));
+
+        assertTrue("timeSpan should be valid", validator.isValid(sameDay, null));
+
+
+        TimeSpan endsTomorrow = new TimeSpan(new Date(), new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000));
+
+        assertFalse("timeSpan should not be valid", validator.isValid(endsTomorrow, null));
+
+
+        TimeSpan startsTomorrow = new TimeSpan(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000), new Date());
+
+        assertFalse("timeSpan should not be valid", validator.isValid(startsTomorrow, null));
+
     }
 
 }
