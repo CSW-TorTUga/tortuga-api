@@ -3,6 +3,7 @@ package st.ilu.rms4csw.security;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import st.ilu.rms4csw.model.user.User;
+import st.ilu.rms4csw.security.token.Token;
 
 import java.util.Collection;
 
@@ -13,8 +14,11 @@ public class UserAuthentication implements Authentication {
 
     private User user;
 
-    public UserAuthentication(User user) {
+    private Token token;
+
+    public UserAuthentication(User user, Token token) {
         this.user = user;
+        this.token = token;
     }
 
 
@@ -55,5 +59,9 @@ public class UserAuthentication implements Authentication {
 
     public User getUser() {
         return user;
+    }
+
+    public Token getToken() {
+        return token;
     }
 }
