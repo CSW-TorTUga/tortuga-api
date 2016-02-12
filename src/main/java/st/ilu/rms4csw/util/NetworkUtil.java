@@ -37,13 +37,10 @@ public class NetworkUtil {
         }
 
         String realIp = request.getHeader("X-Real-IP");
-        logger.info("X-Real-IP: {}", realIp);
 
         String forwardedFor = request.getHeader("X-Forwarded-For");
-        logger.info("X-Forwarded-For: {}", forwardedFor);
 
         String remoteAddr = request.getRemoteAddr();
-        logger.info("RemoteAddr: {}", remoteAddr);
 
 
         if(request.getHeader("X-Real-IP") != null) {
