@@ -20,7 +20,6 @@ import st.ilu.rms4csw.TestContext;
 import st.ilu.rms4csw.TestHelper;
 import st.ilu.rms4csw.controller.base.advice.RestExceptionHandler;
 import st.ilu.rms4csw.model.major.Major;
-import st.ilu.rms4csw.model.terminal.PasscodeAuthenticationRequest;
 import st.ilu.rms4csw.model.user.Gender;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
@@ -183,17 +182,6 @@ public class UserControllerTest {
         assertTrue(code.size() == 5);
 
         return code.stream().reduce("", (a, b) -> a + b);
-    }
-
-    @Test
-    public void testNonExistentPasscode() throws Exception {
-        PasscodeAuthenticationRequest par = new PasscodeAuthenticationRequest();
-        par.setPasscode("blabla");
-
-        mockMvc.perform(post("/api/v1/terminal/authenticate")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(par)))
-                .andExpect(status().isUnauthorized());
     }
 
     @Test
