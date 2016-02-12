@@ -3,6 +3,8 @@ package st.ilu.rms4csw.security.token;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import st.ilu.rms4csw.model.user.User;
 
 import javax.crypto.Mac;
@@ -18,6 +20,8 @@ import java.util.Date;
  * @author Mischa Holz
  */
 public class TokenHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(TokenHandler.class);
 
     private static final String HMAC_ALGO = "HmacSHA256";
     private static final String SEPARATOR = ".";
@@ -68,6 +72,7 @@ public class TokenHandler {
     public Token validateToken(String strToken) {
         String[] parts = strToken.split(SEPARATOR_SPLITTER);
         if(parts.length != 2 || parts[0].length() <= 0 || parts[1].length() <= 0) {
+            logger.info("Invalid token");
             throw new TokenFormatException("Could not parse the token. It consists of 2 parts separated by " + SEPARATOR);
         }
 
@@ -82,6 +87,7 @@ public class TokenHandler {
                     return token;
                 }
 
+                logger.info("Expired token! Was issued at {} and valid for {}", token.getIssuedAt(), token.getValidFor());
                 throw new TokenExpiredException("This token is already expired");
 
             } catch (IOException e) {
@@ -89,6 +95,7 @@ public class TokenHandler {
             }
         }
 
+        logger.info("Invalid token hash");
         throw new TokenHashException("Invalid hash");
     }
 
