@@ -194,6 +194,7 @@ public class RestExceptionHandler {
     @ResponseBody
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(Exception e) {
         LOGGER.info("Access Denied:" + e.getMessage());
+        LOGGER.info("Access Denied", e);
         return handleException(HttpStatus.FORBIDDEN, "Access Denied", e);
     }
 
