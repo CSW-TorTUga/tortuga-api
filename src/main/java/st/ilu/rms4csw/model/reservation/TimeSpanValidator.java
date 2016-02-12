@@ -23,7 +23,7 @@ public class TimeSpanValidator implements ConstraintValidator<TimeSpanIsValid, T
         ZoneOffset zoneOffset = zdt.getOffset();
 
         long beginningSeconds = value.getBeginning().getTime() / 1000;
-        long endSeconds = value.getBeginning().getTime() / 1000;
+        long endSeconds = value.getEnd().getTime() / 1000;
 
         LocalDateTime beginning = LocalDateTime.ofEpochSecond(beginningSeconds, 0, zoneOffset);
         LocalDateTime end = LocalDateTime.ofEpochSecond(endSeconds, 0, zoneOffset);
