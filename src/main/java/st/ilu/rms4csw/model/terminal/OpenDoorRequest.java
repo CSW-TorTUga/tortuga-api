@@ -5,7 +5,7 @@ package st.ilu.rms4csw.model.terminal;
  */
 public class OpenDoorRequest {
 
-    private Boolean open;
+    private Boolean open = false;
 
     public OpenDoorRequest() {}
 
