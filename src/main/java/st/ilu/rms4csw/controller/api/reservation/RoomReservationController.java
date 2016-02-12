@@ -52,6 +52,10 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("hasAuthority('OP_LECTURER')")
     public ResponseEntity<RoomReservation> post(@RequestBody RoomReservation newEntity, HttpServletResponse response) {
+        if(newEntity.getTimeSpan().endIsInPast()) {
+            throw new IllegalArgumentException("Endzeitpunkt kann nicht in der Vergangenheit liegen");
+        }
+
         User user = userService.getLoggedInUser();
         newEntity.setUser(user);
 
@@ -117,6 +121,10 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("hasAuthority('OP_TEAM')")
     public RoomReservation patch(@PathVariable("id") String id, @RequestBody RoomReservation entity) {
+        if(entity.getTimeSpan() != null && entity.getTimeSpan().getEnd() != null && entity.getTimeSpan().endIsInPast()) {
+            throw new IllegalArgumentException("Endzeitpunkt kann nicht in der Vergangenheit liegen");
+        }
+
         return super.patch(id, entity);
     }
 

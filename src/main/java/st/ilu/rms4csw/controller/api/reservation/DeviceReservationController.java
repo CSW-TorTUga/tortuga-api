@@ -50,7 +50,7 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("#newEntity.user.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
     public ResponseEntity<DeviceReservation> post(@RequestBody DeviceReservation newEntity, HttpServletResponse response) {
-        if(endIsInPast(newEntity.getTimeSpan())) {
+        if(newEntity.getTimeSpan().endIsInPast()) {
             throw new IllegalArgumentException("Endzeitpunkt kann nicht in der Vergangenheit liegen");
         }
 
@@ -75,7 +75,7 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
             throw new NotFoundException("Could not find DeviceReservation with id " + id);
         }
 
-        if(entity.getTimeSpan() != null && entity.getTimeSpan().getEnd() != null && endIsInPast(entity.getTimeSpan())) {
+        if(entity.getTimeSpan() != null && entity.getTimeSpan().getEnd() != null && entity.getTimeSpan().endIsInPast()) {
             throw new IllegalArgumentException("Endzeitpunkt kann nicht in der Vergangenheit liegen");
         }
 
@@ -102,10 +102,6 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
         }
 
         return reservation;
-    }
-
-    private boolean endIsInPast(TimeSpan timeSpan) {
-        return new Date().getTime() > timeSpan.getEnd().getTime();
     }
 
     @Override
