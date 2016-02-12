@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.model.terminal.OpenDoorRequest;
-import st.ilu.rms4csw.model.terminal.PasscodeAuthenticationRequest;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.reservation.RoomReservationRepository;
 import st.ilu.rms4csw.security.LoggedInUserHolder;
@@ -37,18 +36,6 @@ public class TerminalController {
     private TimedTokenService timedTokenService;
 
     private LoggedInUserHolder loggedInUserHolder;
-
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<Void> authenticate(@RequestBody PasscodeAuthenticationRequest passcodeAuthenticationRequest) {
-        Optional<User> user = passcodeService.getUserFromPasscode(passcodeAuthenticationRequest.getPasscode());
-        if(!user.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
-        doorOpener.openRoomDoor();
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
 
     @RequestMapping(value = "/door", method = RequestMethod.PATCH)
     public ResponseEntity<Void> openDoorWithOpenRoomReservation(
