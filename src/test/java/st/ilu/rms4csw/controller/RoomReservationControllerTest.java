@@ -2,7 +2,10 @@ package st.ilu.rms4csw.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -28,6 +31,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotEquals;
@@ -75,14 +79,14 @@ public class RoomReservationControllerTest {
         other = userRepository.save(other);
 
         one = new RoomReservation();
-        one.setTimeSpan(new TimeSpan(new Date(100), new Date(200)));
+        one.setTimeSpan(new TimeSpan(TestHelper.getDate(100), TestHelper.getDate(200)));
         one.setApproved(true);
         one.setTitle("beschreibung");
         one.setOpen(false);
-        one.setUser(mockLoggedInUserHolder.getLoggedInUser());
+        one.setUser(mockLoggedInUserHolder.getLoggedInUser().get());
 
         two = new RoomReservation();
-        two.setTimeSpan(new TimeSpan(new Date(201), new Date(300)));
+        two.setTimeSpan(new TimeSpan(TestHelper.getDate(201), TestHelper.getDate(300)));
         two.setTitle("beschreibung");
         two.setApproved(false);
         two.setOpen(false);
@@ -105,8 +109,7 @@ public class RoomReservationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(one.getId())))
-                .andExpect(jsonPath("$[1].id", is(two.getId())));
+                .andExpect(jsonPath("$[*].id", containsInAnyOrder(one.getId(), two.getId())));
 
         assertNotEquals(one.getUser().getId(), two.getUser().getId());
 
@@ -130,10 +133,9 @@ public class RoomReservationControllerTest {
     }
 
     @Test
-    @Ignore
     public void testOverlappingRoomReservations() throws Exception {
         RoomReservation three = new RoomReservation();
-        three.setTimeSpan(new TimeSpan(new Date(150), new Date(500)));
+        three.setTimeSpan(new TimeSpan(TestHelper.getDate(150), TestHelper.getDate(500)));
         three.setOpen(true);
         three.setApproved(true);
         three.setTitle("titel");
@@ -150,16 +152,15 @@ public class RoomReservationControllerTest {
     }
 
     @Test
-    @Ignore
     public void testRepeatRoomReservations() throws Exception {
         roomReservationRepository.deleteAllInBatch();
 
         RoomReservation three = new RoomReservation();
-        three.setTimeSpan(new TimeSpan(new Date(0), new Date(500)));
+        three.setTimeSpan(new TimeSpan(TestHelper.getDate(0), TestHelper.getDate(500)));
         three.setTitle("beschreibung");
         three.setId(null);
         three.setRepeatOption(Optional.of(RepeatOption.WEEKLY));
-        three.setRepeatUntil(Optional.of(new Date(3 * 7 * 24 * 60 * 60 * 1000 + 5)));
+        three.setRepeatUntil(Optional.of(TestHelper.getDate(3 * 7 * 24 * 60 * 60 * 1000 + 5)));
 
         String json = mockMvc.perform(post("/api/v1/roomreservations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -178,13 +179,13 @@ public class RoomReservationControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(4)))
-                .andExpect(jsonPath("$[0].timeSpan.beginning", is(0)))
+                .andExpect(jsonPath("$[0].timeSpan.beginning", is(TestHelper.getDate().getTime())))
                 .andExpect(jsonPath("$[0].sharedId", is(sharedId)))
-                .andExpect(jsonPath("$[1].timeSpan.beginning", is(1 * 7 * 24 * 60 * 60 * 1000)))
+                .andExpect(jsonPath("$[1].timeSpan.beginning", is(TestHelper.getDate(1 * 7 * 24 * 60 * 60 * 1000).getTime())))
                 .andExpect(jsonPath("$[1].sharedId", is(sharedId)))
-                .andExpect(jsonPath("$[2].timeSpan.beginning", is(2 * 7 * 24 * 60 * 60 * 1000)))
+                .andExpect(jsonPath("$[2].timeSpan.beginning", is(TestHelper.getDate(2 * 7 * 24 * 60 * 60 * 1000).getTime())))
                 .andExpect(jsonPath("$[2].sharedId", is(sharedId)))
-                .andExpect(jsonPath("$[3].timeSpan.beginning", is(3 * 7 * 24 * 60 * 60 * 1000)))
+                .andExpect(jsonPath("$[3].timeSpan.beginning", is(TestHelper.getDate(3 * 7 * 24 * 60 * 60 * 1000).getTime())))
                 .andExpect(jsonPath("$[3].sharedId", is(sharedId)));
     }
 
@@ -203,10 +204,9 @@ public class RoomReservationControllerTest {
     }
 
     @Test
-    @Ignore
     public void testPostRoomReservation() throws Exception {
         RoomReservation three = new RoomReservation();
-        three.setTimeSpan(new TimeSpan(new Date(401), new Date(500)));
+        three.setTimeSpan(new TimeSpan(TestHelper.getDate(401), TestHelper.getDate(500)));
         three.setOpen(true);
         three.setApproved(true);
         three.setTitle("beschreibung");
@@ -217,12 +217,12 @@ public class RoomReservationControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(three))
         )
-                .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(status().isCreated())
+                .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andReturn().getResponse().getHeader("Location");
 
         mockMvc.perform(get(location).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.user.id", is(mockLoggedInUserHolder.getLoggedInUser().getId())))
+                .andExpect(jsonPath("$.user.id", is(mockLoggedInUserHolder.getLoggedInUser().get().getId())))
                 .andExpect(jsonPath("$.approved", is(false)))
                 .andExpect(jsonPath("$.open", is(false)));
     }
@@ -234,7 +234,7 @@ public class RoomReservationControllerTest {
         open.setOpen(true);
         open.setApproved(true);
         open.setTitle("title");
-        open.setUser(mockLoggedInUserHolder.getLoggedInUser());
+        open.setUser(mockLoggedInUserHolder.getLoggedInUser().get());
 
         roomReservationRepository.save(open);
 
@@ -246,7 +246,6 @@ public class RoomReservationControllerTest {
     }
 
     @Test
-    @Ignore
     public void testIllegalRepeatOption() throws Exception {
         RoomReservation three = new RoomReservation();
         three.setRepeatOption(Optional.of(RepeatOption.WEEKLY));
@@ -257,29 +256,6 @@ public class RoomReservationControllerTest {
                 .content(objectMapper.writeValueAsString(three))
         )
                 .andExpect(status().is4xxClientError());
-    }
-
-    @Test
-    @Ignore
-    public void testTimeSpanTest() throws Exception {
-
-        String json = "{\"title\":\"Test\",\"timeSpan\":{\"beginning\":1453474800000,\"end\":1453478400000}," +
-                "\"user\":{\"id\":\"ab2fa9b1a0ea4653b7024105edf34718\",\"loginName\":\"admin\",\"firstName\":\"Ilu\"," +
-                "\"lastName\":\"St\",\"email\":\"bp@ilu.st\",\"phoneNumber\":\"\",\"role\":\"ADMIN\"}}";
-
-        String location = mockMvc.perform(post("/api/v1/roomreservations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(json)
-        ).andExpect(header().string("Location", Matchers.notNullValue()))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getHeader("Location");
-
-        mockMvc.perform(get(location).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.user.id", is(mockLoggedInUserHolder.getLoggedInUser().getId())))
-                .andExpect(jsonPath("$.approved", is(false)))
-                .andExpect(jsonPath("$.open", is(false)));
-
     }
 
     @Test
@@ -299,5 +275,27 @@ public class RoomReservationControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testPostIllegalEndDate() throws Exception {
+        RoomReservation three = new RoomReservation();
+        three.setTimeSpan(new TimeSpan(TestHelper.getDateInPast(401), TestHelper.getDateInPast(500)));
+        three.setOpen(true);
+        three.setApproved(true);
+        three.setTitle("beschreibung");
+        three.setId(null);
+
+        mockMvc.perform(post("/api/v1/roomreservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(three))
+        )
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void testPatchIllegalEndDate() throws Exception {
+
     }
 }

@@ -62,8 +62,8 @@ public class TerminalController {
         if(token != null) {
             logger.info("Using token to authenticate");
 
-            User user = loggedInUserHolder.getLoggedInUser();
-            if(user == null) {
+            Optional<User> user = loggedInUserHolder.getLoggedInUser();
+            if(!user.isPresent()) {
                 logger.info("User is not logged in");
 
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

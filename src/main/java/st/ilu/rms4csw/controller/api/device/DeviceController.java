@@ -52,7 +52,7 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
     private List<Device> suggestDevice(Long beginningTime, Long endTime, String categoryId) {
         TimeSpan timeSpan = new TimeSpan(new Date(beginningTime), new Date(endTime));
 
-        User user = loggedInUserHolder.getLoggedInUser();
+        User user = loggedInUserHolder.getLoggedInUser().orElseThrow(() -> new RuntimeException("Not logged in"));
 
         List<DeviceReservation> reservations = deviceReservationRepository.findAllByUserIdAndDeviceCategoryId(user.getId(), categoryId, new Sort(Sort.Direction.DESC, "timeSpan.end"));
 

@@ -10,7 +10,7 @@ import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.user.UserRepository;
 import st.ilu.rms4csw.security.LoggedInUserHolder;
 
-import java.util.Date;
+import java.util.Optional;
 
 /**
  * @author Mischa Holz
@@ -40,7 +40,7 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    public User getLoggedInUser() {
+    public Optional<User> getLoggedInUser() {
         return loggedInUserHolder.getLoggedInUser();
     }
 

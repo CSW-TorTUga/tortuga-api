@@ -31,8 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Date;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -107,17 +106,17 @@ public class DeviceReservationControllerTest {
         otherUser = TestHelper.createUser();
         otherUser = userRepository.save(otherUser);
 
-        user = mockLoggedInUserHolder.getLoggedInUser();
+        user = mockLoggedInUserHolder.getLoggedInUser().get();
 
         one = new DeviceReservation();
-        one.setTimeSpan(new TimeSpan(new Date(100), new Date(200)));
+        one.setTimeSpan(new TimeSpan(TestHelper.getDate(100), TestHelper.getDate(200)));
         one.setBorrowed(false);
         one.setDevice(device);
         one.setUser(user);
         one = deviceReservationRepository.save(one);
 
         two = new DeviceReservation();
-        two.setTimeSpan(new TimeSpan(new Date(300), new Date(400)));
+        two.setTimeSpan(new TimeSpan(TestHelper.getDate(300), TestHelper.getDate(400)));
         two.setBorrowed(false);
         two.setDevice(otherDevice);
         two.setUser(otherUser);
@@ -143,8 +142,7 @@ public class DeviceReservationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(one.getId())))
-                .andExpect(jsonPath("$[1].id", is(two.getId())));
+                .andExpect(jsonPath("$[*].id", containsInAnyOrder(one.getId(), two.getId())));
     }
 
     @Test
@@ -167,7 +165,7 @@ public class DeviceReservationControllerTest {
 
     @Test
     public void testSuggestDeviceForReservationAndFindAvailableNonFavorite() throws Exception {
-        mockMvc.perform(get("/api/v1/devices?beginningTime=50&endTime=150&category=" + deviceCategory.getId()))
+        mockMvc.perform(get("/api/v1/devices?beginningTime=" + TestHelper.getDate(50).getTime() + "&endTime=" + TestHelper.getDate(150).getTime() + "&category=" + deviceCategory.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(two.getDevice().getId())));
@@ -183,10 +181,9 @@ public class DeviceReservationControllerTest {
     }
 
     @Test
-    @Ignore
     public void testPostDeviceReservation() throws Exception {
         DeviceReservation three = new DeviceReservation();
-        three.setTimeSpan(new TimeSpan(new Date(401), new Date(500)));
+        three.setTimeSpan(new TimeSpan(TestHelper.getDate(401), TestHelper.getDate(500)));
         three.setBorrowed(false);
         three.setDevice(device);
         three.setUser(user);
@@ -205,7 +202,6 @@ public class DeviceReservationControllerTest {
     }
 
     @Test
-    @Ignore
     public void testPostDeviceFromInactiveCategory() throws Exception {
         deviceReservationRepository.deleteAllInBatch();
         deviceRepository.deleteAllInBatch();
@@ -220,7 +216,7 @@ public class DeviceReservationControllerTest {
         device = deviceRepository.save(device);
 
         DeviceReservation three = new DeviceReservation();
-        three.setTimeSpan(new TimeSpan(new Date(900), new Date(950)));
+        three.setTimeSpan(new TimeSpan(TestHelper.getDate(900), TestHelper.getDate(950)));
         three.setBorrowed(false);
         three.setDevice(device);
         three.setUser(user);
@@ -238,10 +234,9 @@ public class DeviceReservationControllerTest {
     }
 
     @Test
-    @Ignore
     public void testPostOverlappingDeviceReservation() throws Exception {
         DeviceReservation three = new DeviceReservation();
-        three.setTimeSpan(new TimeSpan(new Date(150), new Date(500)));
+        three.setTimeSpan(new TimeSpan(TestHelper.getDate(150), TestHelper.getDate(500)));
         three.setBorrowed(false);
         three.setDevice(device);
         three.setUser(user);
@@ -272,11 +267,10 @@ public class DeviceReservationControllerTest {
     }
 
     @Test
-    @Ignore
     public void testPatchDeviceReservation() throws Exception {
         DeviceReservation patch = new DeviceReservation();
         patch.setId(null);
-        patch.setTimeSpan(new TimeSpan(new Date(900), new Date(1000)));
+        patch.setTimeSpan(new TimeSpan(TestHelper.getDate(900), TestHelper.getDate(1000)));
 
         mockMvc.perform(patch("/api/v1/devicereservations/" + one.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -285,11 +279,11 @@ public class DeviceReservationControllerTest {
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(one.getId())))
-                .andExpect(jsonPath("$.timeSpan.beginning", is(900)));
+                .andExpect(jsonPath("$.timeSpan.beginning", is(TestHelper.getDate(900).getTime())));
     }
 
     @Test
-    public void testPatchInvalidDevice() throws Exception {
+    public void testPatchInvalidDeviceReservation() throws Exception {
         DeviceReservation patch = new DeviceReservation();
         patch.setId(null);
 
@@ -346,5 +340,36 @@ public class DeviceReservationControllerTest {
 
         mockMvc.perform(get("/api/v1/devicereservations/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testPostDeviceReservationWithWrongEndTime() throws Exception {
+        DeviceReservation three = new DeviceReservation();
+        three.setTimeSpan(new TimeSpan(TestHelper.getDateInPast(401), TestHelper.getDateInPast(500)));
+        three.setBorrowed(false);
+        three.setDevice(device);
+        three.setUser(user);
+
+        mockMvc.perform(post("/api/v1/devicereservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(three))
+        ).andExpect(status().is4xxClientError())
+                .andReturn().getResponse().getContentAsString();
+    }
+
+    @Test
+    public void testPatchDeviceReservationWithWrongEndTime() throws Exception {
+        DeviceReservation patch = new DeviceReservation();
+        patch.setId(null);
+        patch.setTimeSpan(new TimeSpan(TestHelper.getDateInPast(900), TestHelper.getDateInPast(1000)));
+
+        mockMvc.perform(patch("/api/v1/devicereservations/" + one.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(patch))
+        )
+                .andExpect(status().is4xxClientError());
+
     }
 }

@@ -8,12 +8,19 @@ import st.ilu.rms4csw.model.user.Gender;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
 
+import java.util.Date;
 import java.util.Optional;
 
 /**
  * @author Mischa Holz
  */
 public class TestHelper {
+
+    private static long start;
+
+    static {
+        start = System.currentTimeMillis();
+    }
 
     public static User createLoginUser() {
         User user = createUser();
@@ -78,6 +85,18 @@ public class TestHelper {
         deviceCategory.setName("Kategorie");
 
         return deviceCategory;
+    }
+
+    public static Date getDate() {
+        return getDate(0);
+    }
+
+    public static Date getDate(long offset) {
+        return new Date(start + 200_000_000L + offset);
+    }
+
+    public static Date getDateInPast(long offset) {
+        return new Date(start - 200_000_000L + offset);
     }
 
 }

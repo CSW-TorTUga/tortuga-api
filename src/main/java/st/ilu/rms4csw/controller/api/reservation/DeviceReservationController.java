@@ -50,11 +50,11 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("#newEntity.user.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
     public ResponseEntity<DeviceReservation> post(@RequestBody DeviceReservation newEntity, HttpServletResponse response) {
-        if(newEntity.getTimeSpan().endIsInPast()) {
+        if(newEntity.getTimeSpan() != null && newEntity.getTimeSpan().getEnd() != null && newEntity.getTimeSpan().endIsInPast()) {
             throw new IllegalArgumentException("Endzeitpunkt kann nicht in der Vergangenheit liegen");
         }
 
-        newEntity.setUser(loggedInUserHolder.getLoggedInUser());
+        newEntity.setUser(loggedInUserHolder.getLoggedInUser().orElseThrow(() -> new AssertionError("Spring Security should have prevented this")));
 
         return super.post(newEntity, response);
     }

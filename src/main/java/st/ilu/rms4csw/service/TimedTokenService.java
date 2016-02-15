@@ -2,6 +2,7 @@ package st.ilu.rms4csw.service;
 
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.Random;
 
 /**
@@ -9,6 +10,8 @@ import java.util.Random;
  */
 @Service
 public class TimedTokenService {
+
+    private final long seed = new SecureRandom().nextLong();
 
     public long getCurrentToken() {
         return calculateToken(System.currentTimeMillis());
@@ -22,7 +25,7 @@ public class TimedTokenService {
         long currentInterval = time / (30 * 1000);
 
         Random random = new Random();
-        random.setSeed(currentInterval);
+        random.setSeed(seed ^ currentInterval);
 
         return random.nextInt(999_999 - 100_000) + 100_000;
     }

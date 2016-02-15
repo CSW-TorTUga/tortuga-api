@@ -1,6 +1,5 @@
 package st.ilu.rms4csw.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -18,6 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import st.ilu.rms4csw.MockLoggedInUserHolder;
 import st.ilu.rms4csw.TestContext;
 import st.ilu.rms4csw.TestHelper;
+import st.ilu.rms4csw.TestPasscodeService;
 import st.ilu.rms4csw.controller.base.advice.RestExceptionHandler;
 import st.ilu.rms4csw.model.major.Major;
 import st.ilu.rms4csw.model.user.Gender;
@@ -27,7 +27,9 @@ import st.ilu.rms4csw.repository.user.MajorRepository;
 import st.ilu.rms4csw.repository.user.UserRepository;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -58,6 +60,8 @@ public class UserControllerTest {
     @Autowired
     private MockLoggedInUserHolder loggedInUserHolder;
 
+
+
     private MockMvc mockMvc;
 
     private User user1;
@@ -66,13 +70,16 @@ public class UserControllerTest {
 
     private Major major1;
 
+    @Autowired
+    private TestPasscodeService passcodeService;
+
     @Before
     public void setUp() throws Exception {
         userRepository.deleteAllInBatch();
         majorRepository.deleteAllInBatch();
 
         loggedInUserHolder.setUp();
-        user1 = loggedInUserHolder.getLoggedInUser();
+        user1 = loggedInUserHolder.getLoggedInUser().get();
 
         user2 = new User();
         user2.setExpirationDate(Optional.empty());
@@ -163,25 +170,7 @@ public class UserControllerTest {
 
     @Test
     public void testGeneratePasscode() throws Exception {
-        getPasscode();
-    }
-
-    private String getPasscode() throws Exception {
-        String json = mockMvc.perform(post("/api/v1/users/" + loggedInUserHolder.getLoggedInUser().getId() + "/passcode")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        Map<String, Object> response = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
-
-        assertNotNull(response.get("passcode"));
-
-        @SuppressWarnings("unchecked")
-        List<String> code = (List<String>) response.get("passcode");
-        assertTrue(code.size() == 5);
-
-        return code.stream().reduce("", (a, b) -> a + b);
+        passcodeService.getPasscode();
     }
 
     @Test
@@ -190,6 +179,14 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGeneratePasscodeForNonExistingUser() throws Exception {
+        mockMvc.perform(post("/api/v1/users/blabla/passcode")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andExpect(status().isNotFound());
     }
 
     @Test
