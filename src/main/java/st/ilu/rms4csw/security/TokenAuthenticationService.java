@@ -90,7 +90,7 @@ public class TokenAuthenticationService {
 
         Cookie cookie = new Cookie(COOKIE_NAME, strToken);
         cookie.setPath("/");
-        cookie.setMaxAge(100_000);
+        cookie.setMaxAge(14 * 24 * 60 * 60);
 
         response.addCookie(cookie);
 
