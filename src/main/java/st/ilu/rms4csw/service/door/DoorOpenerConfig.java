@@ -16,10 +16,10 @@ public class DoorOpenerConfig {
     private static Logger logger = LoggerFactory.getLogger(DoorOpener.class);
 
     @Bean
-    public static DoorOpener doorOpener(@Value("${SSH_DOOR_HOST:NO_HOST}") String sshHost,
-                                        @Value("${SSH_DOOR_USER:NO_USER}") String sshUser,
-                                        @Value("${SSH_DOOR_PASSWORD:NO_PASSWORD}") String sshPassword,
-                                        @Value("${SSH_FINGER_PRINT:PRINT}") String fingerPrint) {
+    public static DoorOpener doorOpener(@Value("${RMS_SSH_DOOR_HOST:NO_HOST}") String sshHost,
+                                        @Value("${RMS_SSH_DOOR_USER:NO_USER}") String sshUser,
+                                        @Value("${RMS_SSH_DOOR_PASSWORD:NO_PASSWORD}") String sshPassword,
+                                        @Value("${RMS_SSH_FINGER_PRINT:PRINT}") String fingerPrint) {
         if(sshHost != null && !sshHost.equals("NO_HOST")) {
             return new SSHDoorOpener(sshHost, sshUser, sshPassword, fingerPrint);
         } else {
