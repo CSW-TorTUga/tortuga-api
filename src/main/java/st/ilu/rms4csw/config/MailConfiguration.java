@@ -73,7 +73,7 @@ public class MailConfiguration {
         properties.setProperty("mail.smtp.auth", "true");
         properties.setProperty("mail.smtp.port", smtpPort);
 
-        Session session = Session.getDefaultInstance(properties, new Authenticator() {
+        Session session = Session.getInstance(properties, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(smtpUser, smtpPassword);

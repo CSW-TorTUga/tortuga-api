@@ -81,7 +81,7 @@ public class EmailService {
         properties.setProperty("mail.imap.port", imapPort);
 
 
-        Session session = Session.getDefaultInstance(properties);
+        Session session = Session.getInstance(properties);
         Store store = session.getStore("imap");
         store.connect(imapHost, imapUser, imapPassword);
 
