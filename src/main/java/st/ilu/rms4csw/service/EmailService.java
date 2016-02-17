@@ -144,9 +144,14 @@ public class EmailService {
             }
             String from = fromAddresses[0].toString();
 
+            Date receivedDate = message.getReceivedDate();
+            if(receivedDate == null) {
+                receivedDate = new Date();
+            }
+
 
             SupportMessage supportMessage = new SupportMessage();
-            supportMessage.setOpenedAt(new Date());
+            supportMessage.setOpenedAt(receivedDate);
             supportMessage.setSubject(subject);
             supportMessage.setName(Optional.of(from));
             supportMessage.setEmail(Optional.of(addresses));
