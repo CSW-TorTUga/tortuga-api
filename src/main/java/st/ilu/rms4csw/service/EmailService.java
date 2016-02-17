@@ -55,6 +55,8 @@ public class EmailService {
 
     @Scheduled(fixedRate = 10 * 60_000)
     public void pollForEmails() throws MessagingException, IOException {
+        logger.info("Checking emails...");
+
         String imapHost = System.getenv("RMS_IMAP_HOST");
         if(imapHost == null) {
             return;
@@ -96,6 +98,8 @@ public class EmailService {
 
         folder.fetch(messages, fetchProfile);
 
+        int newMails = 0;
+
         for(Message message : messages) {
             String id = message.getHeader("Message-Id")[0];
 
@@ -103,6 +107,7 @@ public class EmailService {
             if(!supportMessagesWithId.isEmpty()) {
                 continue;
             }
+            newMails++;
 
             String body = null;
             Object content = message.getContent();
@@ -152,6 +157,8 @@ public class EmailService {
 
             supportMessageRepository.save(supportMessage);
         }
+
+        logger.info("Imported {} new emails", newMails);
     }
 
 }
