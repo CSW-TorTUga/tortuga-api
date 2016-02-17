@@ -23,6 +23,6 @@ public class PasscodeServiceTest {
 
     @Test
     public void testSplitEmojis() throws Exception {
-        assertTrue("There have to be 42 emojis", passcodeService.getPossibleCharacters().size() == 42);
+        assertTrue("There have to be 36 emojis", passcodeService.getPossibleCharacters().size() == 36);
     }
 }
