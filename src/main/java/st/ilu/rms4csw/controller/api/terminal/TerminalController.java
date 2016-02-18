@@ -51,9 +51,11 @@ public class TerminalController {
         if(passcode != null) {
             Optional<User> user = passcodeService.getUserFromPasscode(passcode);
             if(!user.isPresent()) {
+                logger.info("Wrong passcode entered");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
+            logger.info("DOOR: Opening with passcode");
             doorOpener.openRoomDoor();
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -70,8 +72,7 @@ public class TerminalController {
             }
 
             if(timedTokenService.isValidToken(token)) {
-                logger.info("Token is valid");
-
+                logger.info("DOOR: Opening with token");
                 doorOpener.openRoomDoorWithoutCheckingNetwork();
 
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -86,6 +87,8 @@ public class TerminalController {
                 r -> r.getOpenedTimeSpan().isCurrent())
                 .findAny()
                 .isPresent()) {
+
+            logger.info("DOOR: Opening with open room reservation");
             doorOpener.openRoomDoor();
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

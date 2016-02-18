@@ -1,6 +1,8 @@
 package st.ilu.rms4csw.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -29,6 +31,8 @@ import java.util.Optional;
  * @author Mischa Holz
  */
 public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter {
+
+    private final static Logger logger = LoggerFactory.getLogger(StatelessLoginFilter.class);
 
     private UserRepository userRepository;
 
@@ -86,9 +90,16 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 
         SecurityContextHolder.getContext().setAuthentication(userAuthentication);
 
+        logger.info("LOGIN: Login successful");
+
         response.setContentType("application/json");
         objectMapper.writeValue(response.getOutputStream(), user);
     }
 
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        super.unsuccessfulAuthentication(request, response, failed);
 
+        logger.info("LOGIN: Login failed");
+    }
 }
