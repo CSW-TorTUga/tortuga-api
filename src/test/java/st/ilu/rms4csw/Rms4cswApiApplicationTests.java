@@ -9,7 +9,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = { TestContext.class })
 @WebAppConfiguration
-public class Rms4csvApiApplicationTests {
+public class Rms4cswApiApplicationTests {
 
 	@Test
 	public void contextLoads() {

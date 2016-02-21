@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>st.ilu.rms4csw</groupId>
-	<artifactId>rms4csv-api</artifactId>
+	<artifactId>rms4csw-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>rms4csv-api</name>
+	<name>rms4csw-api</name>
 	<description>RMS4CSW server</description>
 
 	<parent>
