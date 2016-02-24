@@ -31,6 +31,12 @@ public class NetworkUtil {
     }
 
     public static boolean isLocalNetworkRequest(HttpServletRequest request) {
+
+        if("true".equals(System.getenv("RMS_ALWAYS_NON_LOCAL_NETWORK"))) {
+            logger.info("All IP non local because env. ");
+            return false;
+        }
+
         if("true".equals(System.getenv("RMS_IGNORE_LOCAL_NETWORK"))) {
             logger.info("Ignoring IP address because env");
             return true;
