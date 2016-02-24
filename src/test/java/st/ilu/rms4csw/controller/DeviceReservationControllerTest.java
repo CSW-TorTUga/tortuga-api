@@ -1,5 +1,6 @@
 package st.ilu.rms4csw.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.*;
@@ -189,9 +190,9 @@ public class DeviceReservationControllerTest {
         three.setUser(user);
 
         String location = mockMvc.perform(post("/api/v1/devicereservations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(three))
+                                                  .contentType(MediaType.APPLICATION_JSON)
+                                                  .accept(MediaType.APPLICATION_JSON)
+                                                  .content(objectMapper.writeValueAsString(three))
         )
                 .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(status().isCreated())
@@ -222,9 +223,9 @@ public class DeviceReservationControllerTest {
         three.setUser(user);
 
         String json = mockMvc.perform(post("/api/v1/devicereservations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(three))
+                                              .contentType(MediaType.APPLICATION_JSON)
+                                              .accept(MediaType.APPLICATION_JSON)
+                                              .content(objectMapper.writeValueAsString(three))
         ).andExpect(status().is4xxClientError())
                 .andReturn().getResponse().getContentAsString();
 
@@ -242,9 +243,9 @@ public class DeviceReservationControllerTest {
         three.setUser(user);
 
         mockMvc.perform(post("/api/v1/devicereservations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(three))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(three))
         ).andExpect(status().is4xxClientError())
                 .andReturn().getResponse().getContentAsString();
     }
@@ -259,9 +260,9 @@ public class DeviceReservationControllerTest {
         three.setId(null);
 
         mockMvc.perform(post("/api/v1/devicereservations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(three))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(three))
         ).andExpect(status().is4xxClientError())
                 .andReturn().getResponse().getContentAsString();
     }
@@ -273,9 +274,9 @@ public class DeviceReservationControllerTest {
         patch.setTimeSpan(new TimeSpan(TestHelper.getDate(900), TestHelper.getDate(1000)));
 
         mockMvc.perform(patch("/api/v1/devicereservations/" + one.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patch))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(patch))
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(one.getId())))
@@ -288,16 +289,16 @@ public class DeviceReservationControllerTest {
         patch.setId(null);
 
         mockMvc.perform(patch("/api/v1/devicereservations/blabla")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patch))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(patch))
         )
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void testBorrowDevice() throws Exception {
-        try (ByteArrayOutputStream outContent = new ByteArrayOutputStream()) {
+        try(ByteArrayOutputStream outContent = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(outContent));
 
             DeviceReservation patch = new DeviceReservation();
@@ -305,9 +306,9 @@ public class DeviceReservationControllerTest {
             patch.setBorrowed(true);
 
             mockMvc.perform(patch("/api/v1/devicereservations/" + one.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(patch))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(patch))
             )
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id", is(one.getId())))
@@ -316,9 +317,9 @@ public class DeviceReservationControllerTest {
             patch.setBorrowed(false);
 
             mockMvc.perform(patch("/api/v1/devicereservations/" + one.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(patch))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(patch))
             )
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id", is(one.getId())))
@@ -332,10 +333,44 @@ public class DeviceReservationControllerTest {
     }
 
     @Test
+    public void testBorrowInsideLocalNetwork() throws Exception {
+
+        one.setBorrowed(true);
+        mockMvc.perform(patch("/api/v1/devicereservations/" + one.getId())
+                                .with(mockHttpServletRequest -> {
+                                    mockHttpServletRequest.setRemoteAddr("192.168.0.107");
+                                    return mockHttpServletRequest;
+                                })
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(one))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.borrowed", is(true)));
+    }
+
+
+    @Test
+    public void testBorrowOutsideLocalNetwork() throws Exception {
+
+        one.setBorrowed(true);
+        mockMvc.perform(patch("/api/v1/devicereservations/" + one.getId())
+                                .with(mockHttpServletRequest -> {
+                                    mockHttpServletRequest.setRemoteAddr("8.9.6.4");
+                                    return mockHttpServletRequest;
+                                })
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(one))
+        )
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void testDeleteDeviceReservation() throws Exception {
         mockMvc.perform(delete("/api/v1/devicereservations/" + one.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/v1/devicereservations/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
@@ -351,9 +386,9 @@ public class DeviceReservationControllerTest {
         three.setUser(user);
 
         mockMvc.perform(post("/api/v1/devicereservations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(three))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(three))
         ).andExpect(status().is4xxClientError())
                 .andReturn().getResponse().getContentAsString();
     }
@@ -365,9 +400,9 @@ public class DeviceReservationControllerTest {
         patch.setTimeSpan(new TimeSpan(TestHelper.getDateInPast(900), TestHelper.getDateInPast(1000)));
 
         mockMvc.perform(patch("/api/v1/devicereservations/" + one.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patch))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(patch))
         )
                 .andExpect(status().is4xxClientError());
 

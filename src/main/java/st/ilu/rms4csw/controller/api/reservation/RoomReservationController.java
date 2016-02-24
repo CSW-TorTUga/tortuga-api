@@ -1,5 +1,7 @@
 package st.ilu.rms4csw.controller.api.reservation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,11 +12,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.Main;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
+import st.ilu.rms4csw.controller.base.exception.NotFoundException;
 import st.ilu.rms4csw.model.base.IdGenerator;
+import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.service.UserService;
+import st.ilu.rms4csw.util.NetworkUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +34,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/" + RoomReservationController.API_BASE)
 public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation> {
+
+    private static final Logger logger = LoggerFactory.getLogger(RoomReservationController.class);
 
     public static final String API_BASE = "roomreservations";
 
@@ -121,6 +128,25 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("hasAuthority('OP_TEAM')")
     public RoomReservation patch(@PathVariable("id") String id, @RequestBody RoomReservation entity) {
+        RoomReservation old = repository.findOne(id);
+
+        if(old == null) {
+            throw new NotFoundException("Could not find RoomReservation with id " + id);
+        }
+
+
+        Boolean oldOpened = old.isOpen() == null ? false : old.isOpen();
+
+        Boolean newOpened = entity.isOpen() == null ? false : entity.isOpen();
+
+        if(!oldOpened && newOpened && !NetworkUtil.isLocalNetworkRequest()) {
+            logger.warn("NOT OPENING ROOM RESERVATION {} BECAUSE NOT LOCAL NETWORK", entity);
+
+
+            //TODO this needs to "Unauthorized"
+            throw new UnsupportedOperationException("Daueröffnung kann nur vom lokalen Netzwerk eingerichtet werden.");
+        }
+
         return super.patch(id, entity);
     }
 

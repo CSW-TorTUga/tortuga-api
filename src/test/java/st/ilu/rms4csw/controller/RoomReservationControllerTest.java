@@ -13,6 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultHandler;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import st.ilu.rms4csw.MockLoggedInUserHolder;
@@ -141,9 +144,9 @@ public class RoomReservationControllerTest {
         three.setTitle("titel");
 
         String json = mockMvc.perform(post("/api/v1/roomreservations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(three)))
+                                              .contentType(MediaType.APPLICATION_JSON)
+                                              .accept(MediaType.APPLICATION_JSON)
+                                              .content(objectMapper.writeValueAsString(three)))
                 .andExpect(status().is4xxClientError())
                 .andReturn().getResponse().getContentAsString();
 
@@ -163,9 +166,9 @@ public class RoomReservationControllerTest {
         three.setRepeatUntil(Optional.of(TestHelper.getDate(3 * 7 * 24 * 60 * 60 * 1000 + 5)));
 
         String json = mockMvc.perform(post("/api/v1/roomreservations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(three)))
+                                              .contentType(MediaType.APPLICATION_JSON)
+                                              .accept(MediaType.APPLICATION_JSON)
+                                              .content(objectMapper.writeValueAsString(three)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
@@ -196,9 +199,9 @@ public class RoomReservationControllerTest {
         three.setId(null);
 
         mockMvc.perform(patch("/api/v1/roomreservations/" + two.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(three)))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(three)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.approved", is(true)));
     }
@@ -213,9 +216,9 @@ public class RoomReservationControllerTest {
         three.setId(null);
 
         String location = mockMvc.perform(post("/api/v1/roomreservations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(three))
+                                                  .contentType(MediaType.APPLICATION_JSON)
+                                                  .accept(MediaType.APPLICATION_JSON)
+                                                  .content(objectMapper.writeValueAsString(three))
         )
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", Matchers.notNullValue()))
@@ -239,9 +242,9 @@ public class RoomReservationControllerTest {
         roomReservationRepository.save(open);
 
         mockMvc.perform(patch("/api/v1/terminal/door")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content("{\"open\":true}"))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{\"open\":true}"))
                 .andExpect(status().isNoContent());
     }
 
@@ -251,9 +254,9 @@ public class RoomReservationControllerTest {
         three.setRepeatOption(Optional.of(RepeatOption.WEEKLY));
 
         mockMvc.perform(post("/api/v1/roomreservations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(three))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(three))
         )
                 .andExpect(status().is4xxClientError());
     }
@@ -261,8 +264,8 @@ public class RoomReservationControllerTest {
     @Test
     public void testDeleteRoomReservation() throws Exception {
         mockMvc.perform(delete("/api/v1/roomreservations/" + one.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/v1/roomreservations/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
@@ -272,8 +275,8 @@ public class RoomReservationControllerTest {
     @Test
     public void testDeleteNonExistentRoomReservation() throws Exception {
         mockMvc.perform(delete("/api/v1/roomreservations/blabla")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
@@ -287,11 +290,46 @@ public class RoomReservationControllerTest {
         three.setId(null);
 
         mockMvc.perform(post("/api/v1/roomreservations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(three))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(three))
         )
                 .andExpect(status().is4xxClientError());
+    }
+
+
+    @Test
+    public void testPatchOutsideLocalNet() throws Exception {
+        one.setOpen(false);
+        mockMvc.perform(
+                post("/api/v1/roomreservations")
+                        .with(mockHttpServletRequest -> {
+                            mockHttpServletRequest.setRemoteAddr("8.9.8.8");
+                            return mockHttpServletRequest;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(one))
+        )
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    public void testPatchInsideLocalNet() throws Exception {
+        one.setOpen(true);
+        mockMvc.perform(
+                patch("/api/v1/roomreservations/" + one.getId())
+                        .with(mockHttpServletRequest -> {
+                            mockHttpServletRequest.setRemoteAddr("192.168.0.107");
+                            return mockHttpServletRequest;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(one))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.open", is(true)));
     }
 
     @Test
