@@ -31,6 +31,10 @@ public class MockLoggedInUserHolder implements LoggedInUserHolder {
         user = null;
     }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public void setUp() {
         userRepository.deleteAllInBatch();
 

@@ -61,12 +61,13 @@ public class UserControllerTest {
     private MockLoggedInUserHolder loggedInUserHolder;
 
 
-
     private MockMvc mockMvc;
 
     private User user1;
 
     private User user2;
+
+    private User user3;
 
     private Major major1;
 
@@ -77,6 +78,8 @@ public class UserControllerTest {
     public void setUp() throws Exception {
         userRepository.deleteAllInBatch();
         majorRepository.deleteAllInBatch();
+
+        major1 = majorRepository.save(TestHelper.createMajor());
 
         loggedInUserHolder.setUp();
         user1 = loggedInUserHolder.getLoggedInUser().get();
@@ -95,9 +98,22 @@ public class UserControllerTest {
         user2.setPassword("change me.");
         user2.setEnabled(true);
 
-        userRepository.save(Arrays.asList(user2));
+        user3 = new User();
+        user3.setExpirationDate(Optional.empty());
+        user3.setPhoneNumber("12345672289");
+        user3.setRole(Role.STUDENT);
+        user3.setFirstName("Student");
+        user3.setLastName("Studentington");
+        user3.setGender(Optional.of(Gender.FEMALE));
+        user3.setStudentId(Optional.of("345678"));
+        user3.setMajor(Optional.of(major1));
+        user3.setEmail("student@ilu.st");
+        user3.setLoginName("student");
+        user3.setPassword("change me.");
+        user3.setEnabled(true);
 
-        major1 = majorRepository.save(TestHelper.createMajor());
+        userRepository.save(Arrays.asList(user2, user3));
+
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
@@ -113,7 +129,7 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/v1/users").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$", hasSize(2)));
+                .andExpect(jsonPath("$", hasSize(3)));
     }
 
     @Test
@@ -140,8 +156,8 @@ public class UserControllerTest {
                 "}";
 
         mockMvc.perform(post("/api/v1/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(postJson))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(postJson))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(jsonPath("$.loginName", is("test_user")));
@@ -162,8 +178,8 @@ public class UserControllerTest {
                 "}";
 
         mockMvc.perform(post("/api/v1/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(postJson))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(postJson))
 
                 .andExpect(status().is4xxClientError());
     }
@@ -176,16 +192,16 @@ public class UserControllerTest {
     @Test
     public void testGeneratePasscodeForExistingUserButNotMyself() throws Exception {
         mockMvc.perform(post("/api/v1/users/" + user2.getId() + "/passcode")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(""))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void testGeneratePasscodeForNonExistingUser() throws Exception {
         mockMvc.perform(post("/api/v1/users/blabla/passcode")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(""))
                 .andExpect(status().isNotFound());
     }
 
@@ -204,8 +220,8 @@ public class UserControllerTest {
                 "}";
 
         String json = mockMvc.perform(post("/api/v1/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(postJson))
+                                              .contentType(MediaType.APPLICATION_JSON)
+                                              .content(postJson))
 
                 .andExpect(status().is4xxClientError())
                 .andReturn().getResponse().getContentAsString();
@@ -243,15 +259,15 @@ public class UserControllerTest {
                 "}";
 
         String location = mockMvc.perform(post("/api/v1/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(postJson))
+                                                  .contentType(MediaType.APPLICATION_JSON)
+                                                  .content(postJson))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", Matchers.notNullValue()))
                 .andExpect(jsonPath("$.loginName", is("test_user2")))
                 .andReturn().getResponse().getHeader("Location");
 
         User userReturned = objectMapper.readValue(mockMvc.perform(get(location)
-                .accept(MediaType.APPLICATION_JSON)
+                                                                           .accept(MediaType.APPLICATION_JSON)
         ).andReturn().getResponse().getContentAsString(), User.class);
 
         assertTrue("A student must have an expiration date and it has to be in the future", new Date().before(userReturned.getExpirationDate().orElseThrow(NullPointerException::new)));
@@ -274,9 +290,9 @@ public class UserControllerTest {
         patch.setStudentId(Optional.of("1234"));
 
         String json = mockMvc.perform(patch("/api/v1/users/" + user1.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patch))
+                                              .contentType(MediaType.APPLICATION_JSON)
+                                              .accept(MediaType.APPLICATION_JSON)
+                                              .content(objectMapper.writeValueAsString(patch))
         )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -292,9 +308,9 @@ public class UserControllerTest {
         patch.setExpirationDate(Optional.empty());
 
         json = mockMvc.perform(patch("/api/v1/users/" + user1.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patch))
+                                       .contentType(MediaType.APPLICATION_JSON)
+                                       .accept(MediaType.APPLICATION_JSON)
+                                       .content(objectMapper.writeValueAsString(patch))
         )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -311,9 +327,9 @@ public class UserControllerTest {
         patch.setEmail("bla@ilu.st");
 
         mockMvc.perform(patch("/api/v1/users/blabla")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patch)))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(patch)))
                 .andExpect(status().isNotFound());
     }
 
@@ -323,12 +339,66 @@ public class UserControllerTest {
         patch.setId(null);
         patch.setEmail("bla@ilu.st");
 
+
         mockMvc.perform(patch("/api/v1/users/" + user1.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patch)))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(patch)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.loginName", is(user1.getLoginName())))
                 .andExpect(jsonPath("$.email", is("bla@ilu.st")));
+
+    }
+
+
+    @Test
+    public void testPatchNewPasswordWithoutAuthorization() throws Exception {
+        loggedInUserHolder.setUser(user3);
+        mockMvc.perform(patch("/api/v1/users/" + user3.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{\"password\":\"roflcopter\"}"))
+                .andExpect(status().isForbidden());
+
+    }
+
+
+    @Test
+    public void testPatchNewPasswordWithoutBeingLoggedIn() throws Exception {
+        loggedInUserHolder.forgetMe();
+        mockMvc.perform(patch("/api/v1/users/" + user3.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{\"password\":\"roflcopter\"}"))
+                .andExpect(status().isForbidden());
+
+    }
+
+    @Test
+    public void testPatchNewPasswordWithAuthorization() throws Exception {
+
+        mockMvc.perform(patch("/api/v1/users/" + user3.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{\"password\":\"roflcopter\"}")
+                                .header("oldPassword", "change me."))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.loginName", is(user3.getLoginName())));
+
+
+    }
+
+    @Test
+    public void testPatchNewPasswordAsAdmin() throws Exception {
+        loggedInUserHolder.setUser(user1);
+
+        mockMvc.perform(patch("/api/v1/users/" + user3.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{\"password\":\"roflcopter\"}")
+                                .header("oldPassword", "change me."))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.loginName", is(user3.getLoginName())));
+
     }
 }

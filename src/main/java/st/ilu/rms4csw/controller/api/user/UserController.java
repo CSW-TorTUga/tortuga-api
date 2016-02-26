@@ -1,19 +1,25 @@
 package st.ilu.rms4csw.controller.api.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.ChangeSet;
+import st.ilu.rms4csw.controller.base.response.ForbiddenResponse;
 import st.ilu.rms4csw.controller.base.response.NotFoundResponse;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.security.LoggedInUserHolder;
 import st.ilu.rms4csw.service.PasscodeService;
+import st.ilu.rms4csw.service.UserService;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
@@ -37,6 +43,8 @@ public class UserController extends AbstractCRUDCtrl<User> {
     private LoggedInUserHolder loggedInUserHolder;
 
     private PasscodeService passcodeService;
+
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
@@ -100,14 +108,26 @@ public class UserController extends AbstractCRUDCtrl<User> {
         return super.delete(id);
 	}
 
-    @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("#id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
-    public User patch(@PathVariable("id") String id, @RequestBody ChangeSet<User> user) {
+    public User patch(@PathVariable("id") String id, @RequestBody ChangeSet<User> user, HttpServletRequest request) {
         User beforeUpdate = repository.findOne(id);
         if(beforeUpdate == null) {
             throw new NotFoundResponse("Can't find user");
         }
+
+        if(!loggedInUserHolder.getLoggedInUser().isPresent()) {
+            throw new ForbiddenResponse("Du musst eingeloggt zu sein");
+        }
+        User loggedInUser = loggedInUserHolder.getLoggedInUser().get();
+
+        if(id.equals(loggedInUser.getId()) && user.getPatchedFields().contains("password")) {
+            String oldPassword = request.getHeader("X-Old-Password");
+            if(oldPassword == null || !passwordEncoder.matches(oldPassword, loggedInUser.getPassword())) {
+                throw new ForbiddenResponse("Das angegebene Passwort war falsch.");
+            }
+        }
+
 
         if(beforeUpdate.getRole() == Role.STUDENT && (user.getPatch().getRole() == null || user.getPatch().getRole() == Role.STUDENT)) {
             if(!user.getPatch().getExpirationDate().isPresent()) {
@@ -137,4 +157,5 @@ public class UserController extends AbstractCRUDCtrl<User> {
     public void setPasscodeService(PasscodeService passcodeService) {
         this.passcodeService = passcodeService;
     }
+
 }
