@@ -8,7 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import st.ilu.rms4csw.Main;
-import st.ilu.rms4csw.controller.base.exception.NotFoundException;
+import st.ilu.rms4csw.controller.base.response.NotFoundResponse;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 import st.ilu.rms4csw.patch.Patch;
 import st.ilu.rms4csw.repository.base.JpaSpecificationRepository;
@@ -121,7 +121,7 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
     public T findOne(String id) {
         T ret = repository.findOne(id);
         if(ret == null) {
-            throw new NotFoundException("Resource mit ID '" + id + "' konnte nicht gefunden werden");
+            throw new NotFoundResponse("Resource mit ID '" + id + "' konnte nicht gefunden werden");
         }
 
         return ret;
@@ -151,7 +151,7 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
 
     public T patch(T original, ChangeSet<T> changeSet) {
         if(original == null) {
-            throw new NotFoundException("Resource konnte nicht gefunden werden");
+            throw new NotFoundResponse("Resource konnte nicht gefunden werden");
         }
 
         T patched = Patch.patch(original, changeSet);

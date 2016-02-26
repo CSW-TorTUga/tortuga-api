@@ -1,34 +1,34 @@
-package st.ilu.rms4csw.controller.base.exception;
+package st.ilu.rms4csw.controller.base.response;
 
 import org.springframework.http.HttpStatus;
 
 /**
  * @author Mischa Holz
  */
-public class RestException extends RuntimeException {
+public class RestResponse extends RuntimeException {
 
     private HttpStatus status;
 
-    public RestException(HttpStatus status) {
+    public RestResponse(HttpStatus status) {
         this.status = status;
     }
 
-    public RestException(HttpStatus status, String message) {
+    public RestResponse(HttpStatus status, String message) {
         super(message);
         this.status = status;
     }
 
-    public RestException(HttpStatus status, String message, Throwable cause) {
+    public RestResponse(HttpStatus status, String message, Throwable cause) {
         super(message, cause);
         this.status = status;
     }
 
-    public RestException(HttpStatus status, Throwable cause) {
+    public RestResponse(HttpStatus status, Throwable cause) {
         super(cause);
         this.status = status;
     }
 
-    public RestException(HttpStatus status, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public RestResponse(HttpStatus status, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.status = status;
     }

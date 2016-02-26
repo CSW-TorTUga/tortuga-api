@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import st.ilu.rms4csw.controller.base.response.BadRequestResponse;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 import st.ilu.rms4csw.model.major.Major;
 
@@ -156,7 +157,7 @@ public class User extends PersistentEntity {
     @JsonProperty
     public void setPassword(String password) {
         if(password.length() < 6) {
-            throw new IllegalArgumentException("Passwörter müssen mindestens 6 Zeichen lang sein");
+            throw new BadRequestResponse("Passwörter müssen mindestens 6 Zeichen lang sein");
         }
 
         this.password = new BCryptPasswordEncoder().encode(password);

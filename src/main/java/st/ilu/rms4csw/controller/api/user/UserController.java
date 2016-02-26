@@ -8,7 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.ChangeSet;
-import st.ilu.rms4csw.controller.base.exception.NotFoundException;
+import st.ilu.rms4csw.controller.base.response.NotFoundResponse;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.security.LoggedInUserHolder;
@@ -59,7 +59,7 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
         User user = repository.findOne(id);
         if(user == null) {
-            throw new NotFoundException("Didn't find user");
+            throw new NotFoundResponse("Didn't find user");
         }
 
         List<String> passcodeList = passcodeService.generateRandomPasscode();
@@ -106,7 +106,7 @@ public class UserController extends AbstractCRUDCtrl<User> {
     public User patch(@PathVariable("id") String id, @RequestBody ChangeSet<User> user) {
         User beforeUpdate = repository.findOne(id);
         if(beforeUpdate == null) {
-            throw new NotFoundException("Can't find user");
+            throw new NotFoundResponse("Can't find user");
         }
 
         if(beforeUpdate.getRole() == Role.STUDENT && (user.getPatch().getRole() == null || user.getPatch().getRole() == Role.STUDENT)) {

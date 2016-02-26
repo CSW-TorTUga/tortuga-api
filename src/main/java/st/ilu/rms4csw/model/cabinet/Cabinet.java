@@ -2,6 +2,7 @@ package st.ilu.rms4csw.model.cabinet;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import st.ilu.rms4csw.controller.base.response.BadRequestResponse;
 
 /**
  * @author Mischa Holz
@@ -30,6 +31,6 @@ public enum Cabinet {
             }
         }
 
-        throw new IllegalArgumentException("Could not map '" + val + "' to any Cabinet");
+        throw new BadRequestResponse("Could not map '" + val + "' to any Cabinet");
     }
 }

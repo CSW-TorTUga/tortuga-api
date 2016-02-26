@@ -1,6 +1,7 @@
 package st.ilu.rms4csw.controller.base.advice;
 
 import org.apache.catalina.connector.ClientAbortException;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
@@ -19,13 +20,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import st.ilu.rms4csw.controller.base.exception.NotFoundException;
-import st.ilu.rms4csw.controller.base.exception.RestException;
+import st.ilu.rms4csw.controller.base.response.NotFoundResponse;
+import st.ilu.rms4csw.controller.base.response.RestResponse;
 import st.ilu.rms4csw.security.token.TokenException;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.io.PrintStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -117,13 +119,13 @@ public class RestExceptionHandler {
         return handleException(HttpStatus.UNAUTHORIZED, e.getMessage(), e);
     }
 
-    @ExceptionHandler(RestException.class)
+    @ExceptionHandler(RestResponse.class)
     @ResponseBody
     public ResponseEntity<ErrorResponse> restExceptionHandler(Exception e) throws Exception {
-        return handleException(((RestException) e).getStatus(), e.getMessage(), e);
+        return handleException(((RestResponse) e).getStatus(), e.getMessage(), e);
     }
 
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler(NotFoundResponse.class)
     @ResponseBody
     public ResponseEntity<ErrorResponse> notFoundExceptionHandler(Exception e) throws Exception {
         String msg = e.getMessage();
@@ -155,12 +157,6 @@ public class RestExceptionHandler {
     @ResponseBody
     public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(Exception e) {
         return handleException(HttpStatus.BAD_REQUEST, "Bad Request", e);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseBody
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(Exception e) {
-        return handleException(HttpStatus.BAD_REQUEST, "Bad Request: " + e.getMessage(), e);
     }
 
     @ExceptionHandler(UnsatisfiedServletRequestParameterException.class)
@@ -207,6 +203,10 @@ public class RestExceptionHandler {
         if(response.isCommitted()) {
             return null;
         }
-        return handleException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", e);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        e.printStackTrace(new PrintStream(baos));
+
+        return handleException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage() + "\n\n" + baos.toString(), e);
     }
 }

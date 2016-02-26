@@ -3,7 +3,8 @@ package st.ilu.rms4csw.controller.base;
 import org.hibernate.jpa.criteria.path.PluralAttributePath;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
-import st.ilu.rms4csw.controller.base.exception.IllegalFilterException;
+import st.ilu.rms4csw.controller.base.response.BadRequestResponse;
+import st.ilu.rms4csw.controller.base.response.IllegalFilterResponse;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 
 import javax.persistence.criteria.*;
@@ -44,7 +45,7 @@ public class PersistentEntitySpecification<T extends PersistentEntity> implement
             String type = (i - 1 >= 0) ? strPath[i - 1] : "";
             String field = strPath[i];
 
-            throw new IllegalFilterException(type, field);
+            throw new IllegalFilterResponse(type, field);
         }
 
         return path;
@@ -146,7 +147,7 @@ public class PersistentEntitySpecification<T extends PersistentEntity> implement
             List<String> rest = getRestPath(strPath, path);
 
             if(rest.size() != 1) {
-                throw new IllegalArgumentException("Can't descend into map keys");
+                throw new BadRequestResponse("Can't descend into map keys");
             }
 
             if(criteria.getValue() != null && !criteria.getValue().toString().isEmpty()) {
@@ -201,7 +202,11 @@ public class PersistentEntitySpecification<T extends PersistentEntity> implement
             try {
                 return Enum.valueOf(unsafeClass, source);
             } catch (IllegalArgumentException e) {
-                return Enum.valueOf(unsafeClass, source.toUpperCase());
+                try {
+                    return Enum.valueOf(unsafeClass, source.toUpperCase());
+                } catch(IllegalArgumentException e2) {
+                    throw new BadRequestResponse(source + " is not a legal choice for that field");
+                }
             }
         }
 

@@ -3,7 +3,6 @@ package st.ilu.rms4csw.controller.api.reservation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
@@ -11,9 +10,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.ChangeSet;
-import st.ilu.rms4csw.controller.base.exception.NotFoundException;
-import st.ilu.rms4csw.controller.base.exception.RestException;
-import st.ilu.rms4csw.controller.base.exception.UnauthorizedException;
+import st.ilu.rms4csw.controller.base.response.BadRequestResponse;
+import st.ilu.rms4csw.controller.base.response.ForbiddenResponse;
+import st.ilu.rms4csw.controller.base.response.NotFoundResponse;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
 import st.ilu.rms4csw.repository.reservation.DeviceReservationRepository;
@@ -63,7 +62,7 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     @PreAuthorize("#newEntity.user.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
     public ResponseEntity<DeviceReservation> post(@RequestBody DeviceReservation newEntity, HttpServletResponse response) {
         if(newEntity.getTimeSpan() != null && newEntity.getTimeSpan().getEnd() != null && newEntity.getTimeSpan().endIsInPast()) {
-            throw new IllegalArgumentException("Endzeitpunkt kann nicht in der Vergangenheit liegen");
+            throw new BadRequestResponse("Endzeitpunkt kann nicht in der Vergangenheit liegen");
         }
 
         newEntity.setUser(loggedInUserHolder.getLoggedInUser().orElseThrow(() -> new AssertionError("Spring Security should have prevented this")));
@@ -83,11 +82,11 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     public DeviceReservation patchDeviceReservation(@PathVariable("id") String id, @RequestBody ChangeSet<DeviceReservation> entity) {
         DeviceReservation old = repository.findOne(id);
         if(old == null) {
-            throw new NotFoundException("Could not find DeviceReservation with id " + id);
+            throw new NotFoundResponse("Could not find DeviceReservation with id " + id);
         }
 
         if(entity.getPatch().getTimeSpan() != null && entity.getPatch().getTimeSpan().getEnd() != null && entity.getPatch().getTimeSpan().endIsInPast()) {
-            throw new IllegalArgumentException("Endzeitpunkt kann nicht in der Vergangenheit liegen");
+            throw new BadRequestResponse("Endzeitpunkt kann nicht in der Vergangenheit liegen");
         }
 
         Boolean oldBorrowed = old.isBorrowed() == null ? false : old.isBorrowed();
@@ -98,14 +97,14 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
             if(!NetworkUtil.isLocalNetworkRequest()) {
                 logger.warn("NOT OPENING DOOR FOR DEVICE RESERVATION {} BECAUSE NOT LOCAL NETWORK", entity);
 
-                throw new UnauthorizedException();
+                throw new ForbiddenResponse("Geräte können nur an dem Terminal in der CSW ausgeliehen werden.");
             }
         }
 
         if(newBorrowed && !oldBorrowed) {
             List<DeviceReservation> reservations = deviceReservationRepository.findAllByDeviceIdAndBorrowed(old.getDevice().getId(), true);
             if(reservations.size() > 0) {
-                throw new RestException(HttpStatus.BAD_REQUEST, "Dieses Gerät ist bereits ausgeliehen");
+                throw new BadRequestResponse("Dieses Gerät ist bereits ausgeliehen");
             }
         }
 

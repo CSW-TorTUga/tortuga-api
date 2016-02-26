@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.Main;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.ChangeSet;
-import st.ilu.rms4csw.controller.base.exception.NotFoundException;
-import st.ilu.rms4csw.controller.base.exception.UnauthorizedException;
+import st.ilu.rms4csw.controller.base.response.BadRequestResponse;
+import st.ilu.rms4csw.controller.base.response.NotFoundResponse;
+import st.ilu.rms4csw.controller.base.response.UnauthorizedResponse;
 import st.ilu.rms4csw.model.base.IdGenerator;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
@@ -61,7 +62,7 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
     @PreAuthorize("hasAuthority('OP_LECTURER')")
     public ResponseEntity<RoomReservation> post(@RequestBody RoomReservation newEntity, HttpServletResponse response) {
         if(newEntity.getTimeSpan() != null && newEntity.getTimeSpan().getEnd() != null && newEntity.getTimeSpan().endIsInPast()) {
-            throw new IllegalArgumentException("Endzeitpunkt kann nicht in der Vergangenheit liegen");
+            throw new BadRequestResponse("Endzeitpunkt kann nicht in der Vergangenheit liegen");
         }
 
         User user = userService.getLoggedInUser().orElseThrow(() -> new AssertionError("Spring security should not have executed this"));
@@ -72,7 +73,7 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
 
         if(newEntity.getRepeatOption().isPresent()) {
             if(!newEntity.getRepeatUntil().isPresent()) {
-                throw new IllegalArgumentException("if you specify a repeat option you also have to specify an end date");
+                throw new BadRequestResponse("if you specify a repeat option you also have to specify an end date");
             }
 
             String sharedId = IdGenerator.generate();
@@ -132,7 +133,7 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
         RoomReservation old = repository.findOne(id);
 
         if(old == null) {
-            throw new NotFoundException("Could not find RoomReservation with id " + id);
+            throw new NotFoundResponse("Could not find RoomReservation with id " + id);
         }
 
         Boolean oldOpened = old.isOpen() == null ? false : old.isOpen();
@@ -142,7 +143,7 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
         if(!oldOpened && newOpened && !NetworkUtil.isLocalNetworkRequest()) {
             logger.warn("NOT OPENING ROOM RESERVATION {} BECAUSE NOT LOCAL NETWORK", entity);
 
-            throw new UnauthorizedException();
+            throw new UnauthorizedResponse();
         }
 
         return super.patch(id, entity);

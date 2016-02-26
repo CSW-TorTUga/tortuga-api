@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.ChangeSet;
+import st.ilu.rms4csw.controller.base.response.BadRequestResponse;
 import st.ilu.rms4csw.model.support.SupportMessage;
 import st.ilu.rms4csw.service.EmailService;
 
@@ -59,7 +60,7 @@ public class SupportMessageController extends AbstractCRUDCtrl<SupportMessage> {
             SupportMessage supportMessage = repository.findOne(id);
 
             emailService.sendEmail(
-                    supportMessage.getEmail().orElseThrow(() -> new IllegalArgumentException("That SupoprtMessage does not have an email associated with it")),
+                    supportMessage.getEmail().orElseThrow(() -> new BadRequestResponse("Diese Nachricht hat keine Email Adresse, der man antworten könnte.")),
                     supportMessage.getSubject(),
                     entity.getPatch().getAnswer().get());
         }

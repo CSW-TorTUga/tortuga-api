@@ -2,12 +2,12 @@ package st.ilu.rms4csw.controller.api.device;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.ChangeSet;
+import st.ilu.rms4csw.controller.base.response.BadRequestResponse;
 import st.ilu.rms4csw.model.device.Device;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
@@ -18,7 +18,9 @@ import st.ilu.rms4csw.security.LoggedInUserHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,7 +49,7 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
         } else if(beginningTime != null && endTime != null && categoryId != null) {
             return suggestDevice(beginningTime, endTime, categoryId);
         } else {
-            throw new IllegalArgumentException("Um Geräte vorgeschlagen zu bekommen müssen beginningTime, endTime und category Parameter vorhanden sein");
+            throw new BadRequestResponse("Um Geräte vorgeschlagen zu bekommen müssen beginningTime, endTime und category Parameter vorhanden sein");
         }
     }
 
