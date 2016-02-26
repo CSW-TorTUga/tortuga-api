@@ -16,7 +16,7 @@ public class LoginRequest {
     }
 
     public void setLoginName(String loginName) {
-        this.loginName = loginName;
+        this.loginName = loginName.toLowerCase();
     }
 
     public String getPassword() {
