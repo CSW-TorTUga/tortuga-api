@@ -94,8 +94,7 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
             if(!NetworkUtil.isLocalNetworkRequest()) {
                 logger.warn("NOT OPENING DOOR FOR DEVICE RESERVATION {} BECAUSE NOT LOCAL NETWORK", entity);
 
-                //TODO this needs to "Unauthorized"
-                throw new UnsupportedOperationException("Geräte können nur vom lokalen Netzwerk ausgenommen werden.");
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
         }
 

@@ -15,7 +15,6 @@ import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.ChangeSet;
 import st.ilu.rms4csw.controller.base.exception.NotFoundException;
 import st.ilu.rms4csw.model.base.IdGenerator;
-import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
 import st.ilu.rms4csw.model.user.User;
@@ -135,7 +134,6 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
             throw new NotFoundException("Could not find RoomReservation with id " + id);
         }
 
-
         Boolean oldOpened = old.isOpen() == null ? false : old.isOpen();
 
         Boolean newOpened = entity.getPatch().isOpen() == null ? false : entity.getPatch().isOpen();
@@ -143,9 +141,7 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
         if(!oldOpened && newOpened && !NetworkUtil.isLocalNetworkRequest()) {
             logger.warn("NOT OPENING ROOM RESERVATION {} BECAUSE NOT LOCAL NETWORK", entity);
 
-
-            //TODO this needs to "Unauthorized"
-            throw new UnsupportedOperationException("Daueröffnung kann nur vom lokalen Netzwerk eingerichtet werden.");
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         return super.patch(id, entity);

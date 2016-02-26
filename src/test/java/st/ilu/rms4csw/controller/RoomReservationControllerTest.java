@@ -13,9 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.ResultHandler;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import st.ilu.rms4csw.MockLoggedInUserHolder;
@@ -34,9 +31,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -297,21 +292,30 @@ public class RoomReservationControllerTest {
                 .andExpect(status().is4xxClientError());
     }
 
-
     @Test
     public void testPatchOutsideLocalNet() throws Exception {
-        one.setOpen(false);
         mockMvc.perform(
-                post("/api/v1/roomreservations")
+                patch("/api/v1/roomreservations/" + one.getId())
                         .with(mockHttpServletRequest -> {
                             mockHttpServletRequest.setRemoteAddr("8.9.8.8");
                             return mockHttpServletRequest;
                         })
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(one))
+                        .content("{\"open\": true}")
         )
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testPatchNonExistentRoomReservation() throws Exception {
+        mockMvc.perform(
+                patch("/api/v1/roomreservations/blabla")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content("{\"open\": true}")
+        )
+                .andExpect(status().isNotFound());
     }
 
 
