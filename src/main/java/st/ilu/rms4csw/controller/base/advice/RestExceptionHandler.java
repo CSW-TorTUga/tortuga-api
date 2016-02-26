@@ -120,7 +120,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(RestException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponse> restExceptionHandler(Exception e) throws Exception {
-        return handleException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", e);
+        return handleException(((RestException) e).getStatus(), e.getMessage(), e);
     }
 
     @ExceptionHandler(NotFoundException.class)
