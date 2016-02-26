@@ -1,5 +1,7 @@
 package st.ilu.rms4csw.controller.api.reservation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
 import st.ilu.rms4csw.security.LoggedInUserHolder;
 import st.ilu.rms4csw.service.door.DoorOpener;
+import st.ilu.rms4csw.util.NetworkUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +29,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/" + DeviceReservationController.API_BASE)
 public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservation> {
+
+
+    private static final Logger logger = LoggerFactory.getLogger(DeviceReservationController.class);
 
     public static final String API_BASE = "devicereservations";
 
@@ -82,10 +88,19 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
 
         Boolean oldBorrowed = old.isBorrowed() == null ? false : old.isBorrowed();
 
+        Boolean newBorrowed = entity.getPatch().isBorrowed() == null ? false : entity.getPatch().isBorrowed();
+
+        if(oldBorrowed != newBorrowed) {
+            if(!NetworkUtil.isLocalNetworkRequest()) {
+                logger.warn("NOT OPENING DOOR FOR DEVICE RESERVATION {} BECAUSE NOT LOCAL NETWORK", entity);
+
+                //TODO this needs to "Unauthorized"
+                throw new UnsupportedOperationException("Geräte können nur vom lokalen Netzwerk ausgenommen werden.");
+            }
+        }
+
         ResponseEntity<DeviceReservation> response = super.patch(id, entity);
         DeviceReservation reservation = response.getBody();
-
-        Boolean newBorrowed = reservation.isBorrowed() == null ? false : reservation.isBorrowed();
 
         if(oldBorrowed != newBorrowed) {
             doorOpener.openCabinetDoor(reservation.getDevice().getCabinet());
