@@ -173,20 +173,6 @@ public class DeviceControllerTest {
     }
 
     @Test
-    public void testPutDevice() throws Exception {
-        two.setName("Device 3");
-
-         mockMvc.perform(put("/api/v1/devices/" + two.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(two))
-        )
-                 .andExpect(status().isOk())
-                 .andExpect(jsonPath("$.id", is(two.getId())))
-                 .andExpect(jsonPath("$.name", is(two.getName())));
-    }
-
-    @Test
     public void testPatchDevice() throws Exception {
         Device devicePatch = new Device();
         devicePatch.setName("Device3");

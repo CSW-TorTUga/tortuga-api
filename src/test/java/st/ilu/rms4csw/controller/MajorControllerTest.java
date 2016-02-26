@@ -116,18 +116,6 @@ public class MajorControllerTest {
     }
 
     @Test
-    public void testPutMajor() throws Exception {
-        major2.setName("bla");
-
-        mockMvc.perform(put("/api/v1/majors/" + major2.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(major2)))
-                .andExpect(jsonPath("$.id", is(major2.getId())))
-                .andExpect(jsonPath("$.name", is(major2.getName())));
-    }
-
-    @Test
     public void testPatchMajor() throws Exception {
         Major major = new Major();
         major.setName("bla");

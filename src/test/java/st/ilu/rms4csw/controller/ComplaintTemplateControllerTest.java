@@ -119,18 +119,6 @@ public class ComplaintTemplateControllerTest {
     }
 
     @Test
-    public void testPutComplaintTemplate() throws Exception {
-        two.setText("bla");
-
-        mockMvc.perform(put("/api/v1/complainttemplates/" + two.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(two)))
-                .andExpect(jsonPath("$.id", is(two.getId())))
-                .andExpect(jsonPath("$.text", is(two.getText())));
-    }
-
-    @Test
     public void testPatchComplaintTemplate() throws Exception {
         ComplaintTemplate template = new ComplaintTemplate();
         template.setText("bla");

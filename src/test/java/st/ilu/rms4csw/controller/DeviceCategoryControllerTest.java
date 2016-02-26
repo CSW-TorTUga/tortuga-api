@@ -118,18 +118,6 @@ public class DeviceCategoryControllerTest {
     }
 
     @Test
-    public void testPutDeviceCategory() throws Exception {
-        deviceCategory2.setName("bla");
-
-        mockMvc.perform(put("/api/v1/devicecategories/" + deviceCategory2.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(deviceCategory2)))
-                .andExpect(jsonPath("$.id", is(deviceCategory2.getId())))
-                .andExpect(jsonPath("$.name", is(deviceCategory2.getName())));
-    }
-
-    @Test
     public void testPatchDeviceCategory() throws Exception {
         DeviceCategory deviceCategory = new DeviceCategory();
         deviceCategory.setName("bla");
