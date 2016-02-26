@@ -23,14 +23,14 @@ public class MajorController extends AbstractCRUDCtrl<Major> {
     @Override
     @RequestMapping(method = RequestMethod.GET)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public ResponseEntity<List<Major>> findAll(HttpServletRequest request) {
+    public List<Major> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public ResponseEntity<Major> findOne(@PathVariable("id") String id) {
+    public Major findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -51,7 +51,7 @@ public class MajorController extends AbstractCRUDCtrl<Major> {
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public ResponseEntity<Major> patch(@PathVariable("id") String id, @RequestBody ChangeSet<Major> entity) {
+    public Major patch(@PathVariable("id") String id, @RequestBody ChangeSet<Major> entity) {
         return super.patch(id, entity);
     }
 

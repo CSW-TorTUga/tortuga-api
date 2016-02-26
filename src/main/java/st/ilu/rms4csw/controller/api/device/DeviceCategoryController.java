@@ -22,13 +22,13 @@ public class DeviceCategoryController extends AbstractCRUDCtrl<DeviceCategory> {
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<DeviceCategory>> findAll(HttpServletRequest request) {
+    public List<DeviceCategory> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<DeviceCategory> findOne(@PathVariable String id) {
+    public DeviceCategory findOne(@PathVariable String id) {
         return super.findOne(id);
     }
 
@@ -49,7 +49,7 @@ public class DeviceCategoryController extends AbstractCRUDCtrl<DeviceCategory> {
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public ResponseEntity<DeviceCategory> patch(@PathVariable String id, @RequestBody ChangeSet<DeviceCategory> entity) {
+    public DeviceCategory patch(@PathVariable String id, @RequestBody ChangeSet<DeviceCategory> entity) {
         return super.patch(id, entity);
     }
 

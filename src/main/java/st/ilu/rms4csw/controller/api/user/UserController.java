@@ -41,14 +41,14 @@ public class UserController extends AbstractCRUDCtrl<User> {
     @Override
     @RequestMapping(method = RequestMethod.GET)
     @PostFilter("filterObject.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
-    public ResponseEntity<List<User>> findAll(HttpServletRequest request) {
+    public List<User> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @PostAuthorize("returnObject.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
-    public ResponseEntity<User> findOne(@PathVariable("id") String id) {
+    public User findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -103,7 +103,7 @@ public class UserController extends AbstractCRUDCtrl<User> {
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("#id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
-    public ResponseEntity<User> patch(@PathVariable("id") String id, @RequestBody ChangeSet<User> user) {
+    public User patch(@PathVariable("id") String id, @RequestBody ChangeSet<User> user) {
         User beforeUpdate = repository.findOne(id);
         if(beforeUpdate == null) {
             throw new NotFoundException("Can't find user");

@@ -27,14 +27,14 @@ public class SupportMessageController extends AbstractCRUDCtrl<SupportMessage> {
     @Override
     @RequestMapping(method = RequestMethod.GET)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public ResponseEntity<List<SupportMessage>> findAll(HttpServletRequest request) {
+    public List<SupportMessage> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public ResponseEntity<SupportMessage> findOne(@PathVariable("id") String id) {
+    public SupportMessage findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -54,7 +54,7 @@ public class SupportMessageController extends AbstractCRUDCtrl<SupportMessage> {
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public ResponseEntity<SupportMessage> patch(@PathVariable("id") String id, @RequestBody ChangeSet<SupportMessage> entity) {
+    public SupportMessage patch(@PathVariable("id") String id, @RequestBody ChangeSet<SupportMessage> entity) {
         if(entity.getPatch().getAnswer().isPresent()) {
             SupportMessage supportMessage = repository.findOne(id);
 

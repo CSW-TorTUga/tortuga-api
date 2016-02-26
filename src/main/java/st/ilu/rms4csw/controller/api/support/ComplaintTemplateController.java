@@ -22,13 +22,13 @@ public class ComplaintTemplateController extends AbstractCRUDCtrl<ComplaintTempl
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<ComplaintTemplate>> findAll(HttpServletRequest request) {
+    public List<ComplaintTemplate> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<ComplaintTemplate> findOne(@PathVariable("id") String id) {
+    public ComplaintTemplate findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -49,7 +49,7 @@ public class ComplaintTemplateController extends AbstractCRUDCtrl<ComplaintTempl
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public ResponseEntity<ComplaintTemplate> patch(@PathVariable("id") String id, @RequestBody ChangeSet<ComplaintTemplate> entity) {
+    public ComplaintTemplate patch(@PathVariable("id") String id, @RequestBody ChangeSet<ComplaintTemplate> entity) {
         return super.patch(id, entity);
     }
 

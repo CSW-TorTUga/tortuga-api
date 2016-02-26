@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import st.ilu.rms4csw.Main;
+import st.ilu.rms4csw.controller.base.exception.NotFoundException;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 import st.ilu.rms4csw.patch.Patch;
 import st.ilu.rms4csw.repository.base.JpaSpecificationRepository;
@@ -43,15 +44,15 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
         return new Sort(dir, sortValue.split(","));
     }
 
-    public ResponseEntity<List<T>> findAll() {
-        return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
+    public List<T> findAll() {
+        return repository.findAll();
     }
 
-    public ResponseEntity<List<T>> findAll(HttpServletRequest request) {
+    public List<T> findAll(HttpServletRequest request) {
         return findAll(request.getParameterMap(), buildSortObject(request));
     }
 
-    public ResponseEntity<List<T>> findAll(Map<String, String[]> params, Sort sort) {
+    public List<T> findAll(Map<String, String[]> params, Sort sort) {
         List<PersistentEntitySpecification<T>> specifications = new ArrayList<>();
 
         params = new HashMap<>(params);
@@ -99,31 +100,31 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
 
             if(sort == null) {
                 try {
-                    return new ResponseEntity<>(repository.findAll(spec), HttpStatus.OK);
+                    return repository.findAll(spec);
                 } catch(InvalidDataAccessApiUsageException e) {
                     throw (RuntimeException) e.getCause();
                 }
             }
             try {
-                return new ResponseEntity<>(repository.findAll(spec, sort), HttpStatus.OK);
+                return repository.findAll(spec, sort);
             } catch(InvalidDataAccessApiUsageException e) {
                 throw (RuntimeException) e.getCause();
             }
         }
 
         if(sort == null) {
-            return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
+            return repository.findAll();
         }
-        return new ResponseEntity<>(repository.findAll(sort), HttpStatus.OK);
+        return repository.findAll(sort);
     }
 
-    public ResponseEntity<T> findOne(String id) {
+    public T findOne(String id) {
         T ret = repository.findOne(id);
         if(ret == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NotFoundException("Resource mit ID '" + id + "' konnte nicht gefunden werden");
         }
 
-        return new ResponseEntity<>(ret, HttpStatus.OK);
+        return ret;
     }
 
     public ResponseEntity<T> post(T newEntity, HttpServletResponse response) {
@@ -142,20 +143,20 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    public ResponseEntity<T> patch(String id, ChangeSet<T> changeSet) {
+    public T patch(String id, ChangeSet<T> changeSet) {
         T original = repository.findOne(id);
 
         return patch(original, changeSet);
     }
 
-    public ResponseEntity<T> patch(T original, ChangeSet<T> changeSet) {
+    public T patch(T original, ChangeSet<T> changeSet) {
         if(original == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NotFoundException("Resource konnte nicht gefunden werden");
         }
 
         T patched = Patch.patch(original, changeSet);
 
-        return new ResponseEntity<>(repository.save(patched), HttpStatus.OK);
+        return repository.save(patched);
     }
 
     @Autowired

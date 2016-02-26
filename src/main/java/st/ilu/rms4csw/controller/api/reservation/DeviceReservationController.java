@@ -11,8 +11,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.ChangeSet;
-import st.ilu.rms4csw.controller.base.advice.RestExceptionHandler;
 import st.ilu.rms4csw.controller.base.exception.NotFoundException;
+import st.ilu.rms4csw.controller.base.exception.RestException;
+import st.ilu.rms4csw.controller.base.exception.UnauthorizedException;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
 import st.ilu.rms4csw.repository.reservation.DeviceReservationRepository;
@@ -46,14 +47,14 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     @Override
     @RequestMapping(method = RequestMethod.GET)
     @PostFilter("filterObject.user.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
-    public ResponseEntity<List<DeviceReservation>> findAll(HttpServletRequest request) {
+    public List<DeviceReservation> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @PostAuthorize("returnObject.user.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
-    public ResponseEntity<DeviceReservation> findOne(@PathVariable("id") String id) {
+    public DeviceReservation findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -79,7 +80,7 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("@possessedEntityPermissionElevator.checkOwner(@deviceReservationRepository, #id, authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
-    public ResponseEntity<?> patchDeviceReservation(@PathVariable("id") String id, @RequestBody ChangeSet<DeviceReservation> entity) {
+    public DeviceReservation patchDeviceReservation(@PathVariable("id") String id, @RequestBody ChangeSet<DeviceReservation> entity) {
         DeviceReservation old = repository.findOne(id);
         if(old == null) {
             throw new NotFoundException("Could not find DeviceReservation with id " + id);
@@ -97,19 +98,18 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
             if(!NetworkUtil.isLocalNetworkRequest()) {
                 logger.warn("NOT OPENING DOOR FOR DEVICE RESERVATION {} BECAUSE NOT LOCAL NETWORK", entity);
 
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+                throw new UnauthorizedException();
             }
         }
 
         if(newBorrowed && !oldBorrowed) {
             List<DeviceReservation> reservations = deviceReservationRepository.findAllByDeviceIdAndBorrowed(old.getDevice().getId(), true);
             if(reservations.size() > 0) {
-                return new ResponseEntity<>(new RestExceptionHandler.ErrorResponse(400, "Dieses Gerät ist bereits ausgeliehen"), HttpStatus.BAD_REQUEST);
+                throw new RestException(HttpStatus.BAD_REQUEST, "Dieses Gerät ist bereits ausgeliehen");
             }
         }
 
-        ResponseEntity<DeviceReservation> response = super.patch(id, entity);
-        DeviceReservation reservation = response.getBody();
+        DeviceReservation reservation = super.patch(id, entity);
 
         if(oldBorrowed != newBorrowed) {
             doorOpener.openCabinetDoor(reservation.getDevice().getCabinet());
@@ -127,7 +127,7 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
             repository.save(reservation);
         }
 
-        return new ResponseEntity<>(reservation, HttpStatus.OK);
+        return reservation;
     }
 
     @Override

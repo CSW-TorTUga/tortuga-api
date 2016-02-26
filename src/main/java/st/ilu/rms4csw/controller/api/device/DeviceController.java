@@ -38,14 +38,14 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
     private DeviceRepository deviceRepository;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<Device>> findAll(HttpServletRequest request,
+    public List<Device> findAll(HttpServletRequest request,
                                 @RequestParam(value = "beginningTime", required = false) Long beginningTime,
                                 @RequestParam(value = "endTime", required = false) Long endTime,
                                 @RequestParam(value = "category", required = false) String categoryId) {
         if(beginningTime == null && endTime == null) {
             return super.findAll(request);
         } else if(beginningTime != null && endTime != null && categoryId != null) {
-            return new ResponseEntity<>(suggestDevice(beginningTime, endTime, categoryId), HttpStatus.OK);
+            return suggestDevice(beginningTime, endTime, categoryId);
         } else {
             throw new IllegalArgumentException("Um Geräte vorgeschlagen zu bekommen müssen beginningTime, endTime und category Parameter vorhanden sein");
         }
@@ -94,7 +94,7 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<Device> findOne(@PathVariable("id") String id) {
+    public Device findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -115,7 +115,7 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public ResponseEntity<Device> patch(@PathVariable("id") String id, @RequestBody ChangeSet<Device> entity) {
+    public Device patch(@PathVariable("id") String id, @RequestBody ChangeSet<Device> entity) {
         return super.patch(id, entity);
     }
 
