@@ -14,8 +14,8 @@ import st.ilu.rms4csw.Main;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.ChangeSet;
 import st.ilu.rms4csw.controller.base.response.BadRequestResponse;
+import st.ilu.rms4csw.controller.base.response.ForbiddenResponse;
 import st.ilu.rms4csw.controller.base.response.NotFoundResponse;
-import st.ilu.rms4csw.controller.base.response.UnauthorizedResponse;
 import st.ilu.rms4csw.model.base.IdGenerator;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
@@ -143,7 +143,7 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
         if(!oldOpened && newOpened && !NetworkUtil.isLocalNetworkRequest()) {
             logger.warn("NOT OPENING ROOM RESERVATION {} BECAUSE NOT LOCAL NETWORK", entity);
 
-            throw new UnauthorizedResponse();
+            throw new ForbiddenResponse();
         }
 
         return super.patch(id, entity);

@@ -104,7 +104,7 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
         if(newBorrowed && !oldBorrowed) {
             List<DeviceReservation> reservations = deviceReservationRepository.findAllByDeviceIdAndBorrowed(old.getDevice().getId(), true);
             if(reservations.size() > 0) {
-                throw new BadRequestResponse("Dieses Gerät ist bereits ausgeliehen");
+                throw new BadRequestResponse("Jemand anderes hat dieses Gerät noch nicht zurückgegeben.");
             }
         }
 
