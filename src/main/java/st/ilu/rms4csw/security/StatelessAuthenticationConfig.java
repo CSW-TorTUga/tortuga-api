@@ -77,8 +77,6 @@ public class StatelessAuthenticationConfig extends WebSecurityConfigurerAdapter 
 
                     RestExceptionHandler.ErrorResponse resp = new RestExceptionHandler.ErrorResponse(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token or no token at all");
 
-                    logger.info("Caught and handled {}", e);
-
                     new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(response.getOutputStream(), resp);
                 });
     }

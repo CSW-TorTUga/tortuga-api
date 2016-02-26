@@ -3,6 +3,7 @@ package st.ilu.rms4csw;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import st.ilu.rms4csw.security.MethodSecurityConfig;
 import st.ilu.rms4csw.service.SpringSecurityLoggedInUserHolder;
 
 /**
@@ -11,7 +12,8 @@ import st.ilu.rms4csw.service.SpringSecurityLoggedInUserHolder;
 @EnableAutoConfiguration
 @ComponentScan(excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SpringSecurityLoggedInUserHolder.class),
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = Main.class)
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = Main.class),
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = MethodSecurityConfig.class)
 })
 public class TestContext {
 }
