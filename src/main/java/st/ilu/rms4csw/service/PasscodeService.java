@@ -74,6 +74,13 @@ public class PasscodeService {
             characters.add(possibleCharacters.get(index));
         }
 
+        String passcode = characters.stream().reduce("", (a, b) -> a + b);
+
+        Optional<User> existingUser = getUserFromPasscode(passcode);
+        if(existingUser.isPresent()) {
+            return generateRandomPasscode();
+        }
+
         return characters;
     }
 
