@@ -1,14 +1,15 @@
 package st.ilu.rms4csw.controller.api.reservation;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
+import st.ilu.rms4csw.controller.base.ChangeSet;
 import st.ilu.rms4csw.controller.base.exception.NotFoundException;
-import st.ilu.rms4csw.model.cabinet.Cabinet;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
 import st.ilu.rms4csw.security.LoggedInUserHolder;
@@ -35,14 +36,14 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     @Override
     @RequestMapping(method = RequestMethod.GET)
     @PostFilter("filterObject.user.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
-    public List<DeviceReservation> findAll(HttpServletRequest request) {
+    public ResponseEntity<List<DeviceReservation>> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @PostAuthorize("returnObject.user.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
-    public DeviceReservation findOne(@PathVariable("id") String id) {
+    public ResponseEntity<DeviceReservation> findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -69,19 +70,20 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("@possessedEntityPermissionElevator.checkOwner(@deviceReservationRepository, #id, authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
-    public DeviceReservation patch(@PathVariable("id") String id, @RequestBody DeviceReservation entity) {
+    public ResponseEntity<DeviceReservation> patch(@PathVariable("id") String id, @RequestBody ChangeSet<DeviceReservation> entity) {
         DeviceReservation old = repository.findOne(id);
         if(old == null) {
             throw new NotFoundException("Could not find DeviceReservation with id " + id);
         }
 
-        if(entity.getTimeSpan() != null && entity.getTimeSpan().getEnd() != null && entity.getTimeSpan().endIsInPast()) {
+        if(entity.getPatch().getTimeSpan() != null && entity.getPatch().getTimeSpan().getEnd() != null && entity.getPatch().getTimeSpan().endIsInPast()) {
             throw new IllegalArgumentException("Endzeitpunkt kann nicht in der Vergangenheit liegen");
         }
 
         Boolean oldBorrowed = old.isBorrowed() == null ? false : old.isBorrowed();
 
-        DeviceReservation reservation = super.patch(id, entity);
+        ResponseEntity<DeviceReservation> response = super.patch(id, entity);
+        DeviceReservation reservation = response.getBody();
 
         Boolean newBorrowed = reservation.isBorrowed() == null ? false : reservation.isBorrowed();
 
@@ -101,7 +103,7 @@ public class DeviceReservationController extends AbstractCRUDCtrl<DeviceReservat
             repository.save(reservation);
         }
 
-        return reservation;
+        return new ResponseEntity<>(reservation, HttpStatus.OK);
     }
 
     @Override

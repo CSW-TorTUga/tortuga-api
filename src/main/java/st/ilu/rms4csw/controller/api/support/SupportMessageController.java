@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
+import st.ilu.rms4csw.controller.base.ChangeSet;
 import st.ilu.rms4csw.model.support.SupportMessage;
 import st.ilu.rms4csw.service.EmailService;
 
@@ -26,14 +27,14 @@ public class SupportMessageController extends AbstractCRUDCtrl<SupportMessage> {
     @Override
     @RequestMapping(method = RequestMethod.GET)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public List<SupportMessage> findAll(HttpServletRequest request) {
+    public ResponseEntity<List<SupportMessage>> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public SupportMessage findOne(@PathVariable("id") String id) {
+    public ResponseEntity<SupportMessage> findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -53,14 +54,14 @@ public class SupportMessageController extends AbstractCRUDCtrl<SupportMessage> {
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public SupportMessage patch(@PathVariable("id") String id, @RequestBody SupportMessage entity) {
-        if(entity.getAnswer().isPresent()) {
+    public ResponseEntity<SupportMessage> patch(@PathVariable("id") String id, @RequestBody ChangeSet<SupportMessage> entity) {
+        if(entity.getPatch().getAnswer().isPresent()) {
             SupportMessage supportMessage = repository.findOne(id);
 
             emailService.sendEmail(
                     supportMessage.getEmail().orElseThrow(() -> new IllegalArgumentException("That SupoprtMessage does not have an email associated with it")),
                     supportMessage.getSubject(),
-                    entity.getAnswer().get());
+                    entity.getPatch().getAnswer().get());
         }
 
         return super.patch(id, entity);

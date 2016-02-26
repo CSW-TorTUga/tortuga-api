@@ -1,15 +1,14 @@
 package st.ilu.rms4csw.controller.api.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
+import st.ilu.rms4csw.controller.base.ChangeSet;
 import st.ilu.rms4csw.controller.base.exception.NotFoundException;
-import st.ilu.rms4csw.model.base.IdGenerator;
 import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.security.LoggedInUserHolder;
@@ -42,14 +41,14 @@ public class UserController extends AbstractCRUDCtrl<User> {
     @Override
     @RequestMapping(method = RequestMethod.GET)
     @PostFilter("filterObject.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
-    public List<User> findAll(HttpServletRequest request) {
+    public ResponseEntity<List<User>> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @PostAuthorize("returnObject.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
-    public User findOne(@PathVariable("id") String id) {
+    public ResponseEntity<User> findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -104,26 +103,26 @@ public class UserController extends AbstractCRUDCtrl<User> {
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("#id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
-    public User patch(@PathVariable("id") String id, @RequestBody User user) {
+    public ResponseEntity<User> patch(@PathVariable("id") String id, @RequestBody ChangeSet<User> user) {
         User beforeUpdate = repository.findOne(id);
         if(beforeUpdate == null) {
             throw new NotFoundException("Can't find user");
         }
 
-        if(beforeUpdate.getRole() == Role.STUDENT && (user.getRole() == null || user.getRole() == Role.STUDENT)) {
-            if(!user.getExpirationDate().isPresent()) {
+        if(beforeUpdate.getRole() == Role.STUDENT && (user.getPatch().getRole() == null || user.getPatch().getRole() == Role.STUDENT)) {
+            if(!user.getPatch().getExpirationDate().isPresent()) {
                 Date expires = beforeUpdate.getExpirationDate().orElse(User.calculateNextSemesterEnd(new Date()));
-                user.setExpirationDate(Optional.of(expires));
+                user.getPatch().setExpirationDate(Optional.of(expires));
             }
         }
 
-        if(user.getRole() == Role.STUDENT && (!beforeUpdate.getExpirationDate().isPresent())) {
+        if(user.getPatch().getRole() == Role.STUDENT && (!beforeUpdate.getExpirationDate().isPresent())) {
             Date expires = User.calculateNextSemesterEnd(new Date());
-            user.setExpirationDate(Optional.of(expires));
+            user.getPatch().setExpirationDate(Optional.of(expires));
         }
 
-        if(beforeUpdate.getRole() != Role.STUDENT && user.getRole() != Role.STUDENT) {
-            user.setExpirationDate(Optional.empty());
+        if(beforeUpdate.getRole() != Role.STUDENT && user.getPatch().getRole() != Role.STUDENT) {
+            user.getPatch().setExpirationDate(Optional.empty());
         }
 
         return super.patch(id, user);

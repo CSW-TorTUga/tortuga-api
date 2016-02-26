@@ -2,10 +2,12 @@ package st.ilu.rms4csw.controller.api.device;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
+import st.ilu.rms4csw.controller.base.ChangeSet;
 import st.ilu.rms4csw.model.device.Device;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
@@ -36,14 +38,14 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
     private DeviceRepository deviceRepository;
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<Device> findAll(HttpServletRequest request,
+    public ResponseEntity<List<Device>> findAll(HttpServletRequest request,
                                 @RequestParam(value = "beginningTime", required = false) Long beginningTime,
                                 @RequestParam(value = "endTime", required = false) Long endTime,
                                 @RequestParam(value = "category", required = false) String categoryId) {
         if(beginningTime == null && endTime == null) {
             return super.findAll(request);
         } else if(beginningTime != null && endTime != null && categoryId != null) {
-            return suggestDevice(beginningTime, endTime, categoryId);
+            return new ResponseEntity<>(suggestDevice(beginningTime, endTime, categoryId), HttpStatus.OK);
         } else {
             throw new IllegalArgumentException("Um Geräte vorgeschlagen zu bekommen müssen beginningTime, endTime und category Parameter vorhanden sein");
         }
@@ -92,7 +94,7 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Device findOne(@PathVariable("id") String id) {
+    public ResponseEntity<Device> findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -101,13 +103,6 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
     @PreAuthorize("hasAuthority('OP_TEAM')")
     public ResponseEntity<Device> post(@RequestBody Device newEntity, HttpServletResponse response) {
         return super.post(newEntity, response);
-    }
-
-    @Override
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    @PreAuthorize("hasAuthority('OP_TEAM')")
-    public Device put(@PathVariable("id") String id, @RequestBody Device entity) {
-        return super.put(id, entity);
     }
 
     @Override
@@ -120,7 +115,7 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public Device patch(@PathVariable("id") String id, @RequestBody Device entity) {
+    public ResponseEntity<Device> patch(@PathVariable("id") String id, @RequestBody ChangeSet<Device> entity) {
         return super.patch(id, entity);
     }
 

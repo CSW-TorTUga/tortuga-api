@@ -1,19 +1,20 @@
 package st.ilu.rms4csw.controller.base;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import st.ilu.rms4csw.Main;
-import st.ilu.rms4csw.controller.base.exception.NotFoundException;
 import st.ilu.rms4csw.model.base.PersistentEntity;
 import st.ilu.rms4csw.patch.Patch;
 import st.ilu.rms4csw.repository.base.JpaSpecificationRepository;
-import st.ilu.rms4csw.service.PersistentEntityService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,11 +26,9 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
 
     protected JpaSpecificationRepository<T, String> repository;
 
-    private PersistentEntityService persistentEntityService;
+    protected abstract String getApiBase();
 
-    public abstract String getApiBase();
-
-    private Sort buildSortObject(HttpServletRequest request) {
+    protected Sort buildSortObject(HttpServletRequest request) {
         Sort.Direction dir = Sort.DEFAULT_DIRECTION;
         String dirValue = request.getParameter("direction");
         if(dirValue != null) {
@@ -44,34 +43,92 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
         return new Sort(dir, sortValue.split(","));
     }
 
-    public List<T> findAll() {
-        return repository.findAll();
+    public ResponseEntity<List<T>> findAll() {
+        return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
     }
 
-    public List<T> findAll(HttpServletRequest request) {
+    public ResponseEntity<List<T>> findAll(HttpServletRequest request) {
         return findAll(request.getParameterMap(), buildSortObject(request));
     }
 
-    public List<T> findAll(Map<String, String[]> params, Sort sort) {
+    public ResponseEntity<List<T>> findAll(Map<String, String[]> params, Sort sort) {
+        List<PersistentEntitySpecification<T>> specifications = new ArrayList<>();
+
         params = new HashMap<>(params);
+
         params.remove("direction");
         params.remove("sort");
 
-        return persistentEntityService.findAll(params, sort, repository);
-    }
+        for (Map.Entry<String, String[]> stringEntry : params.entrySet()) {
+            String key = stringEntry.getKey();
+            String[] valueArray = stringEntry.getValue();
 
-    public T findOne(String id) {
-        T ret = repository.findOne(id);
-        if(ret == null) {
-            throw new NotFoundException("Did not find resource with id '" + id + "'");
+            for(String value : valueArray) {
+                FilterCriteria criteria;
+                if(value.startsWith("<")) {
+                    criteria = new FilterCriteria();
+                    criteria.setKey(key);
+                    criteria.setOperation(FilterCriteria.Operation.LESS_THAN);
+                    criteria.setValue(value.substring(1));
+                } else if(value.startsWith(">")) {
+                    criteria = new FilterCriteria();
+                    criteria.setKey(key);
+                    criteria.setOperation(FilterCriteria.Operation.GREATER_THAN);
+                    criteria.setValue(value.substring(1));
+                } else {
+                    criteria = new FilterCriteria();
+                    criteria.setKey(key);
+                    criteria.setOperation(FilterCriteria.Operation.EQUALS);
+                    criteria.setValue(value);
+                }
+                specifications.add(new PersistentEntitySpecification<T>(criteria));
+            }
         }
 
-        return ret;
+        if(specifications.size() > 0) {
+            boolean first = true;
+            Specifications<T> spec = null;
+            for(PersistentEntitySpecification<T> specification : specifications) {
+                if(first) {
+                    spec = Specifications.where(specification);
+                    first = false;
+                } else {
+                    spec = spec.and(specification);
+                }
+            }
+
+            if(sort == null) {
+                try {
+                    return new ResponseEntity<>(repository.findAll(spec), HttpStatus.OK);
+                } catch(InvalidDataAccessApiUsageException e) {
+                    throw (RuntimeException) e.getCause();
+                }
+            }
+            try {
+                return new ResponseEntity<>(repository.findAll(spec, sort), HttpStatus.OK);
+            } catch(InvalidDataAccessApiUsageException e) {
+                throw (RuntimeException) e.getCause();
+            }
+        }
+
+        if(sort == null) {
+            return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(repository.findAll(sort), HttpStatus.OK);
+    }
+
+    public ResponseEntity<T> findOne(String id) {
+        T ret = repository.findOne(id);
+        if(ret == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(ret, HttpStatus.OK);
     }
 
     public ResponseEntity<T> post(T newEntity, HttpServletResponse response) {
         if(repository.findOne(newEntity.getId()) != null) {
-            throw new IllegalArgumentException("A resource with this ID exists already. Please use PUT and/or PATCH to update existing resources");
+            return new ResponseEntity<T>(HttpStatus.NOT_ACCEPTABLE);
         }
 
         T ret = repository.save(newEntity);
@@ -80,31 +137,25 @@ public abstract class AbstractCRUDCtrl<T extends PersistentEntity> {
         return new ResponseEntity<>(ret, HttpStatus.CREATED);
     }
 
-    public T put(String id, T entity) {
-        entity.setId(id);
-
-        return repository.save(entity);
-    }
-
     public ResponseEntity delete(String id) {
         repository.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    public T patch(String id, T entity) {
+    public ResponseEntity<T> patch(String id, ChangeSet<T> changeSet) {
         T original = repository.findOne(id);
-        if(original == null) {
-            throw new NotFoundException("Did not find resource with the id " + id);
-        }
 
-        T patched = Patch.patch(original, entity);
-
-        return repository.save(patched);
+        return patch(original, changeSet);
     }
 
-    @Autowired
-    public void setPersistentEntityService(PersistentEntityService persistentEntityService) {
-        this.persistentEntityService = persistentEntityService;
+    public ResponseEntity<T> patch(T original, ChangeSet<T> changeSet) {
+        if(original == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        T patched = Patch.patch(original, changeSet);
+
+        return new ResponseEntity<>(repository.save(patched), HttpStatus.OK);
     }
 
     @Autowired

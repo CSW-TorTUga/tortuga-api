@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
+import st.ilu.rms4csw.controller.base.ChangeSet;
 import st.ilu.rms4csw.model.major.Major;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,14 +23,14 @@ public class MajorController extends AbstractCRUDCtrl<Major> {
     @Override
     @RequestMapping(method = RequestMethod.GET)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public List<Major> findAll(HttpServletRequest request) {
+    public ResponseEntity<List<Major>> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public Major findOne(@PathVariable("id") String id) {
+    public ResponseEntity<Major> findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -38,13 +39,6 @@ public class MajorController extends AbstractCRUDCtrl<Major> {
     @PreAuthorize("hasAuthority('OP_TEAM')")
     public ResponseEntity<Major> post(@RequestBody Major newEntity, HttpServletResponse response) {
         return super.post(newEntity, response);
-    }
-
-    @Override
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    @PreAuthorize("hasAuthority('OP_TEAM')")
-    public Major put(@PathVariable("id") String id, @RequestBody Major entity) {
-        return super.put(id, entity);
     }
 
     @Override
@@ -57,7 +51,7 @@ public class MajorController extends AbstractCRUDCtrl<Major> {
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public Major patch(@PathVariable("id") String id, @RequestBody Major entity) {
+    public ResponseEntity<Major> patch(@PathVariable("id") String id, @RequestBody ChangeSet<Major> entity) {
         return super.patch(id, entity);
     }
 

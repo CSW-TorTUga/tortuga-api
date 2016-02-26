@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.Main;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
+import st.ilu.rms4csw.controller.base.ChangeSet;
 import st.ilu.rms4csw.model.base.IdGenerator;
 import st.ilu.rms4csw.model.reservation.RoomReservation;
 import st.ilu.rms4csw.model.reservation.TimeSpan;
@@ -37,14 +38,14 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
     @Override
     @RequestMapping(method = RequestMethod.GET)
     @PostFilter("(filterObject.approved != null && filterObject.approved) || hasAuthority('OP_TEAM') || filterObject.user.id.equals(authentication.getPrincipal())")
-    public List<RoomReservation> findAll(HttpServletRequest request) {
+    public ResponseEntity<List<RoomReservation>> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @PostAuthorize("(returnObject.approved != null && returnObject.approved) || hasAuthority('OP_TEAM')")
-    public RoomReservation findOne(@PathVariable("id") String id) {
+    public ResponseEntity<RoomReservation> findOne(@PathVariable("id") String id) {
         return super.findOne(id);
     }
 
@@ -120,7 +121,7 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @PreAuthorize("hasAuthority('OP_TEAM')")
-    public RoomReservation patch(@PathVariable("id") String id, @RequestBody RoomReservation entity) {
+    public ResponseEntity<RoomReservation> patch(@PathVariable("id") String id, @RequestBody ChangeSet<RoomReservation> entity) {
         return super.patch(id, entity);
     }
 
