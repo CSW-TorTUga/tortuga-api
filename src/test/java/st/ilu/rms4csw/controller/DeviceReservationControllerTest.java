@@ -1,9 +1,11 @@
 package st.ilu.rms4csw.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -281,6 +283,28 @@ public class DeviceReservationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(one.getId())))
                 .andExpect(jsonPath("$.timeSpan.beginning", is(TestHelper.getDate(900).getTime())));
+    }
+
+    @Test
+    public void testPatchDeviceReservationWhileBorrowed() throws Exception {
+        two.setBorrowed(true);
+
+        two = deviceReservationRepository.save(two);
+
+        DeviceReservation three = new DeviceReservation();
+        three.setTimeSpan(new TimeSpan(TestHelper.getDate(401), TestHelper.getDate(500)));
+        three.setBorrowed(false);
+        three.setDevice(otherDevice);
+        three.setUser(user);
+
+        three = deviceReservationRepository.save(three);
+
+        mockMvc.perform(patch("/api/v1/devicereservations/" + three.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content("{\"borrowed\":true}")
+        )
+                .andExpect(status().isBadRequest());
     }
 
     @Test
