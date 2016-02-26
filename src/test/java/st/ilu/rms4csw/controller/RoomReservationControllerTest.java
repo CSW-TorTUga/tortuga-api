@@ -304,7 +304,7 @@ public class RoomReservationControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .content("{\"open\": true}")
         )
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
