@@ -11,10 +11,10 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Mischa Holz
- *
  */
 @Service
 public class PasscodeService {
@@ -68,18 +68,18 @@ public class PasscodeService {
         List<String> characters = new ArrayList<>();
         List<String> possibleCharacters = getPossibleCharacters();
 
-        for(int i = 0; i < 5; i++) {
-            int index = random.nextInt(possibleCharacters.size());
+        Optional<User> existingUser;
+        do {
+            for(int i = 0; i < 5; i++) {
+                int index = random.nextInt(possibleCharacters.size());
 
-            characters.add(possibleCharacters.get(index));
-        }
+                characters.add(possibleCharacters.get(index));
+            }
 
-        String passcode = characters.stream().reduce("", (a, b) -> a + b);
+            String passcode = characters.stream().collect(Collectors.joining());
 
-        Optional<User> existingUser = getUserFromPasscode(passcode);
-        if(existingUser.isPresent()) {
-            return generateRandomPasscode();
-        }
+            existingUser = getUserFromPasscode(passcode);
+        } while(existingUser.isPresent());
 
         return characters;
     }
