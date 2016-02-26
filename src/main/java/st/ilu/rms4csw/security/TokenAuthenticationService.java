@@ -10,6 +10,7 @@ import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.repository.user.UserRepository;
 import st.ilu.rms4csw.security.token.Token;
 import st.ilu.rms4csw.security.token.TokenHandler;
+import st.ilu.rms4csw.service.ConfigurationService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Optional;
 
 /**
@@ -31,6 +33,8 @@ public class TokenAuthenticationService {
 
     private static final String COOKIE_NAME = "auth_token";
 
+    private static final String SECRET_KEY_LABEL = "st.ilu.rms4csw.security.token";
+
     private TokenHandler tokenHandler;
 
     private long longValidFor;
@@ -40,28 +44,27 @@ public class TokenAuthenticationService {
     private UserRepository userRepository;
 
     @Autowired
-    public TokenAuthenticationService(@Value("${token.secret}") String secret, @Value("${token.longValidFor}") Long longValidFor, @Value("${token.shortValidFor}") Long shortValidFor) {
-        if("true".equals(System.getenv("RMS_RANDOM_TOKEN")) || "RANDOM".equals(secret)) {
+    public TokenAuthenticationService(ConfigurationService configurationService, @Value("${token.longValidFor}") Long longValidFor, @Value("${token.shortValidFor}") Long shortValidFor) {
+        Optional<String> secretKey = configurationService.getValue(SECRET_KEY_LABEL);
+        if(secretKey.isPresent()) {
+            logger.info("Using saved secret");
+
+            byte[] secret = Base64.getDecoder().decode(secretKey.get());
+
+            this.tokenHandler = new TokenHandler(secret);
+        } else {
+            logger.info("Generating new secret");
+
             SecureRandom secureRandom = new SecureRandom();
             byte[] secretBytes = new byte[4096];
 
             secureRandom.nextBytes(secretBytes);
 
+            String persistKey = Base64.getEncoder().encodeToString(secretBytes);
+
+            configurationService.persistOption(SECRET_KEY_LABEL, persistKey);
+
             this.tokenHandler = new TokenHandler(secretBytes);
-        } else {
-            logger.warn("----------------------------------------------");
-            logger.warn("----------------------------------------------");
-            logger.warn("----------------------------------------------");
-            logger.warn("THIS SERVER IS USING AN UNSAFE CONFIGURATION!");
-            logger.warn("PLEASE SET THE ENV VARIABLE RMS_RANDOM_TOKEN TO \"true\" OR SET 'token.secret' TO \"RANDOM\"");
-            logger.warn("THIS SERVER IS USING AN UNSAFE CONFIGURATION!");
-            logger.warn("PLEASE SET THE ENV VARIABLE RMS_RANDOM_TOKEN TO \"true\" OR SET 'token.secret' TO \"RANDOM\"");
-            logger.warn("THIS SERVER IS USING AN UNSAFE CONFIGURATION!");
-            logger.warn("PLEASE SET THE ENV VARIABLE RMS_RANDOM_TOKEN TO \"true\" OR SET 'token.secret' TO \"RANDOM\"");
-            logger.warn("----------------------------------------------");
-            logger.warn("----------------------------------------------");
-            logger.warn("----------------------------------------------");
-            this.tokenHandler = new TokenHandler(secret.getBytes());
         }
 
         this.longValidFor = longValidFor;
