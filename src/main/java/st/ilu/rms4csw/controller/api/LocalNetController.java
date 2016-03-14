@@ -11,10 +11,9 @@ import st.ilu.rms4csw.util.NetworkUtil;
  * Created by hannes on 14.03.16.
  */
 @Controller
-@RequestMapping("/api/v1/" + LocalNetController.API_BASE)
+@RequestMapping("/api/v1/localnet")
 public class LocalNetController {
 
-    public static final String API_BASE = "localnet";
     @RequestMapping()
     public ResponseEntity<Void> localNet() {
         if(NetworkUtil.isLocalNetworkRequest()) {
