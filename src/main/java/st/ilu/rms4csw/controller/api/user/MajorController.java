@@ -1,10 +1,13 @@
 package st.ilu.rms4csw.controller.api.user;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.ChangeSet;
+import st.ilu.rms4csw.controller.base.response.BadRequestResponse;
 import st.ilu.rms4csw.model.major.Major;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +48,11 @@ public class MajorController extends AbstractCRUDCtrl<Major> {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @PreAuthorize("hasAuthority('OP_TEAM')")
     public ResponseEntity delete(@PathVariable("id") String id) {
-        return super.delete(id);
+        try {
+            return super.delete(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new BadRequestResponse("Es gibt noch Benutzer mit diesem Studienfach. Es kann nicht gelöscht werden.");
+        }
     }
 
     @Override

@@ -1,10 +1,12 @@
 package st.ilu.rms4csw.controller.api.device;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.ChangeSet;
+import st.ilu.rms4csw.controller.base.response.BadRequestResponse;
 import st.ilu.rms4csw.model.devicecategory.DeviceCategory;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +45,11 @@ public class DeviceCategoryController extends AbstractCRUDCtrl<DeviceCategory> {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @PreAuthorize("hasAuthority('OP_TEAM')")
     public ResponseEntity delete(@PathVariable String id) {
-        return super.delete(id);
+        try {
+            return super.delete(id);
+        } catch(DataIntegrityViolationException e) {
+            throw new BadRequestResponse("Kategorien mit Geräten können nicht gelöscht werden. Bitte lösche zuerst alle Geräte.");
+        }
     }
 
     @Override
