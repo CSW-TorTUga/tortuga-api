@@ -15,10 +15,10 @@ import st.ilu.rms4csw.util.NetworkUtil;
 public class LocalNetController {
 
     @RequestMapping()
-    public ResponseEntity<Void> localNet() {
+    public ResponseEntity<String> localNet() {
         if(NetworkUtil.isLocalNetworkRequest()) {
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<String>("true", HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        return new ResponseEntity<String>("false", HttpStatus.OK);
     }
 }
