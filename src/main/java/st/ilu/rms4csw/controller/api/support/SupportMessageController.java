@@ -12,6 +12,7 @@ import st.ilu.rms4csw.service.EmailService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -42,6 +43,9 @@ public class SupportMessageController extends AbstractCRUDCtrl<SupportMessage> {
     @Override
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<SupportMessage> post(@RequestBody SupportMessage newEntity, HttpServletResponse response) {
+        if(newEntity.getOpenedAt() == null) {
+            newEntity.setOpenedAt(new Date());
+        }
         return super.post(newEntity, response);
     }
 
