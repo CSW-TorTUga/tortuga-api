@@ -51,7 +51,7 @@ public class EntitiesDontUsePrimitivesTest {
 
         List<Result> results = new ArrayList<>();
 
-        for(BeanDefinition bd : scanner.findCandidateComponents("st.ilu.rms4csw")) {
+        for(BeanDefinition bd : scanner.findCandidateComponents("de.computerstudienwerkstatt.tortuga")) {
             String className = bd.getBeanClassName();
             Class<?> clazz = this.getClass().getClassLoader().loadClass(className);
             Result result = testForPrimitivesInClass(clazz);

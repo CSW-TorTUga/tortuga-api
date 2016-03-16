@@ -47,7 +47,7 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
-    @PostFilter("filterObject.role != T(st.ilu.rms4csw.model.user.Role).DELETED && (filterObject.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM'))")
+    @PostFilter("filterObject.role != T(de.computerstudienwerkstatt.tortuga.model.user.Role).DELETED && (filterObject.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM'))")
     public List<User> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
@@ -90,7 +90,7 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
-    @PreAuthorize("(hasAuthority('OP_TEAM') && #user.getRole() != T(st.ilu.rms4csw.model.user.Role).ADMIN) || hasAuthority('OP_ADMIN')")
+    @PreAuthorize("(hasAuthority('OP_TEAM') && #user.getRole() != T(de.computerstudienwerkstatt.tortuga.model.user.Role).ADMIN) || hasAuthority('OP_ADMIN')")
     public ResponseEntity<User> post(@RequestBody User user, HttpServletResponse response) {
         if(user.getRole() == Role.STUDENT) {
             Date expires = User.calculateNextSemesterEnd(new Date());
