@@ -1,7 +1,6 @@
 package st.ilu.rms4csw.controller.api.user;
 
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +8,8 @@ import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.ChangeSet;
 import st.ilu.rms4csw.controller.base.response.BadRequestResponse;
 import st.ilu.rms4csw.model.major.Major;
+import st.ilu.rms4csw.model.user.User;
+import st.ilu.rms4csw.repository.user.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +23,8 @@ import java.util.List;
 public class MajorController extends AbstractCRUDCtrl<Major> {
 
 	public final static String API_BASE = "majors";
+
+    private UserRepository userRepository;
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
@@ -48,11 +51,12 @@ public class MajorController extends AbstractCRUDCtrl<Major> {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @PreAuthorize("hasAuthority('OP_TEAM')")
     public ResponseEntity delete(@PathVariable("id") String id) {
-        try {
-            return super.delete(id);
-        } catch (DataIntegrityViolationException e) {
-            throw new BadRequestResponse("Es gibt noch Benutzer mit diesem Studienfach. Es kann nicht gelöscht werden.");
+        List<User> users = userRepository.findAllByMajorId(id);
+        if(users.size() > 0) {
+            throw new BadRequestResponse("Es existieren noch Benutzer, die diesen Studiengang haben. Diese Benutzer müssen gelöscht oder bearbeitet werden bevor der Studiengang gelöscht werden kann.");
         }
+
+        return super.delete(id);
     }
 
     @Override
@@ -65,5 +69,10 @@ public class MajorController extends AbstractCRUDCtrl<Major> {
     @Override
     public String getApiBase() {
         return API_BASE;
+    }
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 }

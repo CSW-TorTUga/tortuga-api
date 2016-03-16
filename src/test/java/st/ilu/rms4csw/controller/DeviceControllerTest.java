@@ -198,4 +198,12 @@ public class DeviceControllerTest {
         mockMvc.perform(get("/api/v1/devices/" + one.getId()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void testDeleteDeviceCategoryWithExistingDevices() throws Exception {
+        mockMvc.perform(delete("/api/v1/devicecategories/" + deviceCategory.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }

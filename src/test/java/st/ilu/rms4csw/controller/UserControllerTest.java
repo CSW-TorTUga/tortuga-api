@@ -286,6 +286,11 @@ public class UserControllerTest {
     }
 
     @Test
+    public void testDeleteMajorWithExistingUsers() throws Exception {
+        mockMvc.perform(delete("/api/v1/majors/" + major1.getId())).andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void testPatchUserWithExpirationDate() throws Exception {
         User patch = new User();
         patch.setId(null);

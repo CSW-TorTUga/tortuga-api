@@ -1,13 +1,15 @@
 package st.ilu.rms4csw.controller.api.device;
 
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import st.ilu.rms4csw.controller.base.AbstractCRUDCtrl;
 import st.ilu.rms4csw.controller.base.ChangeSet;
 import st.ilu.rms4csw.controller.base.response.BadRequestResponse;
+import st.ilu.rms4csw.model.device.Device;
 import st.ilu.rms4csw.model.devicecategory.DeviceCategory;
+import st.ilu.rms4csw.repository.device.DeviceRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +23,8 @@ import java.util.List;
 public class DeviceCategoryController extends AbstractCRUDCtrl<DeviceCategory> {
 
     public static final String API_BASE = "devicecategories";
+
+    private DeviceRepository deviceRepository;
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
@@ -45,11 +49,12 @@ public class DeviceCategoryController extends AbstractCRUDCtrl<DeviceCategory> {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @PreAuthorize("hasAuthority('OP_TEAM')")
     public ResponseEntity delete(@PathVariable String id) {
-        try {
-            return super.delete(id);
-        } catch(DataIntegrityViolationException e) {
-            throw new BadRequestResponse("Kategorien mit Geräten können nicht gelöscht werden. Bitte lösche zuerst alle Geräte.");
+        List<Device> devices = deviceRepository.findByCategoryId(id);
+        if(devices.size() > 0) {
+            throw new BadRequestResponse("Diese Gerätekategorie beinhaltet noch Geräte, die zunächst gelöscht werden müssen.");
         }
+
+        return super.delete(id);
     }
 
     @Override
@@ -62,5 +67,10 @@ public class DeviceCategoryController extends AbstractCRUDCtrl<DeviceCategory> {
     @Override
     public String getApiBase() {
         return API_BASE;
+    }
+
+    @Autowired
+    public void setDeviceRepository(DeviceRepository deviceRepository) {
+        this.deviceRepository = deviceRepository;
     }
 }
