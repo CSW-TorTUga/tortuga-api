@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>st.ilu.rms4csw</groupId>
-	<artifactId>rms4csw-api</artifactId>
+	<groupId>de.computerstudienwerkstatt.tortuga</groupId>
+	<artifactId>tortuga-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>rms4csw-api</name>
-	<description>RMS4CSW server</description>
+	<name>tortuga-api</name>
+	<description>TorTUga server</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
