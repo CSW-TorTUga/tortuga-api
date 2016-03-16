@@ -129,7 +129,7 @@ public class RestExceptionHandler {
     @ResponseBody
     public ResponseEntity<ErrorResponse> notFoundExceptionHandler(Exception e) throws Exception {
         String msg = e.getMessage();
-        if(msg.isEmpty()) {
+        if(msg == null || msg.isEmpty()) {
             msg = "Resource not found";
         }
         return handleException(HttpStatus.NOT_FOUND, msg, e);
