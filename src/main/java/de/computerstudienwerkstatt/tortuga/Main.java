@@ -14,7 +14,7 @@ public class Main {
             return envBase;
         }
 
-        return "http://localhost:7081/api/v1";
+        return "http://localhost:2222/api/v1";
     }
 
     public static void main(String[] args) {
