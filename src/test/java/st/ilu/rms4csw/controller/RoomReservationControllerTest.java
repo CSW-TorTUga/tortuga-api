@@ -177,14 +177,30 @@ public class RoomReservationControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(4)))
-                .andExpect(jsonPath("$[0].timeSpan.beginning", is(TestHelper.getDate().getTime())))
                 .andExpect(jsonPath("$[0].sharedId", is(sharedId)))
-                .andExpect(jsonPath("$[1].timeSpan.beginning", is(TestHelper.getDate(1 * 7 * 24 * 60 * 60 * 1000).getTime())))
                 .andExpect(jsonPath("$[1].sharedId", is(sharedId)))
-                .andExpect(jsonPath("$[2].timeSpan.beginning", is(TestHelper.getDate(2 * 7 * 24 * 60 * 60 * 1000).getTime())))
                 .andExpect(jsonPath("$[2].sharedId", is(sharedId)))
-                .andExpect(jsonPath("$[3].timeSpan.beginning", is(TestHelper.getDate(3 * 7 * 24 * 60 * 60 * 1000).getTime())))
-                .andExpect(jsonPath("$[3].sharedId", is(sharedId)));
+                .andExpect(jsonPath("$[3].sharedId", is(sharedId)))
+                .andExpect(jsonPath("$[0].timeSpan.beginning", anyOf(
+                        is(TestHelper.getDate().getTime()),
+                        is(TestHelper.getDate(- 3_600_000).getTime()),
+                        is(TestHelper.getDate(3_600_000).getTime())
+                )))
+                .andExpect(jsonPath("$[1].timeSpan.beginning", anyOf(
+                        is(TestHelper.getDate(1 * 7 * 24 * 60 * 60 * 1000).getTime()),
+                        is(TestHelper.getDate(1 * 7 * 24 * 60 * 60 * 1000 - 3_600_000).getTime()),
+                        is(TestHelper.getDate(1 * 7 * 24 * 60 * 60 * 1000 + 3_600_000).getTime())
+                )))
+                .andExpect(jsonPath("$[2].timeSpan.beginning", anyOf(
+                        is(TestHelper.getDate(2 * 7 * 24 * 60 * 60 * 1000).getTime()),
+                        is(TestHelper.getDate(2 * 7 * 24 * 60 * 60 * 1000 - 3_600_000).getTime()),
+                        is(TestHelper.getDate(2 * 7 * 24 * 60 * 60 * 1000 + 3_600_000).getTime())
+                )))
+                .andExpect(jsonPath("$[3].timeSpan.beginning", anyOf(
+                        is(TestHelper.getDate(3 * 7 * 24 * 60 * 60 * 1000).getTime()),
+                        is(TestHelper.getDate(3 * 7 * 24 * 60 * 60 * 1000 - 3_600_000).getTime()),
+                        is(TestHelper.getDate(3 * 7 * 24 * 60 * 60 * 1000 + 3_600_000).getTime())
+                )));
     }
 
     @Test
