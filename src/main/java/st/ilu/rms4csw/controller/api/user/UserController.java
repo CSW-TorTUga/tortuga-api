@@ -17,14 +17,13 @@ import st.ilu.rms4csw.model.user.Role;
 import st.ilu.rms4csw.model.user.User;
 import st.ilu.rms4csw.security.LoggedInUserHolder;
 import st.ilu.rms4csw.service.PasscodeService;
-import st.ilu.rms4csw.service.UserService;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Mischa Holz
@@ -48,7 +47,7 @@ public class UserController extends AbstractCRUDCtrl<User> {
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
-    @PostFilter("filterObject.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
+    @PostFilter("filterObject.role != T(st.ilu.rms4csw.model.user.Role).DELETED && (filterObject.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM'))")
     public List<User> findAll(HttpServletRequest request) {
         return super.findAll(request);
     }
@@ -57,7 +56,11 @@ public class UserController extends AbstractCRUDCtrl<User> {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @PostAuthorize("returnObject.id.equals(authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
     public User findOne(@PathVariable("id") String id) {
-        return super.findOne(id);
+        User user = super.findOne(id);
+        if(user.getRole() == Role.DELETED) {
+            throw new NotFoundResponse();
+        }
+        return user;
     }
 
     @RequestMapping(value = "/{id}/passcode", method = RequestMethod.POST)
@@ -105,7 +108,28 @@ public class UserController extends AbstractCRUDCtrl<User> {
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @PreAuthorize("@userService.canUserDelete(authentication.getDetails(), #id)")
 	public ResponseEntity delete(@PathVariable("id") String id) {
-        return super.delete(id);
+        User user = repository.findOne(id);
+
+        if(user == null) {
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+
+        user.setRole(Role.DELETED);
+        user.setPassword(UUID.randomUUID().toString());
+        user.setPhoneNumber("0");
+        user.setExpirationDate(Optional.empty());
+        user.setStudentId(Optional.empty());
+        user.setPasscode(Optional.empty());
+        user.setEmail("deleted-" + UUID.randomUUID().toString() + "@csw.de");
+        user.setEnabled(false);
+        user.setFirstName("Deleted");
+        user.setLastName("User");
+        user.setMajor(Optional.empty());
+        user.setLoginName("deleted-" + UUID.randomUUID().toString());
+
+        repository.save(user);
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
 	}
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
