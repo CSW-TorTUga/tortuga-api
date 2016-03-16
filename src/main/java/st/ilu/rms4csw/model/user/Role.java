@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public enum Role {
 
 
+    DELETED,
     STUDENT("OP_STUDENT"),
     LECTURER("OP_STUDENT", "OP_LECTURER"),
     CSW_TEAM("OP_STUDENT", "OP_LECTURER", "OP_TEAM"),
