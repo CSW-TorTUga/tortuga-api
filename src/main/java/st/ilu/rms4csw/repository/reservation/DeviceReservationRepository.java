@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import st.ilu.rms4csw.model.reservation.DeviceReservation;
 import st.ilu.rms4csw.repository.base.JpaSpecificationRepository;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,4 +22,8 @@ public interface DeviceReservationRepository extends JpaSpecificationRepository<
     List<DeviceReservation> findAllByUserIdAndDeviceCategoryId(@Param("userId") String userId, @Param("deviceCategoryId") String deviceCategoryId, Sort sort);
 
     List<DeviceReservation> findAllByDeviceIdAndBorrowed(@Param("deviceId") String deviceId, @Param("borrowed") Boolean borrowed);
+
+    List<DeviceReservation> findAllByDeviceIdAndTimeSpanEndLessThan(String deviceId, Date date);
+
+    List<DeviceReservation> findAllByDeviceIdAndTimeSpanBeginningGreaterThan(String deviceId, Date date);
 }

@@ -431,4 +431,12 @@ public class DeviceReservationControllerTest {
                 .andExpect(status().is4xxClientError());
 
     }
+
+    @Test
+    public void testDeleteDeviceWithFutureReservations() throws Exception {
+        mockMvc.perform(delete("/api/v1/devices/" + device.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }

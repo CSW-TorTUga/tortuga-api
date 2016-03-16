@@ -111,6 +111,17 @@ public class DeviceController extends AbstractCRUDCtrl<Device> {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @PreAuthorize("hasAuthority('OP_TEAM')")
     public ResponseEntity delete(@PathVariable("id") String id) {
+        List<DeviceReservation> futureReservations =
+                deviceReservationRepository.findAllByDeviceIdAndTimeSpanBeginningGreaterThan(id, new Date());
+        if(futureReservations.size() > 0) {
+            throw new BadRequestResponse("Dieses Gerät hat noch Reservierungen, die in der Zukunft liegen. Diese müssen gelöscht werden.");
+        }
+
+        List<DeviceReservation> oldReservations =
+                deviceReservationRepository.findAllByDeviceIdAndTimeSpanEndLessThan(id, new Date());
+
+        deviceReservationRepository.delete(oldReservations);
+
         return super.delete(id);
     }
 
