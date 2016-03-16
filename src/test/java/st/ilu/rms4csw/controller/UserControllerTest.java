@@ -281,6 +281,11 @@ public class UserControllerTest {
     }
 
     @Test
+    public void testDeleteNonExistingUser() throws Exception {
+        mockMvc.perform(delete("/api/v1/users/bla")).andExpect(status().isNoContent());
+    }
+
+    @Test
     public void testPatchUserWithExpirationDate() throws Exception {
         User patch = new User();
         patch.setId(null);
