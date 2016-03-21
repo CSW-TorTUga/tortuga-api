@@ -87,7 +87,7 @@ public class EmailService {
         Store store = session.getStore("imap");
         store.connect(imapHost, imapUser, imapPassword);
 
-        IMAPFolder folder = (IMAPFolder) store.getDefaultFolder();
+        IMAPFolder folder = (IMAPFolder) store.getFolder("inbox");
         folder.open(IMAPFolder.READ_ONLY);
         Message[] messages = folder.getMessages();
 
