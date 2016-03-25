@@ -1,5 +1,7 @@
 package de.computerstudienwerkstatt.tortuga.controller.api.terminal;
 
+import de.computerstudienwerkstatt.tortuga.model.statistics.AuthType;
+import de.computerstudienwerkstatt.tortuga.repository.statistics.DoorAuthorisationAttemptRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,8 @@ public class TerminalController {
 
     private LoggedInUserHolder loggedInUserHolder;
 
+    private DoorAuthorisationAttemptRepository attemptLogger;
+
     @RequestMapping(value = "/door", method = RequestMethod.PATCH)
     public ResponseEntity<Void> openDoorWithOpenRoomReservation(
             @RequestParam(value = "token", required = false) Long token,
@@ -52,10 +56,16 @@ public class TerminalController {
             Optional<User> user = passcodeService.getUserFromPasscode(passcode);
             if(!user.isPresent()) {
                 logger.info("Wrong passcode entered");
+
+                attemptLogger.logUnsuccessful(AuthType.EMOJIS, Optional.empty());
+
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
             logger.info("DOOR: Opening with passcode");
+
+            attemptLogger.logSuccessful(AuthType.EMOJIS, user);
+
             doorOpener.openRoomDoor();
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -68,6 +78,8 @@ public class TerminalController {
             if(!user.isPresent()) {
                 logger.info("User is not logged in");
 
+                attemptLogger.logUnsuccessful(AuthType.QR_CODE, Optional.empty());
+
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
@@ -75,10 +87,14 @@ public class TerminalController {
                 logger.info("DOOR: Opening with token");
                 doorOpener.openRoomDoorWithoutCheckingNetwork();
 
+                attemptLogger.logSuccessful(AuthType.QR_CODE, user);
+
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
 
             logger.info("Token is invalid");
+
+            attemptLogger.logUnsuccessful(AuthType.QR_CODE, user);
 
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -89,10 +105,15 @@ public class TerminalController {
                 .isPresent()) {
 
             logger.info("DOOR: Opening with open room reservation");
+
+            attemptLogger.logSuccessful(AuthType.ROOM_RESERVATION, Optional.empty());
+
             doorOpener.openRoomDoor();
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+
+        attemptLogger.logUnsuccessful(AuthType.EMOJIS, Optional.empty());
 
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
@@ -131,5 +152,10 @@ public class TerminalController {
     @Autowired
     public void setLoggedInUserHolder(@SuppressWarnings("SpringJavaAutowiringInspection") LoggedInUserHolder loggedInUserHolder) {
         this.loggedInUserHolder = loggedInUserHolder;
+    }
+
+    @Autowired
+    public void setDoorAuthorisationAttemptRepository(DoorAuthorisationAttemptRepository doorAuthorisationAttemptRepository) {
+        this.attemptLogger = doorAuthorisationAttemptRepository;
     }
 }

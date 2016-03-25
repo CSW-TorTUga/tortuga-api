@@ -7,6 +7,7 @@ import de.computerstudienwerkstatt.tortuga.controller.base.advice.RestExceptionH
 import de.computerstudienwerkstatt.tortuga.model.major.Major;
 import de.computerstudienwerkstatt.tortuga.model.user.Gender;
 import de.computerstudienwerkstatt.tortuga.model.user.User;
+import de.computerstudienwerkstatt.tortuga.repository.statistics.DoorAuthorisationAttemptRepository;
 import de.computerstudienwerkstatt.tortuga.repository.user.MajorRepository;
 import de.computerstudienwerkstatt.tortuga.repository.user.UserRepository;
 import org.hamcrest.Matchers;
@@ -61,6 +62,9 @@ public class UserControllerTest {
     @Autowired
     private MockLoggedInUserHolder loggedInUserHolder;
 
+    @Autowired
+    private DoorAuthorisationAttemptRepository doorAuthorisationAttemptRepository;
+
 
     private MockMvc mockMvc;
 
@@ -77,6 +81,7 @@ public class UserControllerTest {
 
     @Before
     public void setUp() throws Exception {
+        doorAuthorisationAttemptRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
         majorRepository.deleteAllInBatch();
 
@@ -121,6 +126,7 @@ public class UserControllerTest {
 
     @After
     public void tearDown() throws Exception {
+        doorAuthorisationAttemptRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
         majorRepository.deleteAllInBatch();
     }

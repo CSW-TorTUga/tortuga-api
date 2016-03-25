@@ -2,6 +2,7 @@ package de.computerstudienwerkstatt.tortuga.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.computerstudienwerkstatt.tortuga.model.reservation.DeviceReservation;
+import de.computerstudienwerkstatt.tortuga.repository.statistics.DoorAuthorisationAttemptRepository;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
@@ -84,6 +85,9 @@ public class DeviceReservationControllerTest {
     @Autowired
     private MockLoggedInUserHolder mockLoggedInUserHolder;
 
+    @Autowired
+    private DoorAuthorisationAttemptRepository doorAuthorisationAttemptRepository;
+
 
     @Before
     public void setUp() throws Exception {
@@ -93,6 +97,7 @@ public class DeviceReservationControllerTest {
 
         deviceRepository.deleteAllInBatch();
         deviceCategoryRepository.deleteAllInBatch();
+        doorAuthorisationAttemptRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
 
         mockLoggedInUserHolder.setUp();
@@ -136,6 +141,7 @@ public class DeviceReservationControllerTest {
 
         deviceRepository.deleteAllInBatch();
         deviceCategoryRepository.deleteAllInBatch();
+        doorAuthorisationAttemptRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
     }
 

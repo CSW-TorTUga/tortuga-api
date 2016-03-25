@@ -9,6 +9,7 @@ import de.computerstudienwerkstatt.tortuga.model.reservation.RoomReservation;
 import de.computerstudienwerkstatt.tortuga.model.reservation.TimeSpan;
 import de.computerstudienwerkstatt.tortuga.model.user.User;
 import de.computerstudienwerkstatt.tortuga.repository.reservation.RoomReservationRepository;
+import de.computerstudienwerkstatt.tortuga.repository.statistics.DoorAuthorisationAttemptRepository;
 import de.computerstudienwerkstatt.tortuga.repository.user.UserRepository;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -68,9 +69,13 @@ public class RoomReservationControllerTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private DoorAuthorisationAttemptRepository doorAuthorisationAttemptRepository;
+
     @Before
     public void setUp() throws Exception {
         roomReservationRepository.deleteAllInBatch();
+        doorAuthorisationAttemptRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
 
         mockLoggedInUserHolder.setUp();
@@ -100,6 +105,7 @@ public class RoomReservationControllerTest {
     @After
     public void tearDown() throws Exception {
         roomReservationRepository.deleteAllInBatch();
+        doorAuthorisationAttemptRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
     }
 

@@ -1,6 +1,7 @@
 package de.computerstudienwerkstatt.tortuga;
 
 import de.computerstudienwerkstatt.tortuga.model.user.User;
+import de.computerstudienwerkstatt.tortuga.repository.statistics.DoorAuthorisationAttemptRepository;
 import de.computerstudienwerkstatt.tortuga.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ public class MockLoggedInUserHolder implements LoggedInUserHolder {
     private User user = TestHelper.createLoginUser();
 
     private UserRepository userRepository;
+
+    private DoorAuthorisationAttemptRepository doorAuthorisationAttemptRepository;
 
     @Override
     public Optional<User> getLoggedInUser() {
@@ -36,6 +39,7 @@ public class MockLoggedInUserHolder implements LoggedInUserHolder {
     }
 
     public void setUp() {
+        doorAuthorisationAttemptRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
 
         user = TestHelper.createLoginUser();
@@ -44,6 +48,8 @@ public class MockLoggedInUserHolder implements LoggedInUserHolder {
     }
 
     public void tearDown() {
+        doorAuthorisationAttemptRepository.deleteAllInBatch();
+
         if(user != null) {
             userRepository.delete(user);
         }
@@ -54,5 +60,10 @@ public class MockLoggedInUserHolder implements LoggedInUserHolder {
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setDoorAuthorisationAttemptRepository(DoorAuthorisationAttemptRepository doorAuthorisationAttemptRepository) {
+        this.doorAuthorisationAttemptRepository = doorAuthorisationAttemptRepository;
     }
 }

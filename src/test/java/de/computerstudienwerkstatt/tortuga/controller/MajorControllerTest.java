@@ -3,6 +3,7 @@ package de.computerstudienwerkstatt.tortuga.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.computerstudienwerkstatt.tortuga.TestContext;
 import de.computerstudienwerkstatt.tortuga.model.major.Major;
+import de.computerstudienwerkstatt.tortuga.repository.statistics.DoorAuthorisationAttemptRepository;
 import de.computerstudienwerkstatt.tortuga.repository.user.MajorRepository;
 import de.computerstudienwerkstatt.tortuga.repository.user.UserRepository;
 import org.hamcrest.Matchers;
@@ -54,8 +55,12 @@ public class MajorControllerTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private DoorAuthorisationAttemptRepository doorAuthorisationAttemptRepository;
+
     @Before
     public void setUp() throws Exception {
+        doorAuthorisationAttemptRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
         majorRepository.deleteAllInBatch();
 
@@ -72,6 +77,7 @@ public class MajorControllerTest {
 
     @After
     public void tearDown() throws Exception {
+        doorAuthorisationAttemptRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
         majorRepository.deleteAllInBatch();
     }
