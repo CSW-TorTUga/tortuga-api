@@ -65,8 +65,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 
         try {
             Thread.sleep(400);
-        } catch(InterruptedException e) {
-            e.printStackTrace();
+        } catch(InterruptedException ignored) {
         }
 
         LoginRequest loginRequest = objectMapper.readValue(httpServletRequest.getInputStream(), LoginRequest.class);
