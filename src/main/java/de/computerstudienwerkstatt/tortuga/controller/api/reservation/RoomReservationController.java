@@ -128,7 +128,7 @@ public class RoomReservationController extends AbstractCRUDCtrl<RoomReservation>
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    @PreAuthorize("hasAuthority('OP_TEAM')")
+    @PreAuthorize("@possessedEntityPermissionElevator.checkOwner(@roomReservationRepository, #id, authentication.getPrincipal()) || hasAuthority('OP_TEAM')")
     public RoomReservation patch(@PathVariable("id") String id, @RequestBody ChangeSet<RoomReservation> entity) {
         RoomReservation old = repository.findOne(id);
 
