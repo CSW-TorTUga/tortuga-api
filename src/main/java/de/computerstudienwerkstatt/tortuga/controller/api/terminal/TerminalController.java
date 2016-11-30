@@ -9,7 +9,6 @@ import de.computerstudienwerkstatt.tortuga.security.LoggedInUserHolder;
 import de.computerstudienwerkstatt.tortuga.service.PasscodeService;
 import de.computerstudienwerkstatt.tortuga.service.TimedTokenService;
 import de.computerstudienwerkstatt.tortuga.service.door.DoorOpener;
-import de.computerstudienwerkstatt.tortuga.util.NetworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,9 +119,10 @@ public class TerminalController {
 
     @RequestMapping(value = "/code", method = RequestMethod.GET)
     public ResponseEntity<Long> getCurrentDoorOpenCode(HttpServletRequest request) {
-        if(!NetworkUtil.isLocalNetworkRequest(request)) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
+        //TODO MAKE PROPER FIX
+        //if(!NetworkUtil.isLocalNetworkRequest(request)) {
+        //    return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        //}
 
         long currentCode = timedTokenService.getCurrentToken();
 
