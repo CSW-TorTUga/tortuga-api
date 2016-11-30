@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 public class LocalNetController {
     @RequestMapping
     public Boolean localNet(HttpServletRequest request) {
-        //TODO MAKE PROBER FIX
+        //TODO MAKE PROBER FIX,
         return true;
         // return NetworkUtil.isLocalNetworkRequest(request);
     }
