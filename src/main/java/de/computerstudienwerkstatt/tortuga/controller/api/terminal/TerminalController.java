@@ -109,7 +109,8 @@ public class TerminalController {
 
             attemptLogger.logSuccessful(AuthType.ROOM_RESERVATION, Optional.empty());
 
-            doorOpener.openRoomDoor();
+            doorOpener.openRoomDoorWithoutCheckingNetwork();
+            //doorOpener.openRoomDoor();
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
