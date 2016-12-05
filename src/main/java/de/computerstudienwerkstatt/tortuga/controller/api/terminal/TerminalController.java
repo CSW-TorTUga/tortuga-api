@@ -1,21 +1,20 @@
 package de.computerstudienwerkstatt.tortuga.controller.api.terminal;
 
 import de.computerstudienwerkstatt.tortuga.model.statistics.AuthType;
+import de.computerstudienwerkstatt.tortuga.model.terminal.OpenDoorRequest;
+import de.computerstudienwerkstatt.tortuga.model.user.User;
+import de.computerstudienwerkstatt.tortuga.repository.reservation.RoomReservationRepository;
 import de.computerstudienwerkstatt.tortuga.repository.statistics.DoorAuthorisationAttemptRepository;
+import de.computerstudienwerkstatt.tortuga.security.LoggedInUserHolder;
+import de.computerstudienwerkstatt.tortuga.service.PasscodeService;
+import de.computerstudienwerkstatt.tortuga.service.TimedTokenService;
+import de.computerstudienwerkstatt.tortuga.service.door.DoorOpener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import de.computerstudienwerkstatt.tortuga.model.terminal.OpenDoorRequest;
-import de.computerstudienwerkstatt.tortuga.model.user.User;
-import de.computerstudienwerkstatt.tortuga.repository.reservation.RoomReservationRepository;
-import de.computerstudienwerkstatt.tortuga.security.LoggedInUserHolder;
-import de.computerstudienwerkstatt.tortuga.service.PasscodeService;
-import de.computerstudienwerkstatt.tortuga.service.TimedTokenService;
-import de.computerstudienwerkstatt.tortuga.service.door.DoorOpener;
-import de.computerstudienwerkstatt.tortuga.util.NetworkUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
@@ -122,7 +121,7 @@ public class TerminalController {
 
     @RequestMapping(value = "/code", method = RequestMethod.GET)
     public ResponseEntity<Long> getCurrentDoorOpenCode(HttpServletRequest request) {
-        //TODO Make Proper Fix
+        //TODO MAKE PROPER FIX
         //if(!NetworkUtil.isLocalNetworkRequest(request)) {
         //    return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         //}
