@@ -66,7 +66,9 @@ public class TerminalController {
 
             attemptLogger.logSuccessful(AuthType.EMOJIS, user);
 
-            doorOpener.openRoomDoor();
+            doorOpener.openRoomDoorWithoutCheckingNetwork();
+
+            //doorOpener.openRoomDoor();
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
